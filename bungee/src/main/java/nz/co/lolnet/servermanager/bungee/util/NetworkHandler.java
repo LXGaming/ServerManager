@@ -44,9 +44,8 @@ public class NetworkHandler implements INetworkHandler {
         
         ServerManager.getInstance().getLogger().info("Processing {} for {}", packet.getCommand(), packet.getUser());
         if (packet.getCommand().equals("servermanager:terminate")) {
-            Toolbox.clearSecurityManager();
-            ServiceManager.schedule(() -> Toolbox.invokeHalt(1), 30000L, 0L, false);
-            Toolbox.invokeExit(1);
+            ServiceManager.schedule(() -> Runtime.getRuntime().halt(1), 30000L, 0L, false);
+            Runtime.getRuntime().exit(1);
             return;
         }
         

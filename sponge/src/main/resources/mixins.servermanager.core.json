@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.7.4",
+  "package": "nz.co.lolnet.servermanager.sponge.mixin.core",
+  "refmap": "mixins.servermanager.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "server.dedicated.MixinServerHangWatchdog"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

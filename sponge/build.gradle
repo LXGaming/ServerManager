@@ -1,15 +1,27 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            name = "minecraftforge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "spongepowered"
+            url = "https://repo.spongepowered.org/maven"
+        }
     }
 
     dependencies {
         classpath("com.github.jengelman.gradle.plugins:shadow:2.0.4")
+        classpath("net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT")
+        classpath("org.spongepowered:mixingradle:0.6-SNAPSHOT")
     }
 }
 
 apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: "java"
+apply plugin: "net.minecraftforge.gradle.forge"
+apply plugin: "org.spongepowered.mixin"
 apply plugin: "signing"
 
 sourceCompatibility = 1.8
@@ -19,11 +31,24 @@ group = "nz.co.lolnet"
 archivesBaseName = "ServerManager-Sponge"
 version = "2.0.0-DEV"
 
+minecraft {
+    version = "1.12.2-14.23.4.2705"
+    runDir = "run"
+    mappings = "snapshot_20171003"
+    makeObfSourceJar = false
+}
+
+mixin {
+    defaultObfuscationEnv = searge
+    disableRefMapWarning = true
+    add(sourceSets.main, "mixins.servermanager.refmap.json")
+}
+
 configurations {
     provided {
         compile.extendsFrom(provided)
     }
-    
+
     jar.enabled = false
     jar.dependsOn("shadowJar")
 }
@@ -40,9 +65,9 @@ dependencies {
     shadow(project(path: ":common")) {
         exclude(module: "gson")
     }
-
-    annotationProcessor("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
-    provided("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
+    
+    annotationProcessor("org.spongepowered:spongecommon:7.1.0-SNAPSHOT:dev")
+    provided("org.spongepowered:spongecommon:7.1.0-SNAPSHOT:dev")
     shadow("redis.clients:jedis:2.9.0")
 }
 
@@ -55,11 +80,22 @@ shadowJar {
 }
 
 jar {
+    manifest {
+        attributes(
+                "FMLCorePluginContainsFMLMod": true,
+                "ForceLoadAsMod": true,
+                "MixinConfigs": "mixins.servermanager.core.json",
+                "TweakClass": "org.spongepowered.asm.launch.MixinTweaker"
+        )
+    }
+
     from {
         (configurations.compile - configurations.provided).collect {
             it.isDirectory() ? it : zipTree(it)
         }
     }
+
+    exclude("dummyThing")
 }
 
 processResources {

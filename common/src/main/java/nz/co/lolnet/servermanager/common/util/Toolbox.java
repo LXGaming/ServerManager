@@ -19,10 +19,7 @@ package nz.co.lolnet.servermanager.common.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import nz.co.lolnet.servermanager.common.AbstractServerManager;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.file.Path;
@@ -39,36 +36,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Toolbox {
-    
-    public static void clearSecurityManager() {
-        try {
-            Field field = System.class.getDeclaredField("security");
-            field.setAccessible(true);
-            field.set(null, null);
-        } catch (Exception ex) {
-            AbstractServerManager.getInstance().getLogger().error("Encountered an error processing {}::clearSecurityManager", "Toolbox", ex);
-        }
-    }
-    
-    public static void invokeExit(int status) {
-        try {
-            Method method = Runtime.class.getDeclaredMethod("exit", int.class);
-            method.setAccessible(true);
-            method.invoke(Runtime.getRuntime(), status);
-        } catch (Exception ex) {
-            AbstractServerManager.getInstance().getLogger().error("Encountered an error processing {}::invokeExit", "Toolbox", ex);
-        }
-    }
-    
-    public static void invokeHalt(int status) {
-        try {
-            Method method = Runtime.class.getDeclaredMethod("halt", int.class);
-            method.setAccessible(true);
-            method.invoke(Runtime.getRuntime(), status);
-        } catch (Exception ex) {
-            AbstractServerManager.getInstance().getLogger().error("Encountered an error processing {}::invokeHalt", "Toolbox", ex);
-        }
-    }
     
     public static String getAddress(SocketAddress socketAddress) {
         return getHost(socketAddress).orElse("Unknown") + ":" + getPort(socketAddress).orElse(0);

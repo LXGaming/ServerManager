@@ -1,4 +1,4 @@
-name: ${name}
+name: ServerManager
 main: nz.co.lolnet.servermanager.bungee.BungeePlugin
 version: ${version}
 description: ServerManager.

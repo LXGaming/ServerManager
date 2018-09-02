@@ -31,6 +31,10 @@ public class BungeePlugin extends Plugin implements Platform {
     @Override
     public void onLoad() {
         instance = this;
+    }
+    
+    @Override
+    public void onEnable() {
         ServerManager serverManager = new ServerManager();
         serverManager.getLogger()
                 .add(Logger.Level.INFO, getLogger()::info)
@@ -39,11 +43,6 @@ public class BungeePlugin extends Plugin implements Platform {
                 .add(Logger.Level.DEBUG, getLogger()::info);
         
         serverManager.loadServerManager();
-        ServerManager.getInstance().getRedisService().publish(StatePacket.of(State.LOAD_COMPLETE));
-    }
-    
-    @Override
-    public void onEnable() {
         ProxyServer.getInstance().getPluginManager().registerListener(this, new BungeeListener());
         ServerManager.getInstance().getRedisService().publish(StatePacket.of(State.SERVER_STARTED));
     }

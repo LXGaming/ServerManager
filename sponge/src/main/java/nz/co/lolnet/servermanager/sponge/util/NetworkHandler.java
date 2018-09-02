@@ -16,10 +16,11 @@
 
 package nz.co.lolnet.servermanager.sponge.util;
 
+import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.dedicated.ServerHangWatchdog;
 import nz.co.lolnet.servermanager.common.data.Platform;
 import nz.co.lolnet.servermanager.common.data.Server;
 import nz.co.lolnet.servermanager.common.data.User;
-import nz.co.lolnet.servermanager.common.managers.ServiceManager;
 import nz.co.lolnet.servermanager.common.network.INetworkHandler;
 import nz.co.lolnet.servermanager.common.network.packets.CommandPacket;
 import nz.co.lolnet.servermanager.common.network.packets.ForwardPacket;
@@ -28,6 +29,7 @@ import nz.co.lolnet.servermanager.common.network.packets.StatusPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.sponge.ServerManager;
 import nz.co.lolnet.servermanager.sponge.SpongePlugin;
+import nz.co.lolnet.servermanager.sponge.interfaces.server.dedicated.IMixinServerHangWatchdog;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 
@@ -45,9 +47,7 @@ public class NetworkHandler implements INetworkHandler {
         
         ServerManager.getInstance().getLogger().info("Processing {} for {}", packet.getCommand(), packet.getUser());
         if (packet.getCommand().equals("servermanager:terminate")) {
-            Toolbox.clearSecurityManager();
-            ServiceManager.schedule(() -> Toolbox.invokeHalt(1), 30000L, 0L, false);
-            Toolbox.invokeExit(1);
+            ((IMixinServerHangWatchdog) new ServerHangWatchdog((DedicatedServer) Sponge.getServer())).scheduleHalt();
             return;
         }
         

@@ -1,0 +1,7 @@
+name: ${name}
+main: nz.co.lolnet.servermanager.bungee.BungeePlugin
+version: ${version}
+description: ServerManager.
+author: LX_Gaming
+website: https://www.lolnet.co.nz/
+depends: [RedisBungee]

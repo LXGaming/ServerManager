@@ -49,6 +49,7 @@ configurations {
         compile.extendsFrom(provided)
     }
 
+    extractAnnotationsJar.enabled = false
     jar.enabled = false
     jar.dependsOn("shadowJar")
 }
@@ -65,7 +66,7 @@ dependencies {
     shadow(project(path: ":common")) {
         exclude(module: "gson")
     }
-    
+
     annotationProcessor("org.spongepowered:spongecommon:7.1.0-SNAPSHOT:dev")
     provided("org.spongepowered:spongecommon:7.1.0-SNAPSHOT:dev")
     shadow("redis.clients:jedis:2.9.0")
@@ -77,6 +78,10 @@ shadowJar {
     relocate("org.apache.commons.pool2", "nz.co.lolnet.servermanager.lib.commonspool2")
     relocate("redis.clients.jedis", "nz.co.lolnet.servermanager.lib.jedis")
     relocate("redis.clients.util", "nz.co.lolnet.servermanager.lib.jedisutil")
+}
+
+reobf {
+    shadowJar {}
 }
 
 jar {

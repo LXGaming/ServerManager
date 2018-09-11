@@ -17,7 +17,7 @@
 package nz.co.lolnet.servermanager.sponge.util;
 
 import com.google.common.collect.ImmutableList;
-import nz.co.lolnet.servermanager.common.util.Reference;
+import nz.co.lolnet.servermanager.api.util.Reference;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectCollection;

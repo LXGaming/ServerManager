@@ -18,7 +18,7 @@ package nz.co.lolnet.servermanager.sponge.configuration;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import nz.co.lolnet.servermanager.sponge.configuration.categories.RedisCategory;
+import nz.co.lolnet.servermanager.sponge.configuration.category.RedisCategory;
 
 @ConfigSerializable
 public class Config {

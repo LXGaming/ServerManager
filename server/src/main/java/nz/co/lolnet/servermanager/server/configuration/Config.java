@@ -16,7 +16,7 @@
 
 package nz.co.lolnet.servermanager.server.configuration;
 
-import nz.co.lolnet.servermanager.server.configuration.categories.RedisCategory;
+import nz.co.lolnet.servermanager.server.configuration.category.RedisCategory;
 
 public class Config {
     

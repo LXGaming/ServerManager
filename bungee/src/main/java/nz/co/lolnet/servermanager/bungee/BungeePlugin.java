@@ -19,10 +19,10 @@ package nz.co.lolnet.servermanager.bungee;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
-import nz.co.lolnet.servermanager.bungee.listeners.BungeeListener;
-import nz.co.lolnet.servermanager.common.data.Platform;
-import nz.co.lolnet.servermanager.common.network.packets.StatePacket;
-import nz.co.lolnet.servermanager.common.util.Logger;
+import nz.co.lolnet.servermanager.api.data.Platform;
+import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
+import nz.co.lolnet.servermanager.api.util.Logger;
+import nz.co.lolnet.servermanager.bungee.listener.BungeeListener;
 
 public class BungeePlugin extends Plugin implements Platform {
     
@@ -35,7 +35,7 @@ public class BungeePlugin extends Plugin implements Platform {
     
     @Override
     public void onEnable() {
-        ServerManager serverManager = new ServerManager();
+        ServerManagerImpl serverManager = new ServerManagerImpl();
         serverManager.getLogger()
                 .add(Logger.Level.INFO, getLogger()::info)
                 .add(Logger.Level.WARN, getLogger()::warning)
@@ -43,13 +43,14 @@ public class BungeePlugin extends Plugin implements Platform {
                 .add(Logger.Level.DEBUG, getLogger()::info);
         
         serverManager.loadServerManager();
+        serverManager.reloadServerManager();
         ProxyServer.getInstance().getPluginManager().registerListener(this, new BungeeListener());
-        ServerManager.getInstance().getRedisService().publish(StatePacket.of(State.SERVER_STARTED));
+        serverManager.getRedisService().publish(StatePacket.of(State.SERVER_STARTED));
     }
     
     @Override
     public void onDisable() {
-        ServerManager.getInstance().getRedisService().publish(StatePacket.of(State.SERVER_STOPPED));
+        ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.SERVER_STOPPED));
     }
     
     public static BungeePlugin getInstance() {

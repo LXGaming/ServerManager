@@ -16,10 +16,10 @@
 
 package nz.co.lolnet.servermanager.server;
 
-import nz.co.lolnet.servermanager.common.util.Logger;
-import nz.co.lolnet.servermanager.common.util.Reference;
+import nz.co.lolnet.servermanager.api.util.Logger;
+import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.server.configuration.Config;
-import nz.co.lolnet.servermanager.server.managers.CommandManager;
+import nz.co.lolnet.servermanager.server.manager.CommandManager;
 import nz.co.lolnet.servermanager.server.util.TerminalConsoleAppender;
 import org.apache.logging.log4j.LogManager;
 
@@ -27,7 +27,7 @@ public class Main {
     
     public static void main(String[] args) {
         Thread.currentThread().setName("Main Thread");
-        ServerManager serverManager = new ServerManager();
+        ServerManagerImpl serverManager = new ServerManagerImpl();
         serverManager.getLogger()
                 .add(Logger.Level.INFO, LogManager.getLogger(Reference.ID)::info)
                 .add(Logger.Level.WARN, LogManager.getLogger(Reference.ID)::warn)
@@ -35,6 +35,7 @@ public class Main {
                 .add(Logger.Level.DEBUG, LogManager.getLogger(Reference.ID)::debug);
         
         serverManager.loadServerManager();
+        serverManager.reloadServerManager();
         
         TerminalConsoleAppender.buildTerminal(Reference.NAME, serverManager.getConfig().map(Config::isJlineOverride).orElse(false));
         while (serverManager.getRunning().get()) {

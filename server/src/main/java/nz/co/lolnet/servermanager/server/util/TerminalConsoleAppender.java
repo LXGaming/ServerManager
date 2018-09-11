@@ -16,7 +16,7 @@
 
 package nz.co.lolnet.servermanager.server.util;
 
-import nz.co.lolnet.servermanager.server.ServerManager;
+import nz.co.lolnet.servermanager.api.ServerManager;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Core;
 import org.apache.logging.log4j.core.Filter;

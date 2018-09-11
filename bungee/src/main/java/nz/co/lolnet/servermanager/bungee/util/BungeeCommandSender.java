@@ -19,7 +19,7 @@ package nz.co.lolnet.servermanager.bungee.util;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
-import nz.co.lolnet.servermanager.common.util.Reference;
+import nz.co.lolnet.servermanager.api.util.Reference;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -16,8 +16,9 @@
 
 package nz.co.lolnet.servermanager.server.util;
 
-import nz.co.lolnet.servermanager.common.managers.ServiceManager;
-import nz.co.lolnet.servermanager.server.ServerManager;
+import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.common.manager.ServiceManager;
+import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.concurrent.TimeUnit;
@@ -35,8 +36,8 @@ public class ShutdownHook extends Thread {
     private void shutdownExecutorService() {
         try {
             ServiceManager.getScheduledExecutorService().shutdown();
-            ServerManager.getInstance().getRedisService().getJedisPool().close();
-            ServerManager.getInstance().getRedisService().getJedisPool().destroy();
+            ServerManagerImpl.getInstance().getRedisService().getJedisPool().close();
+            ServerManagerImpl.getInstance().getRedisService().getJedisPool().destroy();
             if (!ServiceManager.getScheduledExecutorService().awaitTermination(2000, TimeUnit.MILLISECONDS)) {
                 throw new InterruptedException();
             }

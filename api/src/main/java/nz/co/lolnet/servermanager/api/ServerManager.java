@@ -18,6 +18,7 @@ package nz.co.lolnet.servermanager.api;
 
 import nz.co.lolnet.servermanager.api.configuration.Configuration;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
+import nz.co.lolnet.servermanager.api.network.packet.AbstractPacket;
 import nz.co.lolnet.servermanager.api.util.Logger;
 
 import java.nio.file.Path;
@@ -28,7 +29,6 @@ public abstract class ServerManager {
     protected Logger logger;
     protected Path path;
     protected Configuration configuration;
-    protected NetworkHandler networkHandler;
     
     protected ServerManager() {
         instance = this;
@@ -37,6 +37,10 @@ public abstract class ServerManager {
     protected abstract void loadServerManager();
     
     public abstract void reloadServerManager();
+    
+    public abstract boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass);
+    
+    public abstract void sendPacket(AbstractPacket packet);
     
     public static ServerManager getInstance() {
         return instance;
@@ -52,9 +56,5 @@ public abstract class ServerManager {
     
     public Configuration getConfiguration() {
         return configuration;
-    }
-    
-    public NetworkHandler getNetworkHandler() {
-        return networkHandler;
     }
 }

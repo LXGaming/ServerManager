@@ -18,5 +18,5 @@ package nz.co.lolnet.servermanager.api.network;
 
 public interface Packet {
     
-    void process();
+    void process(NetworkHandler networkHandler);
 }

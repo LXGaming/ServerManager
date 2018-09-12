@@ -19,7 +19,8 @@ package nz.co.lolnet.servermanager.common.manager;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.network.packet.AbstractPacket;
+import nz.co.lolnet.servermanager.api.network.NetworkHandler;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.ForwardPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
@@ -32,7 +33,9 @@ import java.util.function.Consumer;
 
 public class PacketManager {
     
-    private static final Set<Class<? extends AbstractPacket>> PACKET_CLASSES = Toolbox.newHashSet();
+    private static final Set<NetworkHandler> NETWORK_HANDLERS = Toolbox.newHashSet();
+    private static final Set<Class<? extends NetworkHandler>> NETWORK_HANDLER_CLASSES = Toolbox.newHashSet();
+    private static final Set<Class<? extends Packet>> PACKET_CLASSES = Toolbox.newHashSet();
     
     public static void buildPackets() {
         registerPacket(CommandPacket.class);
@@ -41,55 +44,77 @@ public class PacketManager {
         registerPacket(StatusPacket.class);
     }
     
-    public static boolean process(JsonObject jsonObject) {
-        String packetId = Toolbox.parseJson(jsonObject.get("id"), String.class).orElse(null);
-        if (Toolbox.isBlank(packetId)) {
+    public static void process(JsonObject jsonObject) {
+        String packetClassName = Toolbox.parseJson(jsonObject.get("class"), String.class).orElse(null);
+        if (Toolbox.isBlank(packetClassName)) {
             ServerManager.getInstance().getLogger().warn("Received invalid packet");
-            return false;
+            return;
         }
         
-        Class<? extends AbstractPacket> packetClass = getPacket(packetId).orElse(null);
+        Class<? extends Packet> packetClass = getPacketClass(packetClassName).orElse(null);
         if (packetClass == null) {
-            ServerManager.getInstance().getLogger().warn("Cannot find packet class {}", packetId);
-            return false;
+            ServerManager.getInstance().getLogger().warn("Received packet with unknown class {}", packetClassName);
+            return;
         }
         
-        AbstractPacket packet = Toolbox.parseJson(jsonObject.get("data"), packetClass).orElse(null);
+        Packet packet = Toolbox.parseJson(jsonObject.get("data"), packetClass).orElse(null);
         if (packet == null) {
-            ServerManager.getInstance().getLogger().warn("Failed to deserialize packet {}", packetId);
-            return false;
+            ServerManager.getInstance().getLogger().warn("Failed to deserialize packet {}", packetClass.getName());
+            return;
         }
         
-        ServerManager.getInstance().getLogger().debug("Processing {}: {}", packetClass.getSimpleName(), new Gson().toJson(packet));
-        
-        try {
-            packet.process();
-            return true;
-        } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error processing {}::process", "PacketManager", ex);
-            return false;
+        ServerManager.getInstance().getLogger().debug("Processing {}", packetClass.getSimpleName());
+        for (NetworkHandler networkHandler : getNetworkHandlers()) {
+            try {
+                packet.process(networkHandler);
+            } catch (Throwable throwable) {
+                ServerManager.getInstance().getLogger().error("Encountered an error processing {}::process", networkHandler.getClass().getName(), throwable);
+            }
         }
     }
     
-    public static void sendPacket(AbstractPacket packet, Consumer<String> consumer) {
+    public static void sendPacket(Packet packet, Consumer<String> consumer) {
+        if (!getPacketClasses().contains(packet.getClass())) {
+            ServerManager.getInstance().getLogger().error("Can't serialize unregistered packet", packet.getClass().getSimpleName());
+            return;
+        }
+        
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("id", packet.getClass().getSimpleName());
+        jsonObject.addProperty("class", packet.getClass().getName());
         jsonObject.add("data", new Gson().toJsonTree(packet));
         consumer.accept(new Gson().toJson(jsonObject));
     }
     
-    public static boolean registerPacket(Class<? extends AbstractPacket> packetClass) {
-        if (getPacket(packetClass.getSimpleName()).isPresent()) {
-            ServerManager.getInstance().getLogger().warn("{} has already been registered", packetClass.getSimpleName());
+    public static boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass) {
+        if (getNetworkHandlerClasses().contains(networkHandlerClass)) {
+            ServerManager.getInstance().getLogger().warn("{} is already registered", networkHandlerClass.getSimpleName());
+            return false;
+        }
+        
+        getNetworkHandlerClasses().add(networkHandlerClass);
+        NetworkHandler networkHandler = Toolbox.newInstance(networkHandlerClass).orElse(null);
+        if (networkHandler == null) {
+            ServerManager.getInstance().getLogger().error("{} failed to initialize", networkHandlerClass.getSimpleName());
+            return false;
+        }
+        
+        getNetworkHandlers().add(networkHandler);
+        ServerManager.getInstance().getLogger().debug("{} registered", networkHandlerClass.getSimpleName());
+        return true;
+    }
+    
+    public static boolean registerPacket(Class<? extends Packet> packetClass) {
+        if (getPacketClasses().contains(packetClass)) {
+            ServerManager.getInstance().getLogger().warn("{} is already registered", packetClass.getSimpleName());
             return false;
         }
         
         return getPacketClasses().add(packetClass);
     }
     
-    public static Optional<Class<? extends AbstractPacket>> getPacket(String packetId) {
-        for (Class<? extends AbstractPacket> packetClass : getPacketClasses()) {
-            if (packetClass.getSimpleName().equals(packetId)) {
+    public static Optional<Class<? extends Packet>> getPacketClass(String packetClassName) {
+        for (Class<? extends Packet> packetClass : getPacketClasses()) {
+            if (packetClass.getName().equals(packetClassName)) {
                 return Optional.of(packetClass);
             }
         }
@@ -97,7 +122,15 @@ public class PacketManager {
         return Optional.empty();
     }
     
-    public static Set<Class<? extends AbstractPacket>> getPacketClasses() {
+    private static Set<NetworkHandler> getNetworkHandlers() {
+        return NETWORK_HANDLERS;
+    }
+    
+    private static Set<Class<? extends NetworkHandler>> getNetworkHandlerClasses() {
+        return NETWORK_HANDLER_CLASSES;
+    }
+    
+    private static Set<Class<? extends Packet>> getPacketClasses() {
         return PACKET_CLASSES;
     }
 }

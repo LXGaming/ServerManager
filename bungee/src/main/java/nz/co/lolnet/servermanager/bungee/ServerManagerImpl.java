@@ -17,6 +17,8 @@
 package nz.co.lolnet.servermanager.bungee;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.network.NetworkHandler;
+import nz.co.lolnet.servermanager.api.network.packet.AbstractPacket;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.bungee.configuration.BungeeConfiguration;
 import nz.co.lolnet.servermanager.bungee.configuration.Config;
@@ -36,7 +38,6 @@ public class ServerManagerImpl extends ServerManager {
         this.logger = new LoggerImpl();
         this.path = BungeePlugin.getInstance().getDataFolder().toPath();
         this.configuration = new BungeeConfiguration();
-        this.networkHandler = new NetworkHandlerImpl();
         this.redisService = new RedisService();
     }
     
@@ -45,6 +46,7 @@ public class ServerManagerImpl extends ServerManager {
         getLogger().info("Initializing...");
         getConfiguration().loadConfiguration();
         PacketManager.buildPackets();
+        registerNetworkHandler(NetworkHandlerImpl.class);
         ServiceManager.schedule(getRedisService());
         getConfiguration().saveConfiguration();
         getLogger().info("{} v{} has loaded", Reference.NAME, Reference.VERSION);
@@ -52,6 +54,21 @@ public class ServerManagerImpl extends ServerManager {
     
     @Override
     public void reloadServerManager() {
+        if (getConfig().map(Config::isDebug).orElse(false)) {
+            getLogger().debug("Debug mode enabled");
+        } else {
+            getLogger().info("Debug mode disabled");
+        }
+    }
+    
+    @Override
+    public boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass) {
+        return PacketManager.registerNetworkHandler(networkHandlerClass);
+    }
+    
+    @Override
+    public void sendPacket(AbstractPacket packet) {
+        getRedisService().publish(packet);
     }
     
     public static ServerManagerImpl getInstance() {

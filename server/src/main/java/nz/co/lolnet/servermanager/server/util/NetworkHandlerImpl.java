@@ -44,7 +44,7 @@ public class NetworkHandlerImpl implements NetworkHandler {
     
     @Override
     public void handleState(StatePacket packet) {
-        // throw new UnsupportedOperationException("Not supported");
+        ServerManager.getInstance().getLogger().info("Received State {} from {}", packet.getState().getFriendlyName(), packet.getSender());
     }
     
     @Override

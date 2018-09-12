@@ -17,10 +17,12 @@
 package nz.co.lolnet.servermanager.sponge;
 
 import com.google.inject.Inject;
+import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.api.util.Reference;
+import nz.co.lolnet.servermanager.sponge.configuration.Config;
 import nz.co.lolnet.servermanager.sponge.listener.SpongeListener;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
@@ -61,7 +63,11 @@ public class SpongePlugin implements Platform {
                 .add(Logger.Level.INFO, getPluginContainer().getLogger()::info)
                 .add(Logger.Level.WARN, getPluginContainer().getLogger()::warn)
                 .add(Logger.Level.ERROR, getPluginContainer().getLogger()::error)
-                .add(Logger.Level.DEBUG, getPluginContainer().getLogger()::debug);
+                .add(Logger.Level.DEBUG, message -> {
+                    if (ServerManagerImpl.getInstance().getConfig().map(Config::isDebug).orElse(false)) {
+                        getPluginContainer().getLogger().info(message);
+                    }
+                });
         
         serverManager.loadServerManager();
         serverManager.reloadServerManager();
@@ -75,31 +81,31 @@ public class SpongePlugin implements Platform {
     @Listener
     public void onGameState(GameStateEvent event) {
         if (event.getState() == GameState.CONSTRUCTION) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.CONSTRUCTION));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.CONSTRUCTION));
         } else if (event.getState() == GameState.PRE_INITIALIZATION) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.PRE_INITIALIZATION));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.PRE_INITIALIZATION));
         } else if (event.getState() == GameState.INITIALIZATION) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.INITIALIZATION));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.INITIALIZATION));
         } else if (event.getState() == GameState.POST_INITIALIZATION) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.POST_INITIALIZATION));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.POST_INITIALIZATION));
         } else if (event.getState() == GameState.LOAD_COMPLETE) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.LOAD_COMPLETE));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.LOAD_COMPLETE));
         } else if (event.getState() == GameState.SERVER_ABOUT_TO_START) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.SERVER_ABOUT_TO_START));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_ABOUT_TO_START));
         } else if (event.getState() == GameState.SERVER_STARTING) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.SERVER_STARTING));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_STARTING));
         } else if (event.getState() == GameState.SERVER_STARTED) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.SERVER_STARTED));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_STARTED));
         } else if (event.getState() == GameState.SERVER_STOPPING) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.SERVER_STOPPING));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_STOPPING));
         } else if (event.getState() == GameState.SERVER_STOPPED) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.SERVER_STOPPED));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_STOPPED));
         } else if (event.getState() == GameState.GAME_STOPPING) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.GAME_STOPPING));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.GAME_STOPPING));
         } else if (event.getState() == GameState.GAME_STOPPED) {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.GAME_STOPPED));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.GAME_STOPPED));
         } else {
-            ServerManagerImpl.getInstance().getRedisService().publish(StatePacket.of(State.UNKNOWN));
+            ServerManager.getInstance().sendPacket(StatePacket.of(State.UNKNOWN));
         }
     }
     

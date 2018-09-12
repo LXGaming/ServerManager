@@ -18,6 +18,7 @@ package nz.co.lolnet.servermanager.sponge.util;
 
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.ServerHangWatchdog;
+import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.data.User;
@@ -64,7 +65,7 @@ public class NetworkHandlerImpl implements NetworkHandler {
     @Override
     public void handleState(StatePacket packet) {
         packet.setState(Platform.State.valueOf(Sponge.getGame().getState().name()));
-        ServerManagerImpl.getInstance().getRedisService().publish(packet);
+        ServerManager.getInstance().sendPacket(packet);
     }
     
     @Override
@@ -83,6 +84,6 @@ public class NetworkHandlerImpl implements NetworkHandler {
             serverInfo.setVersion(Sponge.getPlatform().getMinecraftVersion().getName());
         }
         
-        ServerManagerImpl.getInstance().getRedisService().publish(packet);
+        ServerManager.getInstance().sendPacket(packet);
     }
 }

@@ -17,6 +17,7 @@
 package nz.co.lolnet.servermanager.bungee.util;
 
 import net.md_5.bungee.api.ProxyServer;
+import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.data.User;
@@ -60,7 +61,7 @@ public class NetworkHandlerImpl implements NetworkHandler {
     @Override
     public void handleState(StatePacket packet) {
         packet.setState(Platform.State.SERVER_STARTED);
-        ServerManagerImpl.getInstance().getRedisService().publish(packet);
+        ServerManager.getInstance().sendPacket(packet);
     }
     
     @Override
@@ -73,6 +74,6 @@ public class NetworkHandlerImpl implements NetworkHandler {
                 .map(proxiedPlayer -> User.of(proxiedPlayer.getName(), proxiedPlayer.getUniqueId()))
                 .collect(Collectors.toCollection(HashSet::new)));
         serverInfo.setVersion(BungeePlugin.getVersion());
-        ServerManagerImpl.getInstance().getRedisService().publish(packet);
+        ServerManager.getInstance().sendPacket(packet);
     }
 }

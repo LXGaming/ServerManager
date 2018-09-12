@@ -17,6 +17,8 @@
 package nz.co.lolnet.servermanager.server;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.network.NetworkHandler;
+import nz.co.lolnet.servermanager.api.network.packet.AbstractPacket;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.manager.ServiceManager;
@@ -43,7 +45,6 @@ public class ServerManagerImpl extends ServerManager {
         this.logger = new LoggerImpl();
         this.path = Toolbox.getPath().orElse(null);
         this.configuration = new ServerConfiguration();
-        this.networkHandler = new NetworkHandlerImpl();
         this.redisService = new RedisService();
         this.running = new AtomicBoolean(false);
     }
@@ -55,6 +56,7 @@ public class ServerManagerImpl extends ServerManager {
         getConfiguration().loadConfiguration();
         CommandManager.buildCommands();
         PacketManager.buildPackets();
+        registerNetworkHandler(NetworkHandlerImpl.class);
         ServiceManager.schedule(getRedisService());
         getConfiguration().saveConfiguration();
         getRunning().set(true);
@@ -70,6 +72,16 @@ public class ServerManagerImpl extends ServerManager {
             Configurator.setLevel(Reference.ID, Level.INFO);
             getLogger().info("Debug mode disabled");
         }
+    }
+    
+    @Override
+    public boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass) {
+        return PacketManager.registerNetworkHandler(networkHandlerClass);
+    }
+    
+    @Override
+    public void sendPacket(AbstractPacket packet) {
+        throw new UnsupportedOperationException("Not supported");
     }
     
     public static ServerManagerImpl getInstance() {

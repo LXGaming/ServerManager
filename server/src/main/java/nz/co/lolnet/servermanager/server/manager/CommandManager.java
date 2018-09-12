@@ -59,15 +59,15 @@ public class CommandManager {
         try {
             command.execute(arguments);
             return true;
-        } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error processing {}::process", "CommandManager", ex);
+        } catch (Throwable throwable) {
+            ServerManager.getInstance().getLogger().error("Encountered an error processing {}::process", "CommandManager", throwable);
             return false;
         }
     }
     
     public static boolean registerCommand(Class<? extends AbstractCommand> commandClass) {
         if (getCommandClasses().contains(commandClass)) {
-            ServerManager.getInstance().getLogger().warn("{} has already been registered", commandClass.getSimpleName());
+            ServerManager.getInstance().getLogger().warn("{} is already registered", commandClass.getSimpleName());
             return false;
         }
         
@@ -85,7 +85,7 @@ public class CommandManager {
     
     public static boolean registerAlias(AbstractCommand command, String alias) {
         if (Toolbox.containsIgnoreCase(command.getAliases(), alias)) {
-            ServerManager.getInstance().getLogger().warn("{} has already been registered for {}", alias, command.getClass().getSimpleName());
+            ServerManager.getInstance().getLogger().warn("{} is already registered for {}", alias, command.getClass().getSimpleName());
             return false;
         }
         
@@ -101,7 +101,7 @@ public class CommandManager {
         }
         
         if (getCommandClasses().contains(commandClass)) {
-            ServerManager.getInstance().getLogger().warn("{} has already been registered", commandClass.getSimpleName());
+            ServerManager.getInstance().getLogger().warn("{} is already registered", commandClass.getSimpleName());
             return false;
         }
         

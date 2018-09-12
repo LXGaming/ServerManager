@@ -16,7 +16,7 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
-import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class ForwardPacket extends AbstractPacket {
     
@@ -31,8 +31,8 @@ public class ForwardPacket extends AbstractPacket {
     }
     
     @Override
-    public void process() {
-        ServerManager.getInstance().getNetworkHandler().handleForward(this);
+    public void process(NetworkHandler networkHandler) {
+        networkHandler.handleForward(this);
     }
     
     public static ForwardPacket of(String server, String id, String data) {

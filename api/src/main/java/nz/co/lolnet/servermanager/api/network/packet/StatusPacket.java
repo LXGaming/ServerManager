@@ -16,8 +16,8 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
-import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
+import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class StatusPacket extends AbstractPacket {
     
@@ -28,8 +28,8 @@ public class StatusPacket extends AbstractPacket {
     }
     
     @Override
-    public void process() {
-        ServerManager.getInstance().getNetworkHandler().handleStatus(this);
+    public void process(NetworkHandler networkHandler) {
+        networkHandler.handleStatus(this);
     }
     
     public static StatusPacket of(ServerInfo serverInfo) {

@@ -16,8 +16,8 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
-import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.User;
+import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class CommandPacket extends AbstractPacket {
     
@@ -30,8 +30,8 @@ public class CommandPacket extends AbstractPacket {
     }
     
     @Override
-    public void process() {
-        ServerManager.getInstance().getNetworkHandler().handleCommand(this);
+    public void process(NetworkHandler networkHandler) {
+        networkHandler.handleCommand(this);
     }
     
     public static CommandPacket of(String command, User user) {

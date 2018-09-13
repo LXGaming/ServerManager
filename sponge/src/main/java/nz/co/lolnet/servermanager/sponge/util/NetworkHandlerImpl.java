@@ -25,6 +25,7 @@ import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.ForwardPacket;
+import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
@@ -60,6 +61,11 @@ public class NetworkHandlerImpl implements NetworkHandler {
     @Override
     public void handleForward(ForwardPacket packet) {
         throw new UnsupportedOperationException("Not supported");
+    }
+    
+    @Override
+    public void handlePing(PingPacket packet) {
+        ServerManager.getInstance().sendPacket(packet);
     }
     
     @Override

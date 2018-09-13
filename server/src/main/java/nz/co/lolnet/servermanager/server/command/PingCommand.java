@@ -17,37 +17,27 @@
 package nz.co.lolnet.servermanager.server.command;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.User;
-import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
-import nz.co.lolnet.servermanager.api.util.Reference;
-import nz.co.lolnet.servermanager.common.util.Toolbox;
+import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 
 import java.util.List;
 
-public class ExecuteCommand extends AbstractCommand {
+public class PingCommand extends AbstractCommand {
     
-    public ExecuteCommand() {
-        addAlias("execute");
-        setDescription("Executes commands on the targeted server");
-        setUsage("<Server> <Command>");
+    public PingCommand() {
+        addAlias("ping");
+        setDescription("Ping targeted server");
     }
     
     @Override
     public void execute(List<String> arguments) {
-        if (arguments.size() < 1) {
+        if (arguments.isEmpty()) {
             ServerManager.getInstance().getLogger().info("Not enough arguments");
             return;
         }
         
         String channel = arguments.remove(0);
-        String command = String.join(" ", arguments);
-        if (Toolbox.isBlank(command)) {
-            ServerManager.getInstance().getLogger().info("Cannot send blank command");
-            return;
-        }
-        
-        ServerManagerImpl.getInstance().getRedisService().publish(channel, CommandPacket.of(command, User.of(Reference.NAME, null)));
-        ServerManager.getInstance().getLogger().info("Sending execute...");
+        ServerManagerImpl.getInstance().getRedisService().publish(channel, PingPacket.of(System.currentTimeMillis()));
+        ServerManager.getInstance().getLogger().info("Sending ping...");
     }
 }

@@ -17,12 +17,14 @@
 package nz.co.lolnet.servermanager.common.manager;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.ForwardPacket;
+import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
@@ -40,6 +42,7 @@ public class PacketManager {
     public static void buildPackets() {
         registerPacket(CommandPacket.class);
         registerPacket(ForwardPacket.class);
+        registerPacket(PingPacket.class);
         registerPacket(StatePacket.class);
         registerPacket(StatusPacket.class);
     }
@@ -74,14 +77,22 @@ public class PacketManager {
     }
     
     public static void sendPacket(Packet packet, Consumer<String> consumer) {
-        if (!getPacketClasses().contains(packet.getClass())) {
-            ServerManager.getInstance().getLogger().error("Can't serialize unregistered packet", packet.getClass().getSimpleName());
+        sendPacket(packet.getClass(), new Gson().toJsonTree(packet), consumer);
+    }
+    
+    public static void sendBlankPacket(Packet packet, Consumer<String> consumer) {
+        sendPacket(packet.getClass(), new JsonObject(), consumer);
+    }
+    
+    public static void sendPacket(Class<? extends Packet> packetClass, JsonElement jsonElement, Consumer<String> consumer) {
+        if (!getPacketClasses().contains(packetClass)) {
+            ServerManager.getInstance().getLogger().error("Can't serialize unregistered packet", packetClass.getSimpleName());
             return;
         }
         
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("class", packet.getClass().getName());
-        jsonObject.add("data", new Gson().toJsonTree(packet));
+        jsonObject.addProperty("class", packetClass.getName());
+        jsonObject.add("data", jsonElement);
         consumer.accept(new Gson().toJson(jsonObject));
     }
     

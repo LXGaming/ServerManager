@@ -21,12 +21,12 @@ import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 public class ForwardPacket extends AbstractPacket {
     
     private String server;
-    private String id;
+    private String packetClass;
     private String data;
     
-    private ForwardPacket(String server, String id, String data) {
+    private ForwardPacket(String server, String packetClass, String data) {
         this.server = server;
-        this.id = id;
+        this.packetClass = packetClass;
         this.data = data;
     }
     
@@ -35,8 +35,8 @@ public class ForwardPacket extends AbstractPacket {
         networkHandler.handleForward(this);
     }
     
-    public static ForwardPacket of(String server, String id, String data) {
-        return new ForwardPacket(server, id, data);
+    public static ForwardPacket of(String server, String packetClass, String data) {
+        return new ForwardPacket(server, packetClass, data);
     }
     
     public String getServer() {
@@ -47,12 +47,12 @@ public class ForwardPacket extends AbstractPacket {
         this.server = server;
     }
     
-    public String getId() {
-        return id;
+    public String getPacketClass() {
+        return packetClass;
     }
     
-    public void setId(String id) {
-        this.id = id;
+    public void setPacketClass(String packetClass) {
+        this.packetClass = packetClass;
     }
     
     public String getData() {

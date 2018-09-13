@@ -22,6 +22,7 @@ import nz.co.lolnet.servermanager.server.command.AbstractCommand;
 import nz.co.lolnet.servermanager.server.command.ExecuteCommand;
 import nz.co.lolnet.servermanager.server.command.HelpCommand;
 import nz.co.lolnet.servermanager.server.command.InfoCommand;
+import nz.co.lolnet.servermanager.server.command.PingCommand;
 import nz.co.lolnet.servermanager.server.command.ReloadCommand;
 import nz.co.lolnet.servermanager.server.command.StopCommand;
 
@@ -38,6 +39,7 @@ public class CommandManager {
         registerCommand(ExecuteCommand.class);
         registerCommand(HelpCommand.class);
         registerCommand(InfoCommand.class);
+        registerCommand(PingCommand.class);
         registerCommand(ReloadCommand.class);
         registerCommand(StopCommand.class);
     }

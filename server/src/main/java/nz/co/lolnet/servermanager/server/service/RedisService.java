@@ -59,6 +59,19 @@ public class RedisService extends AbstractService {
         getJedisPool().getResource().subscribe(new RedisListener(), getChannels().toArray(new String[0]));
     }
     
+    public void publish(AbstractPacket packet) {
+        String channel;
+        if (Toolbox.isNotBlank(packet.getReplyTo())) {
+            channel = packet.getReplyTo();
+        } else {
+            channel = getProxyChannel().orElse(null);
+        }
+        
+        packet.setSender(null);
+        packet.setReplyTo(null);
+        publish(channel, packet);
+    }
+    
     public void publish(String channel, AbstractPacket packet) {
         if (Toolbox.isBlank(packet.getSender())) {
             getProxyName().map(name -> "data" + name).ifPresent(packet::setSender);

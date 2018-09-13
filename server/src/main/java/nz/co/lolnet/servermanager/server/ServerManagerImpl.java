@@ -81,7 +81,7 @@ public class ServerManagerImpl extends ServerManager {
     
     @Override
     public void sendPacket(AbstractPacket packet) {
-        throw new UnsupportedOperationException("Not supported");
+        getRedisService().publish(packet);
     }
     
     public static ServerManagerImpl getInstance() {

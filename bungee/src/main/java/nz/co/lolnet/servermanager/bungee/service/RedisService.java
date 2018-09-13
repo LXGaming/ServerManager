@@ -46,7 +46,16 @@ public class RedisService extends AbstractService {
     }
     
     public void publish(AbstractPacket packet) {
-        getProxyChannel().ifPresent(channel -> publish(channel, packet));
+        String channel;
+        if (Toolbox.isNotBlank(packet.getReplyTo())) {
+            channel = packet.getReplyTo();
+        } else {
+            channel = getProxyChannel().orElse(null);
+        }
+        
+        packet.setSender(null);
+        packet.setReplyTo(null);
+        publish(channel, packet);
     }
     
     public void publish(String channel, AbstractPacket packet) {

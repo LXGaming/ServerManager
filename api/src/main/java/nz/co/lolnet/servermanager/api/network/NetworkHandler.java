@@ -18,6 +18,7 @@ package nz.co.lolnet.servermanager.api.network;
 
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.ForwardPacket;
+import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
 
@@ -26,6 +27,8 @@ public interface NetworkHandler {
     void handleCommand(CommandPacket packet);
     
     void handleForward(ForwardPacket packet);
+    
+    void handlePing(PingPacket packet);
     
     void handleState(StatePacket packet);
     

@@ -1,4 +1,5 @@
 apply plugin: "java"
+apply plugin: "maven"
 apply plugin: "signing"
 
 sourceCompatibility = 1.8
@@ -12,6 +13,8 @@ configurations {
     provided {
         compile.extendsFrom(provided)
     }
+
+    build.dependsOn("install")
 }
 
 repositories {

@@ -14,7 +14,7 @@ configurations {
         compile.extendsFrom(provided)
     }
 
-    build.dependsOn("install")
+    build.dependsOn("uploadArchives")
 }
 
 repositories {
@@ -35,6 +35,46 @@ jar {
 processResources {
     from("LICENSE")
     rename("LICENSE", "LICENSE-" + archivesBaseName)
+}
+
+uploadArchives {
+    repositories {
+        if (project.hasProperty("maven.url")) {
+            mavenDeployer {
+                project.logger.lifecycle("Uploading Archives")
+                repository(url: project.property("maven.url"))
+
+                pom {
+                    groupId = project.group
+                    artifactId = project.archivesBaseName
+                    version = project.version
+                    project {
+                        name = project.archivesBaseName
+                        packaging = "jar"
+
+                        scm {
+                            url = "https://github.com/lolnetnz/ServerManager"
+                            connection = "scm:git:https://github.com/lolnetnz/ServerManager.git"
+                            developerConnection = "scm:git:git@github.com:lolnetnz/ServerManager.git"
+                        }
+
+                        issueManagement {
+                            system = "GitHub Issues"
+                            url = "https://github.com/lolnetnz/ServerManager/issues"
+                        }
+
+                        licenses {
+                            license {
+                                name = "Apache License 2.0"
+                                url = "https://opensource.org/licenses/Apache-2.0"
+                                distribution = "repo"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 task signJar {

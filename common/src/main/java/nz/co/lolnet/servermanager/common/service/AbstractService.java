@@ -25,7 +25,6 @@ public abstract class AbstractService implements Runnable {
     
     private long delay;
     private long interval;
-    private boolean periodic;
     private ScheduledFuture scheduledFuture;
     
     @Override
@@ -60,14 +59,6 @@ public abstract class AbstractService implements Runnable {
     
     protected final void setInterval(long interval) {
         this.interval = interval;
-    }
-    
-    public boolean isPeriodic() {
-        return periodic;
-    }
-    
-    protected void setPeriodic(boolean periodic) {
-        this.periodic = periodic;
     }
     
     public ScheduledFuture getScheduledFuture() {

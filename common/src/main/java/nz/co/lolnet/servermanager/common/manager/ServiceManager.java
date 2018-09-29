@@ -36,15 +36,15 @@ public class ServiceManager {
                 throw new IllegalStateException("Service preparation failed");
             }
             
-            schedule(abstractService, abstractService.getDelay(), abstractService.getInterval(), abstractService.isPeriodic()).ifPresent(abstractService::setScheduledFuture);
+            schedule(abstractService, abstractService.getDelay(), abstractService.getInterval()).ifPresent(abstractService::setScheduledFuture);
         } catch (RuntimeException ex) {
             ServerManager.getInstance().getLogger().error("Encountered an error processing {}::schedule", "ServiceManager", ex);
         }
     }
     
-    public static Optional<ScheduledFuture> schedule(Runnable runnable, long delay, long interval, boolean periodic) {
+    public static Optional<ScheduledFuture> schedule(Runnable runnable, long delay, long interval) {
         try {
-            if (!periodic) {
+            if (interval <= 0L) {
                 return Optional.of(getScheduledExecutorService().schedule(runnable, Math.max(delay, 0L), TimeUnit.MILLISECONDS));
             }
             

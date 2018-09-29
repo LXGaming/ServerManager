@@ -46,7 +46,7 @@ public class NetworkHandlerImpl implements NetworkHandler {
         
         ServerManagerImpl.getInstance().getLogger().info("Processing {} for {}", packet.getCommand(), packet.getUser());
         if (packet.getCommand().equals("servermanager:terminate")) {
-            ServiceManager.schedule(() -> Runtime.getRuntime().halt(1), 30000L, 0L, false);
+            ServiceManager.schedule(() -> Runtime.getRuntime().halt(1), 30000L, 0L);
             Runtime.getRuntime().exit(1);
             return;
         }

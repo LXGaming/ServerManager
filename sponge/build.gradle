@@ -67,8 +67,8 @@ dependencies {
         exclude(module: "gson")
     }
 
-    annotationProcessor("org.spongepowered:spongecommon:7.1.0-SNAPSHOT:dev")
-    provided("org.spongepowered:spongecommon:7.1.0-SNAPSHOT:dev")
+    annotationProcessor("org.spongepowered:spongecommon:7.1.0:dev")
+    provided("org.spongepowered:spongecommon:7.1.0:dev")
     shadow("redis.clients:jedis:2.9.0")
 }
 

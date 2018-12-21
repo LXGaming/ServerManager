@@ -22,9 +22,8 @@ import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.data.User;
-import nz.co.lolnet.servermanager.api.network.NetworkHandler;
+import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
-import nz.co.lolnet.servermanager.api.network.packet.ForwardPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
@@ -39,7 +38,7 @@ import java.lang.management.ManagementFactory;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
-public class NetworkHandlerImpl implements NetworkHandler {
+public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleCommand(CommandPacket packet) {
@@ -49,7 +48,7 @@ public class NetworkHandlerImpl implements NetworkHandler {
         
         ServerManagerImpl.getInstance().getLogger().info("Processing {} for {}", packet.getCommand(), packet.getUser());
         if (packet.getCommand().equals("servermanager:terminate")) {
-            ((IMixinServerHangWatchdog) new ServerHangWatchdog((DedicatedServer) Sponge.getServer())).scheduleHalt();
+            Toolbox.cast(new ServerHangWatchdog(Toolbox.cast(Sponge.getServer(), DedicatedServer.class)), IMixinServerHangWatchdog.class).scheduleHalt();
             return;
         }
         
@@ -59,18 +58,13 @@ public class NetworkHandlerImpl implements NetworkHandler {
     }
     
     @Override
-    public void handleForward(ForwardPacket packet) {
-        throw new UnsupportedOperationException("Not supported");
-    }
-    
-    @Override
     public void handlePing(PingPacket packet) {
         ServerManager.getInstance().sendPacket(packet);
     }
     
     @Override
     public void handleState(StatePacket packet) {
-        packet.setState(Platform.State.valueOf(Sponge.getGame().getState().name()));
+        packet.setState(SpongePlugin.getInstance().getState());
         ServerManager.getInstance().sendPacket(packet);
     }
     
@@ -78,7 +72,7 @@ public class NetworkHandlerImpl implements NetworkHandler {
     public void handleStatus(StatusPacket packet) {
         ServerInfo serverInfo = new ServerInfo();
         serverInfo.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
-        serverInfo.setState(Platform.State.valueOf(Sponge.getGame().getState().name()));
+        serverInfo.setState(SpongePlugin.getInstance().getState());
         serverInfo.setType(Platform.Type.SPONGE);
         
         if (Sponge.isServerAvailable()) {

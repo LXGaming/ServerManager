@@ -14,28 +14,34 @@
  * limitations under the License.
  */
 
-package nz.co.lolnet.servermanager.api.network.packet;
+package nz.co.lolnet.servermanager.server.configuration.category;
 
-import nz.co.lolnet.servermanager.api.network.NetworkHandler;
+import nz.co.lolnet.servermanager.api.data.Platform;
 
-public class PingPacket extends AbstractPacket {
+public class ServerCategory {
     
-    private final long time;
+    private String name = "Unknown";
+    private Platform.Type platform = Platform.Type.UNKNOWN;
+    private String path = "";
+    private boolean autoRestart = false;
     
-    private PingPacket(long time) {
-        this.time = time;
+    public String getName() {
+        return name;
     }
     
-    @Override
-    public void process(NetworkHandler networkHandler) {
-        networkHandler.handlePing(this);
+    public void setName(String name) {
+        this.name = name;
     }
     
-    public static PingPacket of(long time) {
-        return new PingPacket(time);
+    public Platform.Type getPlatform() {
+        return platform;
     }
     
-    public long getTime() {
-        return time;
+    public String getPath() {
+        return path;
+    }
+    
+    public boolean isAutoRestart() {
+        return autoRestart;
     }
 }

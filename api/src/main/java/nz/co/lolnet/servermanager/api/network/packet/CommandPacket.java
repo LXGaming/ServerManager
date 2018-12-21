@@ -21,8 +21,8 @@ import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class CommandPacket extends AbstractPacket {
     
-    private String command;
-    private User user;
+    private final String command;
+    private final User user;
     
     private CommandPacket(String command, User user) {
         this.command = command;
@@ -42,15 +42,7 @@ public class CommandPacket extends AbstractPacket {
         return command;
     }
     
-    public void setCommand(String command) {
-        this.command = command;
-    }
-    
     public User getUser() {
         return user;
-    }
-    
-    public void setUser(User user) {
-        this.user = user;
     }
 }

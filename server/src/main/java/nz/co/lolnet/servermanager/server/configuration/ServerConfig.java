@@ -16,25 +16,44 @@
 
 package nz.co.lolnet.servermanager.server.configuration;
 
+import nz.co.lolnet.servermanager.api.configuration.Config;
+import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.configuration.category.RedisCategory;
+import nz.co.lolnet.servermanager.server.configuration.category.ServerCategory;
 
-public class Config {
+import java.util.List;
+
+public class ServerConfig implements Config {
     
     private boolean debug = false;
     private String proxyName = "";
+    private String command = "cd [PATH];bash start.sh";
     private boolean jlineOverride = true;
     private RedisCategory redisCategory = new RedisCategory();
+    private List<ServerCategory> serverCategories = Toolbox.newArrayList();
     
+    @Override
     public boolean isDebug() {
         return debug;
     }
     
+    @Override
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
     
+    @Override
     public String getProxyName() {
         return proxyName;
+    }
+    
+    @Override
+    public String getServerName() {
+        return proxyName;
+    }
+    
+    public String getCommand() {
+        return command;
     }
     
     public boolean isJlineOverride() {
@@ -43,5 +62,9 @@ public class Config {
     
     public RedisCategory getRedisCategory() {
         return redisCategory;
+    }
+    
+    public List<ServerCategory> getServerCategories() {
+        return serverCategories;
     }
 }

@@ -6,8 +6,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = "nz.co.lolnet"
-archivesBaseName = "ServerManager-API"
-version = "2.0.0-DEV"
+archivesBaseName = "servermanager-api"
+version = version
 
 configurations {
     provided {
@@ -24,17 +24,34 @@ repositories {
 dependencies {
 }
 
+task javadocJar(type: Jar) {
+    classifier = "javadoc"
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = "sources"
+    from sourceSets.main.allSource
+}
+
 jar {
     from {
-        (configurations.compile - configurations.provided).collect {
+        (configurations.compile - configurations.provided).findAll({
+            it.isDirectory() || it.name.endsWith(".jar")
+        }).collect({
             it.isDirectory() ? it : zipTree(it)
-        }
+        })
     }
 }
 
 processResources {
     from("LICENSE")
     rename("LICENSE", "LICENSE-" + archivesBaseName)
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
 }
 
 uploadArchives {

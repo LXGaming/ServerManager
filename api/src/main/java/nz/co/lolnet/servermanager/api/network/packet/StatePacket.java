@@ -23,6 +23,9 @@ public class StatePacket extends AbstractPacket {
     
     private Platform.State state;
     
+    private StatePacket() {
+    }
+    
     private StatePacket(Platform.State state) {
         this.state = state;
     }
@@ -30,6 +33,10 @@ public class StatePacket extends AbstractPacket {
     @Override
     public void process(NetworkHandler networkHandler) {
         networkHandler.handleState(this);
+    }
+    
+    public static StatePacket of() {
+        return new StatePacket();
     }
     
     public static StatePacket of(Platform.State state) {

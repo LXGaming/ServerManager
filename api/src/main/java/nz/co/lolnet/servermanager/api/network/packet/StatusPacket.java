@@ -21,7 +21,7 @@ import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class StatusPacket extends AbstractPacket {
     
-    private ServerInfo serverInfo;
+    private final ServerInfo serverInfo;
     
     private StatusPacket(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
@@ -38,9 +38,5 @@ public class StatusPacket extends AbstractPacket {
     
     public ServerInfo getServerInfo() {
         return serverInfo;
-    }
-    
-    public void setServerInfo(ServerInfo serverInfo) {
-        this.serverInfo = serverInfo;
     }
 }

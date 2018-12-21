@@ -20,18 +20,20 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.configuration.Config;
+import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
-import nz.co.lolnet.servermanager.api.network.packet.ForwardPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
+import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class PacketManager {
     
@@ -41,7 +43,6 @@ public class PacketManager {
     
     public static void buildPackets() {
         registerPacket(CommandPacket.class);
-        registerPacket(ForwardPacket.class);
         registerPacket(PingPacket.class);
         registerPacket(StatePacket.class);
         registerPacket(StatusPacket.class);
@@ -66,6 +67,11 @@ public class PacketManager {
             return;
         }
         
+        if (Toolbox.isNotBlank(packet.getForwardTo()) && getProxyChannel().map(channel -> !channel.equals(packet.getForwardTo())).orElse(false)) {
+            ServerManager.getInstance().sendPacket(packet.getForwardTo(), packet);
+            return;
+        }
+        
         ServerManager.getInstance().getLogger().debug("Processing {}", packetClass.getSimpleName());
         for (NetworkHandler networkHandler : getNetworkHandlers()) {
             try {
@@ -76,15 +82,36 @@ public class PacketManager {
         }
     }
     
-    public static void sendPacket(Packet packet, Consumer<String> consumer) {
-        sendPacket(packet.getClass(), new Gson().toJsonTree(packet), consumer);
+    public static void sendPacket(Packet packet, BiConsumer<String, String> consumer) {
+        String channel;
+        if (Toolbox.isNotBlank(packet.getReplyTo())) {
+            channel = packet.getReplyTo();
+        } else {
+            channel = getProxyChannel().orElse(null);
+        }
+        
+        packet.setSender(null);
+        packet.setReplyTo(null);
+        sendPacket(channel, packet, consumer);
     }
     
-    public static void sendBlankPacket(Packet packet, Consumer<String> consumer) {
-        sendPacket(packet.getClass(), new JsonObject(), consumer);
+    public static void sendPacket(String channel, Packet packet, BiConsumer<String, String> consumer) {
+        if (Toolbox.isBlank(packet.getSender())) {
+            getServerName().map(name -> ServerManager.getInstance().getPlatformType() + name).ifPresent(packet::setSender);
+        }
+        
+        if (Toolbox.isBlank(packet.getReplyTo())) {
+            getServerChannel().ifPresent(packet::setReplyTo);
+        }
+        
+        if (Toolbox.isNotBlank(channel) && channel.equals(packet.getForwardTo())) {
+            packet.setForwardTo(null);
+        }
+        
+        sendPacket(channel, packet.getClass(), new Gson().toJsonTree(packet), consumer);
     }
     
-    public static void sendPacket(Class<? extends Packet> packetClass, JsonElement jsonElement, Consumer<String> consumer) {
+    public static void sendPacket(String channel, Class<? extends Packet> packetClass, JsonElement jsonElement, BiConsumer<String, String> consumer) {
         if (!getPacketClasses().contains(packetClass)) {
             ServerManager.getInstance().getLogger().error("Can't serialize unregistered packet", packetClass.getSimpleName());
             return;
@@ -93,7 +120,7 @@ public class PacketManager {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("class", packetClass.getName());
         jsonObject.add("data", jsonElement);
-        consumer.accept(new Gson().toJson(jsonObject));
+        consumer.accept(channel, new Gson().toJson(jsonObject));
     }
     
     public static boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass) {
@@ -131,6 +158,22 @@ public class PacketManager {
         }
         
         return Optional.empty();
+    }
+    
+    public static Optional<String> getProxyChannel() {
+        return getProxyName().map(name -> Reference.ID + "-" + Platform.Type.SERVER + "-" + name);
+    }
+    
+    public static Optional<String> getProxyName() {
+        return ServerManager.getInstance().getConfig().map(Config::getProxyName).filter(Toolbox::isNotBlank).map(String::toLowerCase);
+    }
+    
+    public static Optional<String> getServerChannel() {
+        return getServerName().map(name -> Reference.ID + "-" + ServerManager.getInstance().getPlatformType() + "-" + name);
+    }
+    
+    public static Optional<String> getServerName() {
+        return ServerManager.getInstance().getConfig().map(Config::getServerName).filter(Toolbox::isNotBlank).map(String::toLowerCase);
     }
     
     private static Set<NetworkHandler> getNetworkHandlers() {

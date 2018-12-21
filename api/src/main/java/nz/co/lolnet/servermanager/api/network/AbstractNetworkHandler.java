@@ -22,15 +22,25 @@ import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
 
-public interface NetworkHandler {
+public class AbstractNetworkHandler implements NetworkHandler {
     
-    void handleCommand(CommandPacket packet);
+    @Override
+    public void handleCommand(CommandPacket packet) {
+    }
     
-    void handlePing(PingPacket packet);
+    @Override
+    public void handlePing(PingPacket packet) {
+    }
     
-    void handleSetting(SettingPacket packet);
+    @Override
+    public void handleSetting(SettingPacket packet) {
+    }
     
-    void handleState(StatePacket packet);
+    @Override
+    public void handleState(StatePacket packet) {
+    }
     
-    void handleStatus(StatusPacket packet);
+    @Override
+    public void handleStatus(StatusPacket packet) {
+    }
 }

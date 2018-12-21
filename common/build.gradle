@@ -1,17 +1,20 @@
 apply plugin: "java"
+apply plugin: "maven"
 apply plugin: "signing"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = "nz.co.lolnet"
-archivesBaseName = "ServerManager-Common"
-version = "2.0.0-DEV"
+archivesBaseName = "servermanager-common"
+version = version
 
 configurations {
     provided {
         compile.extendsFrom(provided)
     }
+
+    build.dependsOn("uploadArchives")
 }
 
 repositories {
@@ -21,19 +24,78 @@ repositories {
 dependencies {
     compile project(path: ":api")
     provided("com.google.code.gson:gson:2.8.5")
+    provided("redis.clients:jedis:2.9.0")
 }
+
+task javadocJar(type: Jar) {
+    classifier = "javadoc"
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = "sources"
+    from sourceSets.main.allSource
+}
+
 
 jar {
     from {
-        (configurations.compile - configurations.provided).collect {
+        (configurations.compile - configurations.provided).findAll({
+            it.isDirectory() || it.name.endsWith(".jar")
+        }).collect({
             it.isDirectory() ? it : zipTree(it)
-        }
+        })
     }
 }
 
 processResources {
     from("LICENSE")
     rename("LICENSE", "LICENSE-" + archivesBaseName)
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+uploadArchives {
+    repositories {
+        if (project.hasProperty("maven.url")) {
+            mavenDeployer {
+                project.logger.lifecycle("Uploading Archives")
+                repository(url: project.property("maven.url"))
+                
+                pom {
+                    groupId = project.group
+                    artifactId = project.archivesBaseName
+                    version = project.version
+                    project {
+                        name = project.archivesBaseName
+                        packaging = "jar"
+                        
+                        scm {
+                            url = "https://github.com/lolnetnz/ServerManager"
+                            connection = "scm:git:https://github.com/lolnetnz/ServerManager.git"
+                            developerConnection = "scm:git:git@github.com:lolnetnz/ServerManager.git"
+                        }
+                        
+                        issueManagement {
+                            system = "GitHub Issues"
+                            url = "https://github.com/lolnetnz/ServerManager/issues"
+                        }
+                        
+                        licenses {
+                            license {
+                                name = "Apache License 2.0"
+                                url = "https://opensource.org/licenses/Apache-2.0"
+                                distribution = "repo"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 task signJar {

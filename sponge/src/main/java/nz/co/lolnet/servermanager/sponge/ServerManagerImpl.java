@@ -17,28 +17,30 @@
 package nz.co.lolnet.servermanager.sponge;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
-import nz.co.lolnet.servermanager.api.network.packet.AbstractPacket;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.manager.ServiceManager;
 import nz.co.lolnet.servermanager.common.util.LoggerImpl;
-import nz.co.lolnet.servermanager.sponge.configuration.Config;
+import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfig;
 import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfiguration;
-import nz.co.lolnet.servermanager.sponge.service.RedisService;
+import nz.co.lolnet.servermanager.sponge.service.RedisServiceImpl;
 import nz.co.lolnet.servermanager.sponge.util.NetworkHandlerImpl;
 
 import java.util.Optional;
 
-public class ServerManagerImpl extends nz.co.lolnet.servermanager.api.ServerManager {
+public class ServerManagerImpl extends ServerManager {
     
-    private RedisService redisService;
+    private final RedisServiceImpl redisService;
     
     public ServerManagerImpl() {
         this.logger = new LoggerImpl();
         this.path = SpongePlugin.getInstance().getPath();
         this.configuration = new SpongeConfiguration();
-        this.redisService = new RedisService();
+        this.platformType = Platform.Type.SPONGE;
+        this.redisService = new RedisServiceImpl();
     }
     
     @Override
@@ -54,7 +56,7 @@ public class ServerManagerImpl extends nz.co.lolnet.servermanager.api.ServerMana
     
     @Override
     public void reloadServerManager() {
-        if (getConfig().map(Config::isDebug).orElse(false)) {
+        if (getConfig().map(SpongeConfig::isDebug).orElse(false)) {
             getLogger().debug("Debug mode enabled");
         } else {
             getLogger().info("Debug mode disabled");
@@ -67,23 +69,29 @@ public class ServerManagerImpl extends nz.co.lolnet.servermanager.api.ServerMana
     }
     
     @Override
-    public void sendPacket(AbstractPacket packet) {
-        getRedisService().publish(packet);
+    public void sendPacket(String channel, Packet packet) {
+        PacketManager.sendPacket(channel, packet, getRedisService()::publish);
+    }
+    
+    @Override
+    public void sendPacket(Packet packet) {
+        PacketManager.sendPacket(packet, getRedisService()::publish);
     }
     
     public static ServerManagerImpl getInstance() {
         return (ServerManagerImpl) ServerManager.getInstance();
     }
     
-    public Optional<? extends Config> getConfig() {
+    @Override
+    public Optional<? extends SpongeConfig> getConfig() {
         if (getConfiguration() != null) {
-            return Optional.ofNullable(((SpongeConfiguration) getConfiguration()).getConfig());
+            return Optional.ofNullable((SpongeConfig) getConfiguration().getConfig());
         }
         
         return Optional.empty();
     }
     
-    public RedisService getRedisService() {
+    public RedisServiceImpl getRedisService() {
         return redisService;
     }
 }

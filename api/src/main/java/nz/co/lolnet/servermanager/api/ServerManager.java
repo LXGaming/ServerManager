@@ -16,12 +16,15 @@
 
 package nz.co.lolnet.servermanager.api;
 
+import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.api.configuration.Configuration;
+import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
-import nz.co.lolnet.servermanager.api.network.packet.AbstractPacket;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.util.Logger;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public abstract class ServerManager {
     
@@ -29,6 +32,7 @@ public abstract class ServerManager {
     protected Logger logger;
     protected Path path;
     protected Configuration configuration;
+    protected Platform.Type platformType;
     
     protected ServerManager() {
         instance = this;
@@ -40,7 +44,9 @@ public abstract class ServerManager {
     
     public abstract boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass);
     
-    public abstract void sendPacket(AbstractPacket packet);
+    public abstract void sendPacket(String channel, Packet packet);
+    
+    public abstract void sendPacket(Packet packet);
     
     public static ServerManager getInstance() {
         return instance;
@@ -56,5 +62,17 @@ public abstract class ServerManager {
     
     public Configuration getConfiguration() {
         return configuration;
+    }
+    
+    public Optional<? extends Config> getConfig() {
+        if (getConfiguration() != null) {
+            return Optional.ofNullable(getConfiguration().getConfig());
+        }
+        
+        return Optional.empty();
+    }
+    
+    public Platform.Type getPlatformType() {
+        return platformType;
     }
 }

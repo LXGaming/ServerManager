@@ -21,9 +21,8 @@ import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.data.User;
-import nz.co.lolnet.servermanager.api.network.NetworkHandler;
+import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
-import nz.co.lolnet.servermanager.api.network.packet.ForwardPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
@@ -36,7 +35,7 @@ import java.lang.management.ManagementFactory;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
-public class NetworkHandlerImpl implements NetworkHandler {
+public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleCommand(CommandPacket packet) {
@@ -52,11 +51,6 @@ public class NetworkHandlerImpl implements NetworkHandler {
         }
         
         ProxyServer.getInstance().getPluginManager().dispatchCommand(new BungeeCommandSender(), packet.getCommand());
-    }
-    
-    @Override
-    public void handleForward(ForwardPacket packet) {
-        throw new UnsupportedOperationException("Not supported");
     }
     
     @Override

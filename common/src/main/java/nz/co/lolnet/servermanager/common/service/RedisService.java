@@ -1,0 +1,72 @@
+/*
+ * Copyright 2018 lolnet.co.nz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package nz.co.lolnet.servermanager.common.service;
+
+import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.util.Reference;
+import nz.co.lolnet.servermanager.common.manager.PacketManager;
+import nz.co.lolnet.servermanager.common.util.Toolbox;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+public abstract class RedisService extends AbstractService {
+    
+    private final Set<String> channels = Toolbox.newHashSet();
+    
+    @Override
+    public boolean prepareService() {
+        getChannels().add(Reference.ID + "-" + ServerManager.getInstance().getPlatformType());
+        PacketManager.getServerChannel().ifPresent(getChannels()::add);
+        return true;
+    }
+    
+    public abstract void publish(String channel, String message);
+    
+    public abstract String clientList();
+    
+    public List<Properties> getClientList() {
+        List<Properties> clients = Toolbox.newArrayList();
+        String clientList = clientList();
+        if (Toolbox.isBlank(clientList)) {
+            return clients;
+        }
+        
+        for (String line : clientList.split("\n")) {
+            if (Toolbox.isBlank(line)) {
+                continue;
+            }
+            
+            try (StringReader stringReader = new StringReader(line.replace(" ", "\n"))) {
+                Properties properties = new Properties();
+                properties.load(stringReader);
+                clients.add(properties);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        
+        return clients;
+    }
+    
+    public Set<String> getChannels() {
+        return channels;
+    }
+}

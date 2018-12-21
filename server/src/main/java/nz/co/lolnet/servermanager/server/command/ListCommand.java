@@ -17,27 +17,28 @@
 package nz.co.lolnet.servermanager.server.command;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
-import nz.co.lolnet.servermanager.server.ServerManagerImpl;
+import nz.co.lolnet.servermanager.common.util.Toolbox;
+import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
 
 import java.util.List;
+import java.util.Set;
 
-public class PingCommand extends AbstractCommand {
+public class ListCommand extends AbstractCommand {
     
-    public PingCommand() {
-        addAlias("ping");
-        setDescription("Ping targeted server");
+    public ListCommand() {
+        addAlias("list");
+        setDescription("Show a list of connections");
     }
     
     @Override
     public void execute(List<String> arguments) {
-        if (arguments.isEmpty()) {
-            ServerManager.getInstance().getLogger().info("Not enough arguments");
+        Set<String> connections = Toolbox.newHashSet();
+        ConnectionManager.getConnections().forEach(connection -> connections.add(connection.getServerId()));
+        if (connections.isEmpty()) {
+            ServerManager.getInstance().getLogger().info("No connections present");
             return;
         }
         
-        String channel = arguments.remove(0);
-        ServerManagerImpl.getInstance().sendPacket(channel, PingPacket.of(System.currentTimeMillis()));
-        ServerManager.getInstance().getLogger().info("Sending ping...");
+        ServerManager.getInstance().getLogger().info("Connections: {}", String.join(", ", connections));
     }
 }

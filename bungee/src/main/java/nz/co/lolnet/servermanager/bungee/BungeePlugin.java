@@ -23,7 +23,7 @@ import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.util.Logger;
-import nz.co.lolnet.servermanager.bungee.configuration.Config;
+import nz.co.lolnet.servermanager.bungee.configuration.BungeeConfig;
 import nz.co.lolnet.servermanager.bungee.listener.BungeeListener;
 
 public class BungeePlugin extends Plugin implements Platform {
@@ -43,7 +43,7 @@ public class BungeePlugin extends Plugin implements Platform {
                 .add(Logger.Level.WARN, getLogger()::warning)
                 .add(Logger.Level.ERROR, getLogger()::severe)
                 .add(Logger.Level.DEBUG, message -> {
-                    if (ServerManagerImpl.getInstance().getConfig().map(Config::isDebug).orElse(false)) {
+                    if (ServerManagerImpl.getInstance().getConfig().map(BungeeConfig::isDebug).orElse(false)) {
                         getLogger().info(message);
                     }
                 });

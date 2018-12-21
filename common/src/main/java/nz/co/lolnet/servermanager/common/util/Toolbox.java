@@ -153,6 +153,10 @@ public class Toolbox {
         return false;
     }
     
+    public static <T> T cast(Object object, Class<T> type) {
+        return type.cast(object);
+    }
+    
     public static <T> Optional<T> newInstance(Class<? extends T> typeOfT) {
         try {
             return Optional.of(typeOfT.newInstance());

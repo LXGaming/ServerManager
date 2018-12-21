@@ -47,7 +47,7 @@ public class ExecuteCommand extends AbstractCommand {
             return;
         }
         
-        ServerManagerImpl.getInstance().getRedisService().publish(channel, CommandPacket.of(command, User.of(Reference.NAME, null)));
+        ServerManagerImpl.getInstance().sendPacket(channel, CommandPacket.of(command, User.of(Reference.NAME, null)));
         ServerManager.getInstance().getLogger().info("Sending execute...");
     }
 }

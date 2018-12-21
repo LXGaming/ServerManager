@@ -17,12 +17,13 @@
 package nz.co.lolnet.servermanager.bungee;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
-import nz.co.lolnet.servermanager.api.network.packet.AbstractPacket;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.util.Reference;
+import nz.co.lolnet.servermanager.bungee.configuration.BungeeConfig;
 import nz.co.lolnet.servermanager.bungee.configuration.BungeeConfiguration;
-import nz.co.lolnet.servermanager.bungee.configuration.Config;
-import nz.co.lolnet.servermanager.bungee.service.RedisService;
+import nz.co.lolnet.servermanager.bungee.service.RedisServiceImpl;
 import nz.co.lolnet.servermanager.bungee.util.NetworkHandlerImpl;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.manager.ServiceManager;
@@ -32,13 +33,14 @@ import java.util.Optional;
 
 public class ServerManagerImpl extends ServerManager {
     
-    private final RedisService redisService;
+    private final RedisServiceImpl redisService;
     
     public ServerManagerImpl() {
         this.logger = new LoggerImpl();
         this.path = BungeePlugin.getInstance().getDataFolder().toPath();
         this.configuration = new BungeeConfiguration();
-        this.redisService = new RedisService();
+        this.platformType = Platform.Type.BUNGEE;
+        this.redisService = new RedisServiceImpl();
     }
     
     @Override
@@ -54,7 +56,7 @@ public class ServerManagerImpl extends ServerManager {
     
     @Override
     public void reloadServerManager() {
-        if (getConfig().map(Config::isDebug).orElse(false)) {
+        if (getConfig().map(BungeeConfig::isDebug).orElse(false)) {
             getLogger().debug("Debug mode enabled");
         } else {
             getLogger().info("Debug mode disabled");
@@ -67,23 +69,29 @@ public class ServerManagerImpl extends ServerManager {
     }
     
     @Override
-    public void sendPacket(AbstractPacket packet) {
-        getRedisService().publish(packet);
+    public void sendPacket(String channel, Packet packet) {
+        PacketManager.sendPacket(channel, packet, getRedisService()::publish);
+    }
+    
+    @Override
+    public void sendPacket(Packet packet) {
+        PacketManager.sendPacket(packet, getRedisService()::publish);
     }
     
     public static ServerManagerImpl getInstance() {
         return (ServerManagerImpl) ServerManager.getInstance();
     }
     
-    public Optional<? extends Config> getConfig() {
+    @Override
+    public Optional<BungeeConfig> getConfig() {
         if (getConfiguration() != null) {
-            return Optional.ofNullable(((BungeeConfiguration) getConfiguration()).getConfig());
+            return Optional.ofNullable((BungeeConfig) getConfiguration().getConfig());
         }
         
         return Optional.empty();
     }
     
-    public RedisService getRedisService() {
+    private RedisServiceImpl getRedisService() {
         return redisService;
     }
 }

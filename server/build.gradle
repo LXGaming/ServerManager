@@ -5,8 +5,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = "nz.co.lolnet"
-archivesBaseName = "ServerManager-Server"
-version = "2.0.0-DEV"
+archivesBaseName = "servermanager-server"
+version = version
 
 configurations {
     provided {
@@ -25,7 +25,6 @@ dependencies {
     compile("org.apache.logging.log4j:log4j-slf4j-impl:2.11.1")
     compile("org.jline:jline-reader:3.9.0")
     compile("org.jline:jline-terminal:3.9.0")
-    compile("redis.clients:jedis:2.9.0")
 }
 
 jar {
@@ -34,9 +33,11 @@ jar {
     }
 
     from {
-        (configurations.compile - configurations.provided).collect {
+        (configurations.compile - configurations.provided).findAll({
+            it.isDirectory() || it.name.endsWith(".jar")
+        }).collect({
             it.isDirectory() ? it : zipTree(it)
-        }
+        })
     }
 }
 

@@ -18,10 +18,11 @@ package nz.co.lolnet.servermanager.sponge.configuration;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.sponge.configuration.category.RedisCategory;
 
 @ConfigSerializable
-public class Config {
+public class SpongeConfig implements Config {
     
     @Setting(value = "debug", comment = "")
     private boolean debug = false;
@@ -35,18 +36,22 @@ public class Config {
     @Setting(value = "redis", comment = "")
     private RedisCategory redisCategory = new RedisCategory();
     
+    @Override
     public boolean isDebug() {
         return debug;
     }
     
+    @Override
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
     
+    @Override
     public String getProxyName() {
         return proxyName;
     }
     
+    @Override
     public String getServerName() {
         return serverName;
     }

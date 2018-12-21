@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-package nz.co.lolnet.servermanager.sponge.listener;
+package nz.co.lolnet.servermanager.api.configuration;
 
-public class SpongeListener {
+public interface Config {
+    
+    boolean isDebug();
+    
+    void setDebug(boolean debug);
+    
+    String getProxyName();
+    
+    String getServerName();
 }

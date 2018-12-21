@@ -16,41 +16,29 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
-import nz.co.lolnet.servermanager.api.network.Packet;
+import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
-public abstract class AbstractPacket implements Packet {
+public class SettingPacket extends AbstractPacket {
     
-    private String sender;
-    private String replyTo;
-    private String forwardTo;
+    private boolean receiveStatus;
     
-    @Override
-    public final String getSender() {
-        return sender;
+    private SettingPacket() {
     }
     
     @Override
-    public final void setSender(String sender) {
-        this.sender = sender;
+    public void process(NetworkHandler networkHandler) {
+        networkHandler.handleSetting(this);
     }
     
-    @Override
-    public final String getReplyTo() {
-        return replyTo;
+    public static SettingPacket of() {
+        return new SettingPacket();
     }
     
-    @Override
-    public final void setReplyTo(String replyTo) {
-        this.replyTo = replyTo;
+    public boolean isReceiveStatus() {
+        return receiveStatus;
     }
     
-    @Override
-    public final String getForwardTo() {
-        return forwardTo;
-    }
-    
-    @Override
-    public final void setForwardTo(String forwardTo) {
-        this.forwardTo = forwardTo;
+    public void setReceiveStatus(boolean receiveStatus) {
+        this.receiveStatus = receiveStatus;
     }
 }

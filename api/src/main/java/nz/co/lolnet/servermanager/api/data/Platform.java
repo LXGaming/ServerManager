@@ -20,6 +20,8 @@ public interface Platform {
     
     enum State {
         
+        JVM_STARTED("JVM Started"),
+        
         CONSTRUCTION("Construction"),
         
         PRE_INITIALIZATION("Pre Initialization"),
@@ -43,6 +45,8 @@ public interface Platform {
         GAME_STOPPING("Game Stopping"),
         
         GAME_STOPPED("Game Stopped"),
+        
+        JVM_STOPPED("JVM Stopped"),
         
         UNKNOWN("Unknown");
         
@@ -68,7 +72,11 @@ public interface Platform {
         
         BUNGEE("BungeeCord"),
         
+        SERVER("Server"),
+        
         SPONGE("Sponge"),
+        
+        VELOCITY("Velocity"),
         
         UNKNOWN("Unknown");
         

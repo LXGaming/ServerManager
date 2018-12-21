@@ -19,4 +19,16 @@ package nz.co.lolnet.servermanager.api.network;
 public interface Packet {
     
     void process(NetworkHandler networkHandler);
+    
+    String getSender();
+    
+    void setSender(String sender);
+    
+    String getReplyTo();
+    
+    void setReplyTo(String replyTo);
+    
+    String getForwardTo();
+    
+    void setForwardTo(String forwardTo);
 }

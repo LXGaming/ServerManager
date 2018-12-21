@@ -17,19 +17,23 @@
 package nz.co.lolnet.servermanager.server.util;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.network.NetworkHandler;
+import nz.co.lolnet.servermanager.api.data.ServerInfo;
+import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
-import nz.co.lolnet.servermanager.api.network.packet.ForwardPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
+import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
+import nz.co.lolnet.servermanager.server.data.Connection;
 import nz.co.lolnet.servermanager.server.manager.CommandManager;
+import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
 
-public class NetworkHandlerImpl implements NetworkHandler {
+public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleCommand(CommandPacket packet) {
+        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> connection.setLastPacketTime(System.currentTimeMillis()));
         if (Toolbox.isBlank(packet.getCommand())) {
             return;
         }
@@ -39,22 +43,47 @@ public class NetworkHandlerImpl implements NetworkHandler {
     }
     
     @Override
-    public void handleForward(ForwardPacket packet) {
-        throw new UnsupportedOperationException("Not supported");
-    }
-    
-    @Override
     public void handlePing(PingPacket packet) {
+        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> connection.setLastPacketTime(System.currentTimeMillis()));
         ServerManager.getInstance().getLogger().info("{}ms Ping from {}", System.currentTimeMillis() - packet.getTime(), packet.getSender());
     }
     
     @Override
+    public void handleSetting(SettingPacket packet) {
+        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
+            connection.setReceiveStatuses(packet.isReceiveStatus());
+        });
+        
+        ServerManager.getInstance().getLogger().info("Received Setting from {}", packet.getSender());
+    }
+    
+    @Override
     public void handleState(StatePacket packet) {
+        Connection connection = ConnectionManager.getConnection(packet.getSender()).orElse(null);
+        if (connection == null) {
+            ServerManager.getInstance().getLogger().warn("Received {} from unregistered server {}", packet.getClass().getSimpleName(), packet.getSender());
+            return;
+        }
+        
+        connection.setLastPacketTime(System.currentTimeMillis());
+        if (connection.getServerInfo() == null) {
+            connection.setServerInfo(new ServerInfo());
+        }
+        
+        connection.getServerInfo().setState(packet.getState());
         ServerManager.getInstance().getLogger().info("{} State from {}", packet.getState().getFriendlyName(), packet.getSender());
     }
     
     @Override
     public void handleStatus(StatusPacket packet) {
-        throw new UnsupportedOperationException("Not supported");
+        Connection connection = ConnectionManager.getConnection(packet.getSender()).orElse(null);
+        if (connection == null) {
+            ServerManager.getInstance().getLogger().warn("Received {} from unregistered server {}", packet.getClass().getSimpleName(), packet.getSender());
+            return;
+        }
+        
+        connection.setLastPacketTime(System.currentTimeMillis());
+        connection.setServerInfo(packet.getServerInfo());
+        ServerManager.getInstance().getLogger().info("{} Status from {}", packet.getServerInfo().toString(), packet.getSender());
     }
 }

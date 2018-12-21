@@ -5,8 +5,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = "nz.co.lolnet"
-archivesBaseName = "ServerManager-Bungee"
-version = "2.0.0-DEV"
+archivesBaseName = "servermanager-bungee"
+version = version
 
 configurations {
     provided {
@@ -29,6 +29,7 @@ repositories {
 dependencies {
     compile(project(path: ":common")) {
         exclude(module: "gson")
+        exclude(module: "jedis")
     }
 
     provided("com.imaginarycode.minecraft:RedisBungee:0.3.8-INTERIM")
@@ -37,9 +38,11 @@ dependencies {
 
 jar {
     from {
-        (configurations.compile - configurations.provided).collect {
+        (configurations.compile - configurations.provided).findAll({
+            it.isDirectory() || it.name.endsWith(".jar")
+        }).collect({
             it.isDirectory() ? it : zipTree(it)
-        }
+        })
     }
 }
 
@@ -49,7 +52,7 @@ processResources {
 
     from (sourceSets.main.resources.srcDirs) {
         include("bungee.yml")
-        expand("name": archivesBaseName, "version": version)
+        expand("name": "ServerManager", "version": version)
     }
 }
 

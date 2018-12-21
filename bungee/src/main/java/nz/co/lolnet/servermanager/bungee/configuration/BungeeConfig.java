@@ -16,24 +16,30 @@
 
 package nz.co.lolnet.servermanager.bungee.configuration;
 
-public class Config {
+import nz.co.lolnet.servermanager.api.configuration.Config;
+
+public class BungeeConfig implements Config {
     
     private boolean debug = false;
     private String proxyName = "";
     private String serverName = "";
     
+    @Override
     public boolean isDebug() {
         return debug;
     }
     
+    @Override
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
     
+    @Override
     public String getProxyName() {
         return proxyName;
     }
     
+    @Override
     public String getServerName() {
         return serverName;
     }

@@ -22,8 +22,7 @@ import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.api.util.Reference;
-import nz.co.lolnet.servermanager.sponge.configuration.Config;
-import nz.co.lolnet.servermanager.sponge.listener.SpongeListener;
+import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfig;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
@@ -64,7 +63,7 @@ public class SpongePlugin implements Platform {
                 .add(Logger.Level.WARN, getPluginContainer().getLogger()::warn)
                 .add(Logger.Level.ERROR, getPluginContainer().getLogger()::error)
                 .add(Logger.Level.DEBUG, message -> {
-                    if (ServerManagerImpl.getInstance().getConfig().map(Config::isDebug).orElse(false)) {
+                    if (ServerManagerImpl.getInstance().getConfig().map(SpongeConfig::isDebug).orElse(false)) {
                         getPluginContainer().getLogger().info(message);
                     }
                 });
@@ -75,42 +74,41 @@ public class SpongePlugin implements Platform {
     
     @Listener
     public void onGameInitialization(GameInitializationEvent event) {
-        Sponge.getEventManager().registerListeners(getPluginContainer(), new SpongeListener());
     }
     
     @Listener
     public void onGameState(GameStateEvent event) {
-        if (event.getState() == GameState.CONSTRUCTION) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.CONSTRUCTION));
-        } else if (event.getState() == GameState.PRE_INITIALIZATION) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.PRE_INITIALIZATION));
-        } else if (event.getState() == GameState.INITIALIZATION) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.INITIALIZATION));
-        } else if (event.getState() == GameState.POST_INITIALIZATION) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.POST_INITIALIZATION));
-        } else if (event.getState() == GameState.LOAD_COMPLETE) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.LOAD_COMPLETE));
-        } else if (event.getState() == GameState.SERVER_ABOUT_TO_START) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_ABOUT_TO_START));
-        } else if (event.getState() == GameState.SERVER_STARTING) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_STARTING));
-        } else if (event.getState() == GameState.SERVER_STARTED) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_STARTED));
-        } else if (event.getState() == GameState.SERVER_STOPPING) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_STOPPING));
-        } else if (event.getState() == GameState.SERVER_STOPPED) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_STOPPED));
-        } else if (event.getState() == GameState.GAME_STOPPING) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.GAME_STOPPING));
-        } else if (event.getState() == GameState.GAME_STOPPED) {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.GAME_STOPPED));
-        } else {
-            ServerManager.getInstance().sendPacket(StatePacket.of(State.UNKNOWN));
-        }
+        ServerManager.getInstance().sendPacket(StatePacket.of(getState()));
     }
     
-    public Path getPath() {
-        return path;
+    public State getState() {
+        if (Sponge.getGame().getState() == GameState.CONSTRUCTION) {
+            return State.CONSTRUCTION;
+        } else if (Sponge.getGame().getState() == GameState.PRE_INITIALIZATION) {
+            return State.PRE_INITIALIZATION;
+        } else if (Sponge.getGame().getState() == GameState.INITIALIZATION) {
+            return State.INITIALIZATION;
+        } else if (Sponge.getGame().getState() == GameState.POST_INITIALIZATION) {
+            return State.POST_INITIALIZATION;
+        } else if (Sponge.getGame().getState() == GameState.LOAD_COMPLETE) {
+            return State.LOAD_COMPLETE;
+        } else if (Sponge.getGame().getState() == GameState.SERVER_ABOUT_TO_START) {
+            return State.SERVER_ABOUT_TO_START;
+        } else if (Sponge.getGame().getState() == GameState.SERVER_STARTING) {
+            return State.SERVER_STARTING;
+        } else if (Sponge.getGame().getState() == GameState.SERVER_STARTED) {
+            return State.SERVER_STARTED;
+        } else if (Sponge.getGame().getState() == GameState.SERVER_STOPPING) {
+            return State.SERVER_STOPPING;
+        } else if (Sponge.getGame().getState() == GameState.SERVER_STOPPED) {
+            return State.SERVER_STOPPED;
+        } else if (Sponge.getGame().getState() == GameState.GAME_STOPPING) {
+            return State.GAME_STOPPING;
+        } else if (Sponge.getGame().getState() == GameState.GAME_STOPPED) {
+            return State.GAME_STOPPED;
+        } else {
+            return State.UNKNOWN;
+        }
     }
     
     public static SpongePlugin getInstance() {
@@ -119,5 +117,9 @@ public class SpongePlugin implements Platform {
     
     public PluginContainer getPluginContainer() {
         return pluginContainer;
+    }
+    
+    public Path getPath() {
+        return path;
     }
 }

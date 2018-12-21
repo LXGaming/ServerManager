@@ -18,7 +18,9 @@ package nz.co.lolnet.servermanager.api.configuration;
 
 public interface Configuration {
     
-    void loadConfiguration();
+    boolean loadConfiguration();
     
-    void saveConfiguration();
+    boolean saveConfiguration();
+    
+    Config getConfig();
 }

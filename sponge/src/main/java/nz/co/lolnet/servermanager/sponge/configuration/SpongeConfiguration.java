@@ -23,6 +23,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.api.configuration.Configuration;
 
 import java.io.IOException;
@@ -30,39 +31,43 @@ import java.io.IOException;
 public class SpongeConfiguration implements Configuration {
     
     private ConfigurationLoader<CommentedConfigurationNode> configurationLoader;
-    private ObjectMapper<Config>.BoundInstance objectMapper;
+    private ObjectMapper<SpongeConfig>.BoundInstance objectMapper;
     private CommentedConfigurationNode configurationNode;
-    private Config config;
+    private SpongeConfig spongeConfig;
     
     public SpongeConfiguration() {
         try {
             this.configurationLoader = HoconConfigurationLoader.builder().setPath(ServerManager.getInstance().getPath()).build();
-            this.objectMapper = ObjectMapper.forClass(Config.class).bindToNew();
+            this.objectMapper = ObjectMapper.forClass(SpongeConfig.class).bindToNew();
         } catch (Exception ex) {
             ServerManager.getInstance().getLogger().error("Encountered an error initializing {}", getClass().getSimpleName(), ex);
         }
     }
     
     @Override
-    public void loadConfiguration() {
+    public boolean loadConfiguration() {
         try {
             configurationNode = getConfigurationLoader().load(ConfigurationOptions.defaults());
-            config = getObjectMapper().populate(getConfigurationNode());
+            spongeConfig = getObjectMapper().populate(getConfigurationNode());
             ServerManager.getInstance().getLogger().info("Successfully loaded configuration file.");
+            return true;
         } catch (IOException | ObjectMappingException | RuntimeException ex) {
             configurationNode = getConfigurationLoader().createEmptyNode(ConfigurationOptions.defaults());
             ServerManager.getInstance().getLogger().error("Encountered an error processing {}::loadConfiguration", getClass().getSimpleName(), ex);
+            return false;
         }
     }
     
     @Override
-    public void saveConfiguration() {
+    public boolean saveConfiguration() {
         try {
             getObjectMapper().serialize(getConfigurationNode());
             getConfigurationLoader().save(getConfigurationNode());
             ServerManager.getInstance().getLogger().info("Successfully saved configuration file.");
+            return true;
         } catch (IOException | ObjectMappingException | RuntimeException ex) {
             ServerManager.getInstance().getLogger().error("Encountered an error processing {}::saveConfiguration", getClass().getSimpleName(), ex);
+            return false;
         }
     }
     
@@ -70,7 +75,7 @@ public class SpongeConfiguration implements Configuration {
         return configurationLoader;
     }
     
-    private ObjectMapper<Config>.BoundInstance getObjectMapper() {
+    private ObjectMapper<SpongeConfig>.BoundInstance getObjectMapper() {
         return objectMapper;
     }
     
@@ -78,7 +83,8 @@ public class SpongeConfiguration implements Configuration {
         return configurationNode;
     }
     
+    @Override
     public Config getConfig() {
-        return config;
+        return spongeConfig;
     }
 }

@@ -16,8 +16,10 @@
 
 package nz.co.lolnet.servermanager.server.service;
 
-import nz.co.lolnet.servermanager.common.manager.PacketManager;
+import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.common.service.RedisService;
+import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 import nz.co.lolnet.servermanager.server.configuration.ServerConfig;
 import nz.co.lolnet.servermanager.server.configuration.category.RedisCategory;
@@ -47,9 +49,23 @@ public class RedisServiceImpl extends RedisService {
     @Override
     public void executeService() {
         try (Jedis jedis = getJedisPool().getResource()) {
-            PacketManager.getServerChannel().ifPresent(jedis::clientSetname);
+            ServerManager.getInstance().getConfig()
+                    .map(Config::getName)
+                    .map(name -> Toolbox.createChannel(ServerManager.getInstance().getPlatformType(), name))
+                    .ifPresent(jedis::clientSetname);
+            
             jedis.subscribe(new RedisListener(), getChannels().toArray(new String[0]));
         }
+    }
+    
+    @Override
+    public void shutdown() {
+        if (getJedisPool() == null || getJedisPool().isClosed()) {
+            return;
+        }
+        
+        getJedisPool().close();
+        getJedisPool().destroy();
     }
     
     @Override

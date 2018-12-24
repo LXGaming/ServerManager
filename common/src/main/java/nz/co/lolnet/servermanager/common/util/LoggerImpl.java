@@ -16,6 +16,8 @@
 
 package nz.co.lolnet.servermanager.common.util;
 
+import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.api.util.Logger;
 
 import java.io.PrintWriter;
@@ -33,7 +35,9 @@ public class LoggerImpl implements Logger {
     
     @Override
     public void debug(String format, Object... arguments) {
-        log(Level.DEBUG, format, arguments);
+        if (ServerManager.getInstance().getConfig().map(Config::isDebug).orElse(false)) {
+            log(Level.DEBUG, format, arguments);
+        }
     }
     
     @Override

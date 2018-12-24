@@ -21,22 +21,18 @@ import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class StatusPacket extends AbstractPacket {
     
-    private final ServerInfo serverInfo;
-    
-    private StatusPacket(ServerInfo serverInfo) {
-        this.serverInfo = serverInfo;
-    }
+    private ServerInfo serverInfo;
     
     @Override
     public void process(NetworkHandler networkHandler) {
         networkHandler.handleStatus(this);
     }
     
-    public static StatusPacket of(ServerInfo serverInfo) {
-        return new StatusPacket(serverInfo);
-    }
-    
     public ServerInfo getServerInfo() {
         return serverInfo;
+    }
+    
+    public void setServerInfo(ServerInfo serverInfo) {
+        this.serverInfo = serverInfo;
     }
 }

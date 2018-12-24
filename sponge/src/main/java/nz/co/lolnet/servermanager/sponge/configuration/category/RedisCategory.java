@@ -16,19 +16,10 @@
 
 package nz.co.lolnet.servermanager.sponge.configuration.category;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-
-@ConfigSerializable
 public class RedisCategory {
     
-    @Setting(value = "host", comment = "")
     private String host = "localhost";
-    
-    @Setting(value = "port", comment = "")
     private int port = 6379;
-    
-    @Setting(value = "password", comment = "")
     private String password = "";
     
     public String getHost() {

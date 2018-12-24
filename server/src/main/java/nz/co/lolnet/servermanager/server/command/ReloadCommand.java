@@ -16,7 +16,7 @@
 
 package nz.co.lolnet.servermanager.server.command;
 
-import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 
 import java.util.List;
 
@@ -29,8 +29,9 @@ public class ReloadCommand extends AbstractCommand {
     
     @Override
     public void execute(List<String> arguments) {
-        ServerManager.getInstance().getConfiguration().loadConfiguration();
-        ServerManager.getInstance().reloadServerManager();
-        ServerManager.getInstance().getLogger().info("Reloaded");
+        ServerManagerImpl.getInstance().getConfiguration().loadConfiguration();
+        ServerManagerImpl.getInstance().reloadServerManager();
+        ServerManagerImpl.getInstance().getConfiguration().saveConfiguration();
+        ServerManagerImpl.getInstance().getLogger().info("Reloaded");
     }
 }

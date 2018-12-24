@@ -20,9 +20,5 @@ public interface Config {
     
     boolean isDebug();
     
-    void setDebug(boolean debug);
-    
-    String getProxyName();
-    
-    String getServerName();
+    String getName();
 }

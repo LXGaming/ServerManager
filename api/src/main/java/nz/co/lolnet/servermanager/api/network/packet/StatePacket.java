@@ -16,31 +16,16 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
-import nz.co.lolnet.servermanager.api.data.Platform;
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class StatePacket extends AbstractPacket {
     
     private Platform.State state;
     
-    private StatePacket() {
-    }
-    
-    private StatePacket(Platform.State state) {
-        this.state = state;
-    }
-    
     @Override
     public void process(NetworkHandler networkHandler) {
         networkHandler.handleState(this);
-    }
-    
-    public static StatePacket of() {
-        return new StatePacket();
-    }
-    
-    public static StatePacket of(Platform.State state) {
-        return new StatePacket(state);
     }
     
     public Platform.State getState() {

@@ -22,17 +22,13 @@ public class PingPacket extends AbstractPacket {
     
     private final long time;
     
-    private PingPacket(long time) {
+    public PingPacket(long time) {
         this.time = time;
     }
     
     @Override
     public void process(NetworkHandler networkHandler) {
         networkHandler.handlePing(this);
-    }
-    
-    public static PingPacket of(long time) {
-        return new PingPacket(time);
     }
     
     public long getTime() {

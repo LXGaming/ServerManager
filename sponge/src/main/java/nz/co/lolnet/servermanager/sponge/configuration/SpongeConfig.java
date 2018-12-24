@@ -16,24 +16,14 @@
 
 package nz.co.lolnet.servermanager.sponge.configuration;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.sponge.configuration.category.RedisCategory;
 
-@ConfigSerializable
 public class SpongeConfig implements Config {
     
-    @Setting(value = "debug", comment = "")
     private boolean debug = false;
-    
-    @Setting(value = "proxy-name", comment = "")
-    private String proxyName = "";
-    
-    @Setting(value = "server-name", comment = "")
-    private String serverName = "";
-    
-    @Setting(value = "redis", comment = "")
+    private String name = "";
+    private String host = "";
     private RedisCategory redisCategory = new RedisCategory();
     
     @Override
@@ -42,18 +32,12 @@ public class SpongeConfig implements Config {
     }
     
     @Override
-    public void setDebug(boolean debug) {
-        this.debug = debug;
+    public String getName() {
+        return name;
     }
     
-    @Override
-    public String getProxyName() {
-        return proxyName;
-    }
-    
-    @Override
-    public String getServerName() {
-        return serverName;
+    public String getHost() {
+        return host;
     }
     
     public RedisCategory getRedisCategory() {

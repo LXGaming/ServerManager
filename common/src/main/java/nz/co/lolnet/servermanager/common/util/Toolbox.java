@@ -19,6 +19,8 @@ package nz.co.lolnet.servermanager.common.util;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import nz.co.lolnet.servermanager.api.Platform;
+import nz.co.lolnet.servermanager.api.util.Reference;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -67,6 +69,22 @@ public class Toolbox {
      */
     public static String filter(String string) {
         return string.replaceAll("[^\\x20-\\x7E\\x0A\\x0D]", "");
+    }
+    
+    public static String createChannel(Platform.Type platformType, String name) {
+        if (Toolbox.isNotBlank(name)) {
+            return Reference.ID + "-" + platformType + "-" + name.toLowerCase();
+        }
+        
+        return null;
+    }
+    
+    public static String createName(Platform.Type platformType, String name) {
+        if (Toolbox.isNotBlank(name)) {
+            return platformType.getFriendlyName() + name;
+        }
+        
+        return null;
     }
     
     public static String getTimeString(long time) {

@@ -16,34 +16,20 @@
 
 package nz.co.lolnet.servermanager.server.configuration;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.configuration.Config;
-import nz.co.lolnet.servermanager.api.configuration.Configuration;
-import nz.co.lolnet.servermanager.common.util.Toolbox;
+import nz.co.lolnet.servermanager.common.configuration.Configuration;
 
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
-public class ServerConfiguration implements Configuration {
+public class ServerConfiguration extends Configuration {
     
-    private static final Gson GSON = new GsonBuilder()
-            .disableHtmlEscaping()
-            .enableComplexMapKeySerialization()
-            .setPrettyPrinting()
-            .create();
-    
-    private Config config;
+    public ServerConfiguration(Path path) {
+        super(path);
+    }
     
     @Override
     public boolean loadConfiguration() {
-        Optional<ServerConfig> config = loadFile(ServerManager.getInstance().getPath().resolve("config.json"), ServerConfig.class);
+        Optional<ServerConfig> config = loadFile(getPath().resolve("config.json"), ServerConfig.class);
         if (config.isPresent()) {
             this.config = config.get();
             return true;
@@ -53,65 +39,7 @@ public class ServerConfiguration implements Configuration {
     }
     
     @Override
-    public boolean saveConfiguration() {
-        return saveFile(ServerManager.getInstance().getPath().resolve("config.json"), config);
-    }
-    
-    public static <T> Optional<T> loadFile(Path path, Class<T> typeOfT) {
-        if (Files.exists(path)) {
-            return deserializeFile(path, typeOfT);
-        }
-        
-        return Toolbox.newInstance(typeOfT).filter(object -> saveFile(path, object));
-    }
-    
-    public static boolean saveFile(Path path, Object object) {
-        if (Files.exists(path) || createFile(path)) {
-            return serializeFile(path, object);
-        }
-        
-        return false;
-    }
-    
-    public static <T> Optional<T> deserializeFile(Path path, Class<T> typeOfT) {
-        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-            return Optional.ofNullable(getGson().fromJson(reader, typeOfT));
-        } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error while deserializing {}", path, ex);
-            return Optional.empty();
-        }
-    }
-    
-    public static boolean serializeFile(Path path, Object object) {
-        try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
-            getGson().toJson(object, writer);
-            return true;
-        } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error while serializing {}", path, ex);
-            return false;
-        }
-    }
-    
-    private static boolean createFile(Path path) {
-        try {
-            if (path.getParent() != null) {
-                Files.createDirectories(path.getParent());
-            }
-            
-            Files.createFile(path);
-            return true;
-        } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error while creating {}", path, ex);
-            return false;
-        }
-    }
-    
-    public static Gson getGson() {
-        return GSON;
-    }
-    
-    @Override
-    public Config getConfig() {
-        return config;
+    public ServerConfig getConfig() {
+        return (ServerConfig) super.getConfig();
     }
 }

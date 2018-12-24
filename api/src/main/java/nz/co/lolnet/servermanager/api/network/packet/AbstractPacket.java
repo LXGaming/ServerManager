@@ -20,37 +20,37 @@ import nz.co.lolnet.servermanager.api.network.Packet;
 
 public abstract class AbstractPacket implements Packet {
     
-    private String sender;
-    private String replyTo;
     private String forwardTo;
+    private String sender;
+    private Type type;
     
     @Override
-    public final String getSender() {
-        return sender;
-    }
-    
-    @Override
-    public final void setSender(String sender) {
-        this.sender = sender;
-    }
-    
-    @Override
-    public final String getReplyTo() {
-        return replyTo;
-    }
-    
-    @Override
-    public final void setReplyTo(String replyTo) {
-        this.replyTo = replyTo;
-    }
-    
-    @Override
-    public final String getForwardTo() {
+    public String getForwardTo() {
         return forwardTo;
     }
     
     @Override
-    public final void setForwardTo(String forwardTo) {
+    public void setForwardTo(String forwardTo) {
         this.forwardTo = forwardTo;
+    }
+    
+    @Override
+    public String getSender() {
+        return sender;
+    }
+    
+    @Override
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+    
+    @Override
+    public Type getType() {
+        return type;
+    }
+    
+    @Override
+    public void setType(Type type) {
+        this.type = type;
     }
 }

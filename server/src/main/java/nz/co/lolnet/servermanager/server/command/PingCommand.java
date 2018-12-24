@@ -17,6 +17,7 @@
 package nz.co.lolnet.servermanager.server.command;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 
@@ -37,7 +38,9 @@ public class PingCommand extends AbstractCommand {
         }
         
         String channel = arguments.remove(0);
-        ServerManagerImpl.getInstance().sendPacket(channel, PingPacket.of(System.currentTimeMillis()));
+        PingPacket packet = new PingPacket(System.currentTimeMillis());
+        packet.setType(Packet.Type.REQUEST);
+        ServerManagerImpl.getInstance().sendPacket(channel, packet);
         ServerManager.getInstance().getLogger().info("Sending ping...");
     }
 }

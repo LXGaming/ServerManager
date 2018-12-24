@@ -20,28 +20,24 @@ import nz.co.lolnet.servermanager.api.data.ServerInfo;
 
 public class Connection {
     
-    private final String channelId;
-    private final String serverId;
+    private final String channel;
+    private final String name;
     private boolean receiveStatuses;
     private long lastPacketTime;
     private long lastPingTime;
     private ServerInfo serverInfo;
     
-    private Connection(String channelId, String serverId) {
-        this.channelId = channelId;
-        this.serverId = serverId;
+    public Connection(String channel, String name) {
+        this.channel = channel;
+        this.name = name;
     }
     
-    public static Connection of(String channelId, String serverId) {
-        return new Connection(channelId, serverId);
+    public String getChannel() {
+        return channel;
     }
     
-    public String getChannelId() {
-        return channelId;
-    }
-    
-    public String getServerId() {
-        return serverId;
+    public String getName() {
+        return name;
     }
     
     public boolean isReceiveStatuses() {

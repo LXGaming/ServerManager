@@ -16,7 +16,7 @@
 
 package nz.co.lolnet.servermanager.server.configuration.category;
 
-import nz.co.lolnet.servermanager.api.data.Platform;
+import nz.co.lolnet.servermanager.api.Platform;
 
 public class ServerCategory {
     

@@ -33,7 +33,7 @@ public class ListCommand extends AbstractCommand {
     @Override
     public void execute(List<String> arguments) {
         Set<String> connections = Toolbox.newHashSet();
-        ConnectionManager.getConnections().forEach(connection -> connections.add(connection.getServerId()));
+        ConnectionManager.getConnections().forEach(connection -> connections.add(connection.getName()));
         if (connections.isEmpty()) {
             ServerManager.getInstance().getLogger().info("No connections present");
             return;

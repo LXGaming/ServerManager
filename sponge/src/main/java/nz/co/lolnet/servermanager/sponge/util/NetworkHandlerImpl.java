@@ -18,11 +18,12 @@ package nz.co.lolnet.servermanager.sponge.util;
 
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.ServerHangWatchdog;
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
@@ -39,6 +40,11 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class NetworkHandlerImpl extends AbstractNetworkHandler {
+    
+    @Override
+    public boolean handle(Packet packet) {
+        return packet.getType().equals(Packet.Type.REQUEST);
+    }
     
     @Override
     public void handleCommand(CommandPacket packet) {
@@ -64,6 +70,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleState(StatePacket packet) {
+        packet.setType(Packet.Type.RESPONSE);
         packet.setState(SpongePlugin.getInstance().getState());
         ServerManager.getInstance().sendPacket(packet);
     }
@@ -84,6 +91,8 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
             serverInfo.setVersion(Sponge.getPlatform().getMinecraftVersion().getName());
         }
         
+        packet.setType(Packet.Type.RESPONSE);
+        packet.setServerInfo(serverInfo);
         ServerManager.getInstance().sendPacket(packet);
     }
 }

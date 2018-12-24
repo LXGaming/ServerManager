@@ -16,14 +16,17 @@
 
 package nz.co.lolnet.servermanager.sponge;
 
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.util.Reference;
+import nz.co.lolnet.servermanager.common.configuration.Configuration;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.manager.ServiceManager;
+import nz.co.lolnet.servermanager.common.service.RedisService;
 import nz.co.lolnet.servermanager.common.util.LoggerImpl;
+import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfig;
 import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfiguration;
 import nz.co.lolnet.servermanager.sponge.service.RedisServiceImpl;
@@ -33,13 +36,13 @@ import java.util.Optional;
 
 public class ServerManagerImpl extends ServerManager {
     
-    private final RedisServiceImpl redisService;
+    private Configuration configuration;
+    private RedisService redisService;
     
     public ServerManagerImpl() {
-        this.logger = new LoggerImpl();
-        this.path = SpongePlugin.getInstance().getPath();
-        this.configuration = new SpongeConfiguration();
         this.platformType = Platform.Type.SPONGE;
+        this.logger = new LoggerImpl();
+        this.configuration = new SpongeConfiguration(SpongePlugin.getInstance().getPath());
         this.redisService = new RedisServiceImpl();
     }
     
@@ -69,21 +72,27 @@ public class ServerManagerImpl extends ServerManager {
     }
     
     @Override
-    public void sendPacket(String channel, Packet packet) {
-        PacketManager.sendPacket(channel, packet, getRedisService()::publish);
+    public void sendPacket(Packet packet) {
+        getConfig()
+                .map(SpongeConfig::getHost)
+                .map(name -> Toolbox.createChannel(Platform.Type.SERVER, name))
+                .ifPresent(channel -> sendPacket(channel, packet));
     }
     
     @Override
-    public void sendPacket(Packet packet) {
-        PacketManager.sendPacket(packet, getRedisService()::publish);
+    public void sendPacket(String channel, Packet packet) {
+        PacketManager.sendPacket(channel, packet, getRedisService()::publish);
     }
     
     public static ServerManagerImpl getInstance() {
         return (ServerManagerImpl) ServerManager.getInstance();
     }
     
-    @Override
-    public Optional<? extends SpongeConfig> getConfig() {
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+    
+    public Optional<SpongeConfig> getConfig() {
         if (getConfiguration() != null) {
             return Optional.ofNullable((SpongeConfig) getConfiguration().getConfig());
         }
@@ -91,7 +100,7 @@ public class ServerManagerImpl extends ServerManager {
         return Optional.empty();
     }
     
-    public RedisServiceImpl getRedisService() {
+    public RedisService getRedisService() {
         return redisService;
     }
 }

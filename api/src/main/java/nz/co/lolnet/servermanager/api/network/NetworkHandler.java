@@ -24,6 +24,8 @@ import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
 
 public interface NetworkHandler {
     
+    boolean handle(Packet packet);
+    
     void handleCommand(CommandPacket packet);
     
     void handlePing(PingPacket packet);

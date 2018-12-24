@@ -19,11 +19,11 @@ package nz.co.lolnet.servermanager.bungee;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.Platform;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.util.Logger;
-import nz.co.lolnet.servermanager.bungee.configuration.BungeeConfig;
 import nz.co.lolnet.servermanager.bungee.listener.BungeeListener;
 
 public class BungeePlugin extends Plugin implements Platform {
@@ -42,25 +42,24 @@ public class BungeePlugin extends Plugin implements Platform {
                 .add(Logger.Level.INFO, getLogger()::info)
                 .add(Logger.Level.WARN, getLogger()::warning)
                 .add(Logger.Level.ERROR, getLogger()::severe)
-                .add(Logger.Level.DEBUG, message -> {
-                    if (ServerManagerImpl.getInstance().getConfig().map(BungeeConfig::isDebug).orElse(false)) {
-                        getLogger().info(message);
-                    }
-                });
+                .add(Logger.Level.DEBUG, getLogger()::info);
         
         serverManager.loadServerManager();
         serverManager.reloadServerManager();
         ProxyServer.getInstance().getPluginManager().registerListener(this, new BungeeListener());
-        serverManager.sendPacket(StatePacket.of(State.SERVER_STARTED));
+        
+        StatePacket packet = new StatePacket();
+        packet.setType(Packet.Type.RESPONSE);
+        packet.setState(State.SERVER_STARTED);
+        ServerManager.getInstance().sendPacket(packet);
     }
     
     @Override
     public void onDisable() {
-        ServerManager.getInstance().sendPacket(StatePacket.of(State.SERVER_STOPPED));
-    }
-    
-    public static BungeePlugin getInstance() {
-        return instance;
+        StatePacket packet = new StatePacket();
+        packet.setType(Packet.Type.RESPONSE);
+        packet.setState(State.SERVER_STOPPED);
+        ServerManager.getInstance().sendPacket(packet);
     }
     
     public static String getVersion() {
@@ -69,5 +68,9 @@ public class BungeePlugin extends Plugin implements Platform {
         }
         
         return ProtocolConstants.SUPPORTED_VERSIONS.get(0) + " - " + ProtocolConstants.SUPPORTED_VERSIONS.get(ProtocolConstants.SUPPORTED_VERSIONS.size() - 1);
+    }
+    
+    public static BungeePlugin getInstance() {
+        return instance;
     }
 }

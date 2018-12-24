@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nz.co.lolnet.servermanager.api.data;
+package nz.co.lolnet.servermanager.api;
 
 public interface Platform {
     
@@ -70,7 +70,7 @@ public interface Platform {
         
         BUKKIT("Bukkit"),
         
-        BUNGEE("BungeeCord"),
+        BUNGEECORD("BungeeCord"),
         
         SERVER("Server"),
         

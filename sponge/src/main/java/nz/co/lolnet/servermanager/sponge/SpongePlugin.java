@@ -17,15 +17,15 @@
 package nz.co.lolnet.servermanager.sponge;
 
 import com.google.inject.Inject;
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.Platform;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.api.util.Reference;
-import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfig;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
@@ -51,7 +51,7 @@ public class SpongePlugin implements Platform {
     private PluginContainer pluginContainer;
     
     @Inject
-    @DefaultConfig(sharedRoot = true)
+    @ConfigDir(sharedRoot = false)
     private Path path;
     
     @Listener
@@ -62,11 +62,7 @@ public class SpongePlugin implements Platform {
                 .add(Logger.Level.INFO, getPluginContainer().getLogger()::info)
                 .add(Logger.Level.WARN, getPluginContainer().getLogger()::warn)
                 .add(Logger.Level.ERROR, getPluginContainer().getLogger()::error)
-                .add(Logger.Level.DEBUG, message -> {
-                    if (ServerManagerImpl.getInstance().getConfig().map(SpongeConfig::isDebug).orElse(false)) {
-                        getPluginContainer().getLogger().info(message);
-                    }
-                });
+                .add(Logger.Level.DEBUG, getPluginContainer().getLogger()::debug);
         
         serverManager.loadServerManager();
         serverManager.reloadServerManager();
@@ -78,7 +74,10 @@ public class SpongePlugin implements Platform {
     
     @Listener
     public void onGameState(GameStateEvent event) {
-        ServerManager.getInstance().sendPacket(StatePacket.of(getState()));
+        StatePacket packet = new StatePacket();
+        packet.setType(Packet.Type.RESPONSE);
+        packet.setState(getState());
+        ServerManager.getInstance().sendPacket(packet);
     }
     
     public State getState() {

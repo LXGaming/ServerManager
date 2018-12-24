@@ -22,16 +22,9 @@ public class SettingPacket extends AbstractPacket {
     
     private boolean receiveStatus;
     
-    private SettingPacket() {
-    }
-    
     @Override
     public void process(NetworkHandler networkHandler) {
         networkHandler.handleSetting(this);
-    }
-    
-    public static SettingPacket of() {
-        return new SettingPacket();
     }
     
     public boolean isReceiveStatus() {

@@ -22,7 +22,12 @@ import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
 
-public class AbstractNetworkHandler implements NetworkHandler {
+public abstract class AbstractNetworkHandler implements NetworkHandler {
+    
+    @Override
+    public boolean handle(Packet packet) {
+        return true;
+    }
     
     @Override
     public void handleCommand(CommandPacket packet) {

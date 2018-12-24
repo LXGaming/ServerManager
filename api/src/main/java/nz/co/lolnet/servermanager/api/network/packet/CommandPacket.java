@@ -24,7 +24,7 @@ public class CommandPacket extends AbstractPacket {
     private final String command;
     private final User user;
     
-    private CommandPacket(String command, User user) {
+    public CommandPacket(String command, User user) {
         this.command = command;
         this.user = user;
     }
@@ -32,10 +32,6 @@ public class CommandPacket extends AbstractPacket {
     @Override
     public void process(NetworkHandler networkHandler) {
         networkHandler.handleCommand(this);
-    }
-    
-    public static CommandPacket of(String command, User user) {
-        return new CommandPacket(command, user);
     }
     
     public String getCommand() {

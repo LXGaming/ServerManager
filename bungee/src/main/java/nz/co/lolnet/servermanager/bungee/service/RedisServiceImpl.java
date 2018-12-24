@@ -22,8 +22,9 @@ import com.imaginarycode.minecraft.redisbungee.internal.jedis.JedisPool;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.common.manager.PacketManager;
+import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.common.service.RedisService;
+import nz.co.lolnet.servermanager.common.util.Toolbox;
 
 public class RedisServiceImpl extends RedisService {
     
@@ -31,7 +32,7 @@ public class RedisServiceImpl extends RedisService {
     
     @Override
     public boolean prepareService() {
-        Plugin plugin = ProxyServer.getInstance().getPluginManager().getPlugin("redisbungee");
+        Plugin plugin = ProxyServer.getInstance().getPluginManager().getPlugin("RedisBungee");
         if (!(plugin instanceof RedisBungee)) {
             ServerManager.getInstance().getLogger().error("RedisBungee is not loaded");
             return false;
@@ -44,10 +45,22 @@ public class RedisServiceImpl extends RedisService {
     @Override
     public void executeService() {
         try (Jedis jedis = getJedisPool().getResource()) {
-            PacketManager.getServerChannel().ifPresent(jedis::clientSetname);
+            ServerManager.getInstance().getConfig()
+                    .map(Config::getName)
+                    .map(name -> Toolbox.createChannel(ServerManager.getInstance().getPlatformType(), name))
+                    .ifPresent(jedis::clientSetname);
         }
         
         RedisBungee.getApi().registerPubSubChannels(getChannels().toArray(new String[0]));
+    }
+    
+    @Override
+    public void shutdown() {
+        if (getJedisPool() == null || getJedisPool().isClosed()) {
+            return;
+        }
+        
+        RedisBungee.getApi().unregisterPubSubChannels(getChannels().toArray(new String[0]));
     }
     
     @Override

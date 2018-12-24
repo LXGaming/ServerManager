@@ -16,6 +16,8 @@
 
 package nz.co.lolnet.servermanager.api.data;
 
+import nz.co.lolnet.servermanager.api.Platform;
+
 import java.util.Collection;
 import java.util.Objects;
 

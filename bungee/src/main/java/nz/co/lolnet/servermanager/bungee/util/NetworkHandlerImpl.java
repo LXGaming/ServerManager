@@ -17,11 +17,12 @@
 package nz.co.lolnet.servermanager.bungee.util;
 
 import net.md_5.bungee.api.ProxyServer;
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
@@ -36,6 +37,11 @@ import java.util.HashSet;
 import java.util.stream.Collectors;
 
 public class NetworkHandlerImpl extends AbstractNetworkHandler {
+    
+    @Override
+    public boolean handle(Packet packet) {
+        return Toolbox.isBlank(packet.getForwardTo()) && packet.getType().equals(Packet.Type.REQUEST);
+    }
     
     @Override
     public void handleCommand(CommandPacket packet) {
@@ -55,11 +61,13 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handlePing(PingPacket packet) {
+        packet.setType(Packet.Type.RESPONSE);
         ServerManager.getInstance().sendPacket(packet);
     }
     
     @Override
     public void handleState(StatePacket packet) {
+        packet.setType(Packet.Type.RESPONSE);
         packet.setState(Platform.State.SERVER_STARTED);
         ServerManager.getInstance().sendPacket(packet);
     }
@@ -69,11 +77,14 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         ServerInfo serverInfo = new ServerInfo();
         serverInfo.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
         serverInfo.setState(Platform.State.SERVER_STARTED);
-        serverInfo.setType(Platform.Type.BUNGEE);
+        serverInfo.setType(Platform.Type.BUNGEECORD);
         serverInfo.setUsers(ProxyServer.getInstance().getPlayers().stream()
-                .map(proxiedPlayer -> User.of(proxiedPlayer.getName(), proxiedPlayer.getUniqueId()))
+                .map(player -> User.of(player.getName(), player.getUniqueId()))
                 .collect(Collectors.toCollection(HashSet::new)));
         serverInfo.setVersion(BungeePlugin.getVersion());
+        
+        packet.setType(Packet.Type.RESPONSE);
+        packet.setServerInfo(serverInfo);
         ServerManager.getInstance().sendPacket(packet);
     }
 }

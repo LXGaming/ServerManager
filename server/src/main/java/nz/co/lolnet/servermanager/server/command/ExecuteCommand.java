@@ -18,6 +18,7 @@ package nz.co.lolnet.servermanager.server.command;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.User;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
@@ -47,7 +48,9 @@ public class ExecuteCommand extends AbstractCommand {
             return;
         }
         
-        ServerManagerImpl.getInstance().sendPacket(channel, CommandPacket.of(command, User.of(Reference.NAME, null)));
+        CommandPacket packet = new CommandPacket(command, User.of(Reference.NAME, null));
+        packet.setType(Packet.Type.REQUEST);
+        ServerManagerImpl.getInstance().sendPacket(channel, packet);
         ServerManager.getInstance().getLogger().info("Sending execute...");
     }
 }

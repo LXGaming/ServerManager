@@ -38,7 +38,7 @@ public class Main {
         serverManager.reloadServerManager();
         
         TerminalConsoleAppender.buildTerminal(Reference.NAME, serverManager.getConfig().map(ServerConfig::isJlineOverride).orElse(false));
-        while (serverManager.getRunning().get()) {
+        while (serverManager.isRunning()) {
             TerminalConsoleAppender.readline().ifPresent(CommandManager::process);
         }
     }

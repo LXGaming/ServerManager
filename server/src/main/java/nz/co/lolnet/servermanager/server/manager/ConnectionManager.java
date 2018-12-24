@@ -18,7 +18,6 @@ package nz.co.lolnet.servermanager.server.manager;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.Packet;
-import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 import nz.co.lolnet.servermanager.server.configuration.ServerConfig;
@@ -49,27 +48,28 @@ public class ConnectionManager {
                 serverCategory.setName(serverCategory.getName().toLowerCase());
             }
             
-            String channelId = Reference.ID + "-" + serverCategory.getPlatform() + "-" + serverCategory.getName();
-            String serverId = serverCategory.getPlatform() + serverCategory.getName();
-            getConnections().add(Connection.of(channelId, serverId));
+            
+            String channel = Toolbox.createChannel(serverCategory.getPlatform(), serverCategory.getName());
+            String name = Toolbox.createName(serverCategory.getPlatform(), serverCategory.getName());
+            getConnections().add(new Connection(channel, name));
         }
     }
     
-    public static void forwardStatuses(Packet packet) {
+    public static void forwardState(Packet packet) {
         for (Connection connection : getConnections()) {
-            if (!connection.isReceiveStatuses()) {
+            if (connection.getName().equalsIgnoreCase(packet.getSender()) || !connection.isReceiveStatuses()) {
                 continue;
             }
             
             // TODO Check if alive
             
-            ServerManager.getInstance().sendPacket(connection.getChannelId(), packet);
+            ServerManager.getInstance().sendPacket(connection.getChannel(), packet);
         }
     }
     
-    public static Optional<Connection> getConnection(String serverId) {
+    public static Optional<Connection> getConnection(String name) {
         for (Connection connection : getConnections()) {
-            if (connection.getServerId().equals(serverId)) {
+            if (connection.getName().equalsIgnoreCase(name)) {
                 return Optional.of(connection);
             }
         }

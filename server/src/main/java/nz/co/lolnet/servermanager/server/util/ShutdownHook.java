@@ -36,8 +36,7 @@ public class ShutdownHook extends Thread {
     private void shutdownExecutorService() {
         try {
             ServiceManager.getScheduledExecutorService().shutdown();
-            ServerManagerImpl.getInstance().getRedisService().getJedisPool().close();
-            ServerManagerImpl.getInstance().getRedisService().getJedisPool().destroy();
+            ServerManagerImpl.getInstance().getRedisService().shutdown();
             if (!ServiceManager.getScheduledExecutorService().awaitTermination(2000, TimeUnit.MILLISECONDS)) {
                 throw new InterruptedException();
             }

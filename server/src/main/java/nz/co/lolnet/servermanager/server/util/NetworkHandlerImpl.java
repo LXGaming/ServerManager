@@ -19,6 +19,7 @@ package nz.co.lolnet.servermanager.server.util;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
+import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
@@ -30,6 +31,20 @@ import nz.co.lolnet.servermanager.server.manager.CommandManager;
 import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
 
 public class NetworkHandlerImpl extends AbstractNetworkHandler {
+    
+    @Override
+    public boolean handle(Packet packet) {
+        ServerManager.getInstance().getLogger().info("Received Packet from {} ({})", packet.getSender(), packet.getType());
+        if (Toolbox.isNotBlank(packet.getForwardTo())) {
+            ConnectionManager.getConnection(packet.getForwardTo()).ifPresent(connection -> {
+                ServerManager.getInstance().sendPacket(connection.getChannel(), packet);
+            });
+            
+            return false;
+        }
+        
+        return packet.getType().equals(Packet.Type.RESPONSE);
+    }
     
     @Override
     public void handleCommand(CommandPacket packet) {
@@ -72,6 +87,8 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         
         connection.getServerInfo().setState(packet.getState());
         ServerManager.getInstance().getLogger().info("{} State from {}", packet.getState().getFriendlyName(), packet.getSender());
+        
+        ConnectionManager.forwardState(packet);
     }
     
     @Override

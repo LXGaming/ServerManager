@@ -20,15 +20,37 @@ public interface Packet {
     
     void process(NetworkHandler networkHandler);
     
+    String getForwardTo();
+    
+    void setForwardTo(String forwardTo);
+    
     String getSender();
     
     void setSender(String sender);
     
-    String getReplyTo();
+    Type getType();
     
-    void setReplyTo(String replyTo);
+    void setType(Type type);
     
-    String getForwardTo();
-    
-    void setForwardTo(String forwardTo);
+    enum Type {
+        
+        REQUEST("Request"),
+        
+        RESPONSE("Response");
+        
+        private final String friendlyName;
+        
+        Type(String friendlyName) {
+            this.friendlyName = friendlyName;
+        }
+        
+        public String getFriendlyName() {
+            return friendlyName;
+        }
+        
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+    }
 }

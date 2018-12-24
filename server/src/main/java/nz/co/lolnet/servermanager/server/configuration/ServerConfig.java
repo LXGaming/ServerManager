@@ -26,7 +26,7 @@ import java.util.List;
 public class ServerConfig implements Config {
     
     private boolean debug = false;
-    private String proxyName = "";
+    private String name = "";
     private String command = "cd [PATH];bash start.sh";
     private boolean jlineOverride = true;
     private RedisCategory redisCategory = new RedisCategory();
@@ -38,18 +38,8 @@ public class ServerConfig implements Config {
     }
     
     @Override
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-    
-    @Override
-    public String getProxyName() {
-        return proxyName;
-    }
-    
-    @Override
-    public String getServerName() {
-        return proxyName;
+    public String getName() {
+        return name;
     }
     
     public String getCommand() {

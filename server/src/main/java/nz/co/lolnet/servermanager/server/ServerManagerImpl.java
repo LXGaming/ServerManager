@@ -16,13 +16,15 @@
 
 package nz.co.lolnet.servermanager.server;
 
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.Platform;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.util.Reference;
+import nz.co.lolnet.servermanager.common.configuration.Configuration;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.manager.ServiceManager;
+import nz.co.lolnet.servermanager.common.service.RedisService;
 import nz.co.lolnet.servermanager.common.util.LoggerImpl;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.configuration.ServerConfig;
@@ -36,20 +38,18 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ServerManagerImpl extends ServerManager {
     
-    private final RedisServiceImpl redisService;
-    private final AtomicBoolean running;
+    private Configuration configuration;
+    private RedisService redisService;
+    private volatile boolean running;
     
     public ServerManagerImpl() {
-        this.logger = new LoggerImpl();
-        this.path = Toolbox.getPath().orElse(null);
-        this.configuration = new ServerConfiguration();
         this.platformType = Platform.Type.SERVER;
+        this.logger = new LoggerImpl();
+        this.configuration = new ServerConfiguration(Toolbox.getPath().orElse(null));
         this.redisService = new RedisServiceImpl();
-        this.running = new AtomicBoolean(false);
     }
     
     @Override
@@ -63,7 +63,7 @@ public class ServerManagerImpl extends ServerManager {
         registerNetworkHandler(NetworkHandlerImpl.class);
         ServiceManager.schedule(getRedisService());
         getConfiguration().saveConfiguration();
-        getRunning().set(true);
+        setRunning(true);
         getLogger().info("{} v{} has loaded", Reference.NAME, Reference.VERSION);
     }
     
@@ -84,21 +84,24 @@ public class ServerManagerImpl extends ServerManager {
     }
     
     @Override
-    public void sendPacket(String channel, Packet packet) {
-        PacketManager.sendPacket(channel, packet, getRedisService()::publish);
+    public void sendPacket(Packet packet) {
+        throw new UnsupportedOperationException("Not supported");
     }
     
     @Override
-    public void sendPacket(Packet packet) {
-        PacketManager.sendPacket(packet, getRedisService()::publish);
+    public void sendPacket(String channel, Packet packet) {
+        PacketManager.sendPacket(channel, packet, getRedisService()::publish);
     }
     
     public static ServerManagerImpl getInstance() {
         return (ServerManagerImpl) ServerManager.getInstance();
     }
     
-    @Override
-    public Optional<? extends ServerConfig> getConfig() {
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+    
+    public Optional<ServerConfig> getConfig() {
         if (getConfiguration() != null) {
             return Optional.ofNullable((ServerConfig) getConfiguration().getConfig());
         }
@@ -106,11 +109,16 @@ public class ServerManagerImpl extends ServerManager {
         return Optional.empty();
     }
     
-    public RedisServiceImpl getRedisService() {
+    public RedisService getRedisService() {
         return redisService;
     }
     
-    public AtomicBoolean getRunning() {
+    
+    public boolean isRunning() {
         return running;
+    }
+    
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 }

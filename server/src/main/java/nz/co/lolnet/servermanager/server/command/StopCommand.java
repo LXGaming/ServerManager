@@ -30,6 +30,6 @@ public class StopCommand extends AbstractCommand {
     
     @Override
     public void execute(List<String> arguments) {
-        ServerManagerImpl.getInstance().getRunning().set(false);
+        ServerManagerImpl.getInstance().setRunning(false);
     }
 }

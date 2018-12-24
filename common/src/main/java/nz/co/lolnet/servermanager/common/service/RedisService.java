@@ -17,8 +17,8 @@
 package nz.co.lolnet.servermanager.common.service;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.api.util.Reference;
-import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 
 import java.io.IOException;
@@ -34,9 +34,14 @@ public abstract class RedisService extends AbstractService {
     @Override
     public boolean prepareService() {
         getChannels().add(Reference.ID + "-" + ServerManager.getInstance().getPlatformType());
-        PacketManager.getServerChannel().ifPresent(getChannels()::add);
+        ServerManager.getInstance().getConfig()
+                .map(Config::getName)
+                .map(name -> Toolbox.createChannel(ServerManager.getInstance().getPlatformType(), name))
+                .ifPresent(getChannels()::add);
         return true;
     }
+    
+    public abstract void shutdown();
     
     public abstract void publish(String channel, String message);
     

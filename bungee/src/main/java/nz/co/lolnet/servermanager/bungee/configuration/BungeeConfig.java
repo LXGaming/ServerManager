@@ -21,8 +21,8 @@ import nz.co.lolnet.servermanager.api.configuration.Config;
 public class BungeeConfig implements Config {
     
     private boolean debug = false;
-    private String proxyName = "";
-    private String serverName = "";
+    private String name = "";
+    private String host = "";
     
     @Override
     public boolean isDebug() {
@@ -30,17 +30,11 @@ public class BungeeConfig implements Config {
     }
     
     @Override
-    public void setDebug(boolean debug) {
-        this.debug = debug;
+    public String getName() {
+        return name;
     }
     
-    @Override
-    public String getProxyName() {
-        return proxyName;
-    }
-    
-    @Override
-    public String getServerName() {
-        return serverName;
+    public String getHost() {
+        return host;
     }
 }

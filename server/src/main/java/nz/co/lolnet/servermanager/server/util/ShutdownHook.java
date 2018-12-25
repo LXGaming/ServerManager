@@ -29,15 +29,16 @@ public class ShutdownHook extends Thread {
     public void run() {
         Thread.currentThread().setName("Shutdown Thread");
         ServerManager.getInstance().getLogger().info("Shutting down...");
-        shutdownExecutorService();
+        shutdownServices();
         LogManager.shutdown();
     }
     
-    private void shutdownExecutorService() {
+    private void shutdownServices() {
         try {
             ServiceManager.getScheduledExecutorService().shutdown();
-            ServerManagerImpl.getInstance().getRedisService().shutdown();
-            if (!ServiceManager.getScheduledExecutorService().awaitTermination(2000, TimeUnit.MILLISECONDS)) {
+            ServerManagerImpl.getInstance().getRedisService().getRedisListener().unsubscribe();
+            ServerManagerImpl.getInstance().getRedisService().getJedisPool().destroy();
+            if (!ServiceManager.getScheduledExecutorService().awaitTermination(5000L, TimeUnit.MILLISECONDS)) {
                 throw new InterruptedException();
             }
             

@@ -32,6 +32,7 @@ import redis.clients.jedis.Protocol;
 public class RedisServiceImpl extends RedisService {
     
     private JedisPool jedisPool;
+    private RedisListener redisListener;
     
     @Override
     public boolean prepareService() {
@@ -43,6 +44,7 @@ public class RedisServiceImpl extends RedisService {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         jedisPoolConfig.setMaxTotal(10);
         setJedisPool(new JedisPool(jedisPoolConfig, redisCategory.getHost(), redisCategory.getPort(), Protocol.DEFAULT_TIMEOUT, redisCategory.getPassword()));
+        setRedisListener(new RedisListener());
         return super.prepareService();
     }
     
@@ -54,7 +56,7 @@ public class RedisServiceImpl extends RedisService {
                     .map(name -> Toolbox.createChannel(ServerManager.getInstance().getPlatformType(), name))
                     .ifPresent(jedis::clientSetname);
             
-            jedis.subscribe(new RedisListener(), getChannels().toArray(new String[0]));
+            jedis.subscribe(getRedisListener(), getChannels().toArray(new String[0]));
         }
     }
     
@@ -64,7 +66,6 @@ public class RedisServiceImpl extends RedisService {
             return;
         }
         
-        getJedisPool().close();
         getJedisPool().destroy();
     }
     
@@ -88,5 +89,13 @@ public class RedisServiceImpl extends RedisService {
     
     public void setJedisPool(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
+    }
+    
+    public RedisListener getRedisListener() {
+        return redisListener;
+    }
+    
+    public void setRedisListener(RedisListener redisListener) {
+        this.redisListener = redisListener;
     }
 }

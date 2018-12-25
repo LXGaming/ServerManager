@@ -22,10 +22,8 @@ import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.api.util.Reference;
-import nz.co.lolnet.servermanager.common.configuration.Configuration;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.manager.ServiceManager;
-import nz.co.lolnet.servermanager.common.service.RedisService;
 import nz.co.lolnet.servermanager.common.util.LoggerImpl;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.configuration.ServerConfig;
@@ -43,8 +41,8 @@ import java.util.Optional;
 
 public class ServerManagerImpl extends ServerManager {
     
-    private Configuration configuration;
-    private RedisService redisService;
+    private ServerConfiguration configuration;
+    private RedisServiceImpl redisService;
     private volatile boolean running;
     
     private ServerManagerImpl() {
@@ -116,19 +114,19 @@ public class ServerManagerImpl extends ServerManager {
         return (ServerManagerImpl) ServerManager.getInstance();
     }
     
-    public Configuration getConfiguration() {
+    public ServerConfiguration getConfiguration() {
         return configuration;
     }
     
     public Optional<ServerConfig> getConfig() {
         if (getConfiguration() != null) {
-            return Optional.ofNullable((ServerConfig) getConfiguration().getConfig());
+            return Optional.ofNullable(getConfiguration().getConfig());
         }
         
         return Optional.empty();
     }
     
-    public RedisService getRedisService() {
+    public RedisServiceImpl getRedisService() {
         return redisService;
     }
     

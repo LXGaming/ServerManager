@@ -27,10 +27,8 @@ import nz.co.lolnet.servermanager.bungee.configuration.BungeeConfig;
 import nz.co.lolnet.servermanager.bungee.configuration.BungeeConfiguration;
 import nz.co.lolnet.servermanager.bungee.service.RedisServiceImpl;
 import nz.co.lolnet.servermanager.bungee.util.NetworkHandlerImpl;
-import nz.co.lolnet.servermanager.common.configuration.Configuration;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.manager.ServiceManager;
-import nz.co.lolnet.servermanager.common.service.RedisService;
 import nz.co.lolnet.servermanager.common.util.LoggerImpl;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 
@@ -38,8 +36,8 @@ import java.util.Optional;
 
 public class ServerManagerImpl extends ServerManager {
     
-    private Configuration configuration;
-    private RedisService redisService;
+    private BungeeConfiguration configuration;
+    private RedisServiceImpl redisService;
     
     private ServerManagerImpl() {
         this.platformType = Platform.Type.BUNGEECORD;
@@ -107,19 +105,19 @@ public class ServerManagerImpl extends ServerManager {
         return (ServerManagerImpl) ServerManager.getInstance();
     }
     
-    public Configuration getConfiguration() {
+    public BungeeConfiguration getConfiguration() {
         return configuration;
     }
     
     public Optional<BungeeConfig> getConfig() {
         if (getConfiguration() != null) {
-            return Optional.ofNullable((BungeeConfig) getConfiguration().getConfig());
+            return Optional.ofNullable(getConfiguration().getConfig());
         }
         
         return Optional.empty();
     }
     
-    private RedisService getRedisService() {
+    private RedisServiceImpl getRedisService() {
         return redisService;
     }
 }

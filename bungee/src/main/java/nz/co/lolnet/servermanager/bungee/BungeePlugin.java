@@ -21,7 +21,6 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.bungee.listener.BungeeListener;
 
@@ -40,17 +39,15 @@ public class BungeePlugin extends Plugin implements Platform {
         ProxyServer.getInstance().getPluginManager().registerListener(this, new BungeeListener());
         
         StatePacket packet = new StatePacket();
-        packet.setType(Packet.Type.RESPONSE);
         packet.setState(State.SERVER_STARTED);
-        ServerManager.getInstance().sendPacket(packet);
+        ServerManager.getInstance().sendResponse(packet);
     }
     
     @Override
     public void onDisable() {
         StatePacket packet = new StatePacket();
-        packet.setType(Packet.Type.RESPONSE);
         packet.setState(State.SERVER_STOPPED);
-        ServerManager.getInstance().sendPacket(packet);
+        ServerManager.getInstance().sendResponse(packet);
     }
     
     public static String getVersion() {

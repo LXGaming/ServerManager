@@ -23,6 +23,7 @@ public class ServerCategory {
     private String name = "Unknown";
     private Platform.Type platform = Platform.Type.UNKNOWN;
     private String path = "";
+    private String script = "start.sh";
     private boolean autoRestart = false;
     
     public String getName() {
@@ -39,6 +40,10 @@ public class ServerCategory {
     
     public String getPath() {
         return path;
+    }
+    
+    public String getScript() {
+        return script;
     }
     
     public boolean isAutoRestart() {

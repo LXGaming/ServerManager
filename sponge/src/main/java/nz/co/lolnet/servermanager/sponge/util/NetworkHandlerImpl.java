@@ -65,14 +65,13 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handlePing(PingPacket packet) {
-        ServerManager.getInstance().sendPacket(packet);
+        ServerManager.getInstance().sendResponse(packet);
     }
     
     @Override
     public void handleState(StatePacket packet) {
-        packet.setType(Packet.Type.RESPONSE);
         packet.setState(SpongePlugin.getInstance().getState());
-        ServerManager.getInstance().sendPacket(packet);
+        ServerManager.getInstance().sendResponse(packet);
     }
     
     @Override
@@ -91,8 +90,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
             serverInfo.setVersion(Sponge.getPlatform().getMinecraftVersion().getName());
         }
         
-        packet.setType(Packet.Type.RESPONSE);
         packet.setServerInfo(serverInfo);
-        ServerManager.getInstance().sendPacket(packet);
+        ServerManager.getInstance().sendResponse(packet);
     }
 }

@@ -61,15 +61,13 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handlePing(PingPacket packet) {
-        packet.setType(Packet.Type.RESPONSE);
-        ServerManager.getInstance().sendPacket(packet);
+        ServerManager.getInstance().sendResponse(packet);
     }
     
     @Override
     public void handleState(StatePacket packet) {
-        packet.setType(Packet.Type.RESPONSE);
         packet.setState(Platform.State.SERVER_STARTED);
-        ServerManager.getInstance().sendPacket(packet);
+        ServerManager.getInstance().sendResponse(packet);
     }
     
     @Override
@@ -83,8 +81,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
                 .collect(Collectors.toCollection(HashSet::new)));
         serverInfo.setVersion(BungeePlugin.getVersion());
         
-        packet.setType(Packet.Type.RESPONSE);
         packet.setServerInfo(serverInfo);
-        ServerManager.getInstance().sendPacket(packet);
+        ServerManager.getInstance().sendResponse(packet);
     }
 }

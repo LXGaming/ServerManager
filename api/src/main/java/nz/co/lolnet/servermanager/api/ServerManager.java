@@ -39,9 +39,21 @@ public abstract class ServerManager {
     
     public abstract boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass);
     
-    public abstract void sendPacket(Packet packet);
+    public void sendRequest(Packet packet) {
+        packet.setSender(null);
+        packet.setType(Packet.Type.REQUEST);
+        sendPacket(packet);
+    }
     
-    public abstract void sendPacket(String channel, Packet packet);
+    public void sendResponse(Packet packet) {
+        packet.setSender(null);
+        packet.setType(Packet.Type.RESPONSE);
+        sendPacket(packet);
+    }
+    
+    protected void sendPacket(Packet packet) {
+        throw new UnsupportedOperationException("Not supported");
+    }
     
     public abstract Optional<? extends Config> getConfig();
     

@@ -60,7 +60,7 @@ public class ConnectionManager {
             }
             
             if (packet instanceof StatePacket && connection.getSetting().isForwardState()) {
-                ServerManager.getInstance().sendPacket(connection.getChannel(), packet);
+                ServerManagerImpl.getInstance().sendPacket(connection.getChannel(), packet);
             }
         }
     }

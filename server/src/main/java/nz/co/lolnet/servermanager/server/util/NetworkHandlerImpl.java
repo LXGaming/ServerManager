@@ -27,6 +27,7 @@ import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
+import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 import nz.co.lolnet.servermanager.server.data.Connection;
 import nz.co.lolnet.servermanager.server.manager.CommandManager;
 import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
@@ -38,7 +39,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         ServerManager.getInstance().getLogger().info("Received Packet from {} ({})", packet.getSender(), packet.getType());
         if (Toolbox.isNotBlank(packet.getForwardTo())) {
             ConnectionManager.getConnection(packet.getForwardTo()).ifPresent(connection -> {
-                ServerManager.getInstance().sendPacket(connection.getChannel(), packet);
+                ServerManagerImpl.getInstance().sendPacket(connection.getChannel(), packet);
             });
             
             return false;
@@ -94,7 +95,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         
         connection.getServerInfo().setState(packet.getState());
         if (connection.getServerInfo().getState().equals(Platform.State.SERVER_STARTED)) {
-            ServerManager.getInstance().sendPacket(connection.getChannel(), new SettingPacket());
+            ServerManagerImpl.getInstance().sendRequest(connection.getChannel(), new SettingPacket());
         }
         
         ServerManager.getInstance().getLogger().info("{} State from {}", packet.getState().getFriendlyName(), packet.getSender());

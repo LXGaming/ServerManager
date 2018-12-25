@@ -93,12 +93,7 @@ public class ServerManagerImpl extends ServerManager {
         getConfig()
                 .map(BungeeConfig::getHost)
                 .map(name -> Toolbox.createChannel(Platform.Type.SERVER, name))
-                .ifPresent(channel -> sendPacket(channel, packet));
-    }
-    
-    @Override
-    public void sendPacket(String channel, Packet packet) {
-        PacketManager.sendPacket(channel, packet, getRedisService()::publish);
+                .ifPresent(channel -> PacketManager.sendPacket(channel, packet, getRedisService()::publish));
     }
     
     public static ServerManagerImpl getInstance() {

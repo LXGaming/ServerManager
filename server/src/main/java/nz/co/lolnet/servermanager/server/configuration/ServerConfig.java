@@ -27,7 +27,7 @@ public class ServerConfig implements Config {
     
     private boolean debug = false;
     private String name = "";
-    private String command = "cd [PATH];bash start.sh";
+    private String command = "bash [SCRIPT]";
     private boolean jlineOverride = true;
     private RedisCategory redisCategory = new RedisCategory();
     private List<ServerCategory> serverCategories = Toolbox.newArrayList();

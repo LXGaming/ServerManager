@@ -19,7 +19,6 @@ package nz.co.lolnet.servermanager.sponge;
 import com.google.inject.Inject;
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import org.spongepowered.api.GameState;
@@ -54,9 +53,8 @@ public class SpongePlugin implements Platform {
     @Listener
     public void onGameState(GameStateEvent event) {
         StatePacket packet = new StatePacket();
-        packet.setType(Packet.Type.RESPONSE);
         packet.setState(getState());
-        ServerManager.getInstance().sendPacket(packet);
+        ServerManager.getInstance().sendResponse(packet);
     }
     
     public State getState() {

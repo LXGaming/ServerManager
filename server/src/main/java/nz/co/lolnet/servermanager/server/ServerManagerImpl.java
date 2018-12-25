@@ -100,12 +100,18 @@ public class ServerManagerImpl extends ServerManager {
         return PacketManager.registerNetworkHandler(networkHandlerClass);
     }
     
-    @Override
-    public void sendPacket(Packet packet) {
-        throw new UnsupportedOperationException("Not supported");
+    public void sendRequest(String channel, Packet packet) {
+        packet.setSender(null);
+        packet.setType(Packet.Type.REQUEST);
+        sendPacket(channel, packet);
     }
     
-    @Override
+    public void sendResponse(String channel, Packet packet) {
+        packet.setSender(null);
+        packet.setType(Packet.Type.RESPONSE);
+        sendPacket(channel, packet);
+    }
+    
     public void sendPacket(String channel, Packet packet) {
         PacketManager.sendPacket(channel, packet, getRedisService()::publish);
     }

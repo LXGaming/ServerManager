@@ -16,6 +16,7 @@
 
 package nz.co.lolnet.servermanager.server.util;
 
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
@@ -69,10 +70,13 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleSetting(SettingPacket packet) {
-        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
-            connection.setSetting(packet.getSetting());
-        });
+        Connection connection = ConnectionManager.getConnection(packet.getSender()).orElse(null);
+        if (connection == null) {
+            ServerManager.getInstance().getLogger().warn("Received {} from unregistered server {}", packet.getClass().getSimpleName(), packet.getSender());
+            return;
+        }
         
+        connection.setSetting(packet.getSetting());
         ServerManager.getInstance().getLogger().info("Received Setting from {}", packet.getSender());
     }
     
@@ -89,6 +93,10 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         }
         
         connection.getServerInfo().setState(packet.getState());
+        if (connection.getServerInfo().getState().equals(Platform.State.SERVER_STARTED)) {
+            ServerManager.getInstance().sendPacket(connection.getChannel(), new SettingPacket());
+        }
+        
         ServerManager.getInstance().getLogger().info("{} State from {}", packet.getState().getFriendlyName(), packet.getSender());
     }
     

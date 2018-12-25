@@ -16,13 +16,15 @@
 
 package nz.co.lolnet.servermanager.server.command;
 
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.User;
-import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
+import nz.co.lolnet.servermanager.server.data.Connection;
+import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
 
 import java.util.List;
 
@@ -37,20 +39,23 @@ public class ExecuteCommand extends AbstractCommand {
     @Override
     public void execute(List<String> arguments) {
         if (arguments.size() < 1) {
-            ServerManager.getInstance().getLogger().info("Not enough arguments");
+            ServerManager.getInstance().getLogger().error("Not enough arguments");
             return;
         }
         
-        String channel = arguments.remove(0);
+        Connection connection = ConnectionManager.getConnection(arguments.remove(0)).orElse(null);
+        if (connection == null) {
+            ServerManager.getInstance().getLogger().error("Failed to find connection");
+            return;
+        }
+        
         String command = String.join(" ", arguments);
         if (Toolbox.isBlank(command)) {
-            ServerManager.getInstance().getLogger().info("Cannot send blank command");
+            ServerManager.getInstance().getLogger().error("Cannot send blank command");
             return;
         }
         
-        CommandPacket packet = new CommandPacket(command, new User(Reference.NAME, null));
-        packet.setType(Packet.Type.REQUEST);
-        ServerManagerImpl.getInstance().sendPacket(channel, packet);
-        ServerManager.getInstance().getLogger().info("Sending execute...");
+        ServerManagerImpl.getInstance().sendRequest(connection.getChannel(), new CommandPacket(command, new User(Reference.NAME, Platform.CONSOLE_UUID)));
+        ServerManager.getInstance().getLogger().info("Execute sent");
     }
 }

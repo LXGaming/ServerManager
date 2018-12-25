@@ -35,7 +35,7 @@ public class ListCommand extends AbstractCommand {
         Set<String> connections = Toolbox.newHashSet();
         ConnectionManager.getConnections().forEach(connection -> connections.add(connection.getName()));
         if (connections.isEmpty()) {
-            ServerManager.getInstance().getLogger().info("No connections present");
+            ServerManager.getInstance().getLogger().warn("No connections present");
             return;
         }
         

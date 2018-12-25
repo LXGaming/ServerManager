@@ -16,7 +16,11 @@
 
 package nz.co.lolnet.servermanager.api;
 
+import java.util.UUID;
+
 public interface Platform {
+    
+    UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     
     enum State {
         

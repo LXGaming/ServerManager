@@ -17,9 +17,10 @@
 package nz.co.lolnet.servermanager.server.command;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
+import nz.co.lolnet.servermanager.server.data.Connection;
+import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
 
 import java.util.List;
 
@@ -33,14 +34,17 @@ public class PingCommand extends AbstractCommand {
     @Override
     public void execute(List<String> arguments) {
         if (arguments.isEmpty()) {
-            ServerManager.getInstance().getLogger().info("Not enough arguments");
+            ServerManager.getInstance().getLogger().error("Not enough arguments");
             return;
         }
         
-        String channel = arguments.remove(0);
-        PingPacket packet = new PingPacket(System.currentTimeMillis());
-        packet.setType(Packet.Type.REQUEST);
-        ServerManagerImpl.getInstance().sendPacket(channel, packet);
-        ServerManager.getInstance().getLogger().info("Sending ping...");
+        Connection connection = ConnectionManager.getConnection(arguments.remove(0)).orElse(null);
+        if (connection == null) {
+            ServerManager.getInstance().getLogger().error("Failed to find connection");
+            return;
+        }
+        
+        ServerManagerImpl.getInstance().sendRequest(connection.getChannel(), new PingPacket(System.currentTimeMillis()));
+        ServerManager.getInstance().getLogger().info("Ping sent");
     }
 }

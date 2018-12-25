@@ -85,7 +85,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         if (Sponge.isServerAvailable()) {
             serverInfo.setTicksPerSecond(Sponge.getServer().getTicksPerSecond());
             serverInfo.setUsers(Sponge.getServer().getOnlinePlayers().stream()
-                    .map(player -> User.of(player.getName(), player.getUniqueId()))
+                    .map(player -> new User(player.getName(), player.getUniqueId()))
                     .collect(Collectors.toCollection(HashSet::new)));
             
             serverInfo.setVersion(Sponge.getPlatform().getMinecraftVersion().getName());

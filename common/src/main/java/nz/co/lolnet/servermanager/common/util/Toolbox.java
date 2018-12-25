@@ -72,19 +72,11 @@ public class Toolbox {
     }
     
     public static String createChannel(Platform.Type platformType, String name) {
-        if (Toolbox.isNotBlank(name)) {
-            return Reference.ID + "-" + platformType + "-" + name.toLowerCase();
-        }
-        
-        return null;
+        return Reference.ID + "-" + platformType + "-" + name.toLowerCase();
     }
     
     public static String createName(Platform.Type platformType, String name) {
-        if (Toolbox.isNotBlank(name)) {
-            return platformType.getFriendlyName() + name;
-        }
-        
-        return null;
+        return platformType.getFriendlyName() + name;
     }
     
     public static String getTimeString(long time) {

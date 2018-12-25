@@ -25,32 +25,32 @@ public abstract class AbstractPacket implements Packet {
     private Type type;
     
     @Override
-    public String getForwardTo() {
+    public final String getForwardTo() {
         return forwardTo;
     }
     
     @Override
-    public void setForwardTo(String forwardTo) {
+    public final void setForwardTo(String forwardTo) {
         this.forwardTo = forwardTo;
     }
     
     @Override
-    public String getSender() {
+    public final String getSender() {
         return sender;
     }
     
     @Override
-    public void setSender(String sender) {
+    public final void setSender(String sender) {
         this.sender = sender;
     }
     
     @Override
-    public Type getType() {
+    public final Type getType() {
         return type;
     }
     
     @Override
-    public void setType(Type type) {
+    public final void setType(Type type) {
         this.type = type;
     }
 }

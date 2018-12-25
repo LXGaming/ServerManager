@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package nz.co.lolnet.servermanager.api.network.packet;
+package nz.co.lolnet.servermanager.api.data;
 
-import nz.co.lolnet.servermanager.api.data.Setting;
-import nz.co.lolnet.servermanager.api.network.NetworkHandler;
-
-public class SettingPacket extends AbstractPacket {
+public class Setting {
     
-    private Setting setting;
+    private boolean forwardState;
     
-    @Override
-    public void process(NetworkHandler networkHandler) {
-        networkHandler.handleSetting(this);
+    public boolean isForwardState() {
+        return forwardState;
     }
     
-    public Setting getSetting() {
-        return setting;
-    }
-    
-    public void setSetting(Setting setting) {
-        this.setting = setting;
+    public void setForwardState(boolean forwardState) {
+        this.forwardState = forwardState;
     }
 }

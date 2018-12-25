@@ -48,7 +48,7 @@ public class ExecuteCommand extends AbstractCommand {
             return;
         }
         
-        CommandPacket packet = new CommandPacket(command, User.of(Reference.NAME, null));
+        CommandPacket packet = new CommandPacket(command, new User(Reference.NAME, null));
         packet.setType(Packet.Type.REQUEST);
         ServerManagerImpl.getInstance().sendPacket(channel, packet);
         ServerManager.getInstance().getLogger().info("Sending execute...");

@@ -24,13 +24,9 @@ public class User {
     private final String name;
     private final UUID uniqueId;
     
-    private User(String name, UUID uniqueId) {
+    public User(String name, UUID uniqueId) {
         this.name = name;
         this.uniqueId = uniqueId;
-    }
-    
-    public static User of(String name, UUID uniqueId) {
-        return new User(name, uniqueId);
     }
     
     public String getName() {

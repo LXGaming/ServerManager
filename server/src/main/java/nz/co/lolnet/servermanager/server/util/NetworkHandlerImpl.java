@@ -66,7 +66,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     @Override
     public void handleSetting(SettingPacket packet) {
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
-            connection.setReceiveStatuses(packet.isReceiveStatus());
+            connection.setReceiveStatuses(packet.getSetting().isForwardState());
         });
         
         ServerManager.getInstance().getLogger().info("Received Setting from {}", packet.getSender());

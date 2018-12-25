@@ -79,7 +79,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         serverInfo.setState(Platform.State.SERVER_STARTED);
         serverInfo.setType(Platform.Type.BUNGEECORD);
         serverInfo.setUsers(ProxyServer.getInstance().getPlayers().stream()
-                .map(player -> User.of(player.getName(), player.getUniqueId()))
+                .map(player -> new User(player.getName(), player.getUniqueId()))
                 .collect(Collectors.toCollection(HashSet::new)));
         serverInfo.setVersion(BungeePlugin.getVersion());
         

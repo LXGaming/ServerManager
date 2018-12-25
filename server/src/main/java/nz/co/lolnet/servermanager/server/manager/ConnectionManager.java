@@ -24,8 +24,8 @@ import nz.co.lolnet.servermanager.server.configuration.ServerConfig;
 import nz.co.lolnet.servermanager.server.configuration.category.ServerCategory;
 import nz.co.lolnet.servermanager.server.data.Connection;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -34,8 +34,9 @@ public class ConnectionManager {
     private static final Set<Connection> CONNECTIONS = Collections.synchronizedSet(Toolbox.newHashSet());
     
     public static void buildConnections() {
-        Collection<ServerCategory> serverCategories = ServerManagerImpl.getInstance().getConfig().map(ServerConfig::getServerCategories).orElse(null);
+        List<ServerCategory> serverCategories = ServerManagerImpl.getInstance().getConfig().map(ServerConfig::getServerCategories).orElse(null);
         if (serverCategories == null || serverCategories.isEmpty()) {
+            ServerManager.getInstance().getLogger().warn("Cannot build connections as Server Categories is unavailable or empty");
             return;
         }
         
@@ -43,11 +44,6 @@ public class ConnectionManager {
             if (Toolbox.isBlank(serverCategory.getName()) || serverCategory.getPlatform() == null) {
                 continue;
             }
-            
-            if (!serverCategory.getName().equals(serverCategory.getName().toLowerCase())) {
-                serverCategory.setName(serverCategory.getName().toLowerCase());
-            }
-            
             
             String channel = Toolbox.createChannel(serverCategory.getPlatform(), serverCategory.getName());
             String name = Toolbox.createName(serverCategory.getPlatform(), serverCategory.getName());
@@ -69,6 +65,10 @@ public class ConnectionManager {
     
     public static Optional<Connection> getConnection(String name) {
         for (Connection connection : getConnections()) {
+            if (Toolbox.isBlank(connection.getName())) {
+                continue;
+            }
+            
             if (connection.getName().equalsIgnoreCase(name)) {
                 return Optional.of(connection);
             }
@@ -77,8 +77,8 @@ public class ConnectionManager {
         return Optional.empty();
     }
     
-    public static Optional<ServerCategory> getServerCategory(String serverId) {
-        Collection<ServerCategory> serverCategories = ServerManagerImpl.getInstance().getConfig().map(ServerConfig::getServerCategories).orElse(null);
+    public static Optional<ServerCategory> getServerCategory(String name) {
+        List<ServerCategory> serverCategories = ServerManagerImpl.getInstance().getConfig().map(ServerConfig::getServerCategories).orElse(null);
         if (serverCategories == null || serverCategories.isEmpty()) {
             return Optional.empty();
         }
@@ -88,7 +88,7 @@ public class ConnectionManager {
                 continue;
             }
             
-            if ((serverCategory.getPlatform() + serverCategory.getName()).equals(serverId)) {
+            if (Toolbox.createName(serverCategory.getPlatform(), serverCategory.getName()).equalsIgnoreCase(name)) {
                 return Optional.of(serverCategory);
             }
         }

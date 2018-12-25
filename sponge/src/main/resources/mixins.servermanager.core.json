@@ -3,6 +3,7 @@
   "minVersion": "0.7.4",
   "package": "nz.co.lolnet.servermanager.sponge.mixin.core",
   "refmap": "mixins.servermanager.refmap.json",
+  "plugin": "nz.co.lolnet.servermanager.sponge.mixin.plugin.CorePlugin",
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_8",
   "mixins": [

@@ -23,7 +23,6 @@ import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
-import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.bungee.listener.BungeeListener;
 
 public class BungeePlugin extends Plugin implements Platform {
@@ -37,15 +36,7 @@ public class BungeePlugin extends Plugin implements Platform {
     
     @Override
     public void onEnable() {
-        ServerManagerImpl serverManager = new ServerManagerImpl();
-        serverManager.getLogger()
-                .add(Logger.Level.INFO, getLogger()::info)
-                .add(Logger.Level.WARN, getLogger()::warning)
-                .add(Logger.Level.ERROR, getLogger()::severe)
-                .add(Logger.Level.DEBUG, getLogger()::info);
-        
-        serverManager.loadServerManager();
-        serverManager.reloadServerManager();
+        ServerManagerImpl.init();
         ProxyServer.getInstance().getPluginManager().registerListener(this, new BungeeListener());
         
         StatePacket packet = new StatePacket();

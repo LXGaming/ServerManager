@@ -21,19 +21,14 @@ import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
-import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
-
-import java.nio.file.Path;
 
 @Plugin(
         id = Reference.ID,
@@ -50,26 +45,10 @@ public class SpongePlugin implements Platform {
     @Inject
     private PluginContainer pluginContainer;
     
-    @Inject
-    @ConfigDir(sharedRoot = false)
-    private Path path;
-    
     @Listener
     public void onGameConstruction(GameConstructionEvent event) {
         instance = this;
-        ServerManagerImpl serverManager = new ServerManagerImpl();
-        serverManager.getLogger()
-                .add(Logger.Level.INFO, getPluginContainer().getLogger()::info)
-                .add(Logger.Level.WARN, getPluginContainer().getLogger()::warn)
-                .add(Logger.Level.ERROR, getPluginContainer().getLogger()::error)
-                .add(Logger.Level.DEBUG, getPluginContainer().getLogger()::debug);
-        
-        serverManager.loadServerManager();
-        serverManager.reloadServerManager();
-    }
-    
-    @Listener
-    public void onGameInitialization(GameInitializationEvent event) {
+        ServerManagerImpl.init();
     }
     
     @Listener
@@ -116,9 +95,5 @@ public class SpongePlugin implements Platform {
     
     public PluginContainer getPluginContainer() {
         return pluginContainer;
-    }
-    
-    public Path getPath() {
-        return path;
     }
 }

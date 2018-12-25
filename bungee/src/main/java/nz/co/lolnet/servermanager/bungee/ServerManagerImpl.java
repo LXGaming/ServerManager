@@ -21,6 +21,7 @@ import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
+import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.bungee.configuration.BungeeConfig;
 import nz.co.lolnet.servermanager.bungee.configuration.BungeeConfiguration;
@@ -40,11 +41,28 @@ public class ServerManagerImpl extends ServerManager {
     private Configuration configuration;
     private RedisService redisService;
     
-    public ServerManagerImpl() {
+    private ServerManagerImpl() {
         this.platformType = Platform.Type.BUNGEECORD;
         this.logger = new LoggerImpl();
         this.configuration = new BungeeConfiguration(BungeePlugin.getInstance().getDataFolder().toPath());
         this.redisService = new RedisServiceImpl();
+    }
+    
+    public static boolean init() {
+        if (getInstance() != null) {
+            return false;
+        }
+        
+        ServerManagerImpl serverManager = new ServerManagerImpl();
+        serverManager.getLogger()
+                .add(Logger.Level.INFO, BungeePlugin.getInstance().getLogger()::info)
+                .add(Logger.Level.WARN, BungeePlugin.getInstance().getLogger()::warning)
+                .add(Logger.Level.ERROR, BungeePlugin.getInstance().getLogger()::severe)
+                .add(Logger.Level.DEBUG, BungeePlugin.getInstance().getLogger()::info);
+        
+        serverManager.loadServerManager();
+        serverManager.reloadServerManager();
+        return true;
     }
     
     @Override

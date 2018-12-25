@@ -16,29 +16,18 @@
 
 package nz.co.lolnet.servermanager.server;
 
-import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.server.configuration.ServerConfig;
 import nz.co.lolnet.servermanager.server.manager.CommandManager;
 import nz.co.lolnet.servermanager.server.util.TerminalConsoleAppender;
-import org.apache.logging.log4j.LogManager;
 
 public class Main {
     
     public static void main(String[] args) {
         Thread.currentThread().setName("Main Thread");
-        ServerManagerImpl serverManager = new ServerManagerImpl();
-        serverManager.getLogger()
-                .add(Logger.Level.INFO, LogManager.getLogger(Reference.ID)::info)
-                .add(Logger.Level.WARN, LogManager.getLogger(Reference.ID)::warn)
-                .add(Logger.Level.ERROR, LogManager.getLogger(Reference.ID)::error)
-                .add(Logger.Level.DEBUG, LogManager.getLogger(Reference.ID)::debug);
-        
-        serverManager.loadServerManager();
-        serverManager.reloadServerManager();
-        
-        TerminalConsoleAppender.buildTerminal(Reference.NAME, serverManager.getConfig().map(ServerConfig::isJlineOverride).orElse(false));
-        while (serverManager.isRunning()) {
+        ServerManagerImpl.init();
+        TerminalConsoleAppender.buildTerminal(Reference.NAME, ServerManagerImpl.getInstance().getConfig().map(ServerConfig::isJlineOverride).orElse(false));
+        while (ServerManagerImpl.getInstance().isRunning()) {
             TerminalConsoleAppender.readline().ifPresent(CommandManager::process);
         }
     }

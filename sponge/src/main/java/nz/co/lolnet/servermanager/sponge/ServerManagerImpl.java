@@ -20,6 +20,7 @@ import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
+import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.common.configuration.Configuration;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
@@ -31,6 +32,8 @@ import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfig;
 import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfiguration;
 import nz.co.lolnet.servermanager.sponge.service.RedisServiceImpl;
 import nz.co.lolnet.servermanager.sponge.util.NetworkHandlerImpl;
+import org.slf4j.LoggerFactory;
+import org.spongepowered.common.launch.SpongeLaunch;
 
 import java.util.Optional;
 
@@ -39,11 +42,28 @@ public class ServerManagerImpl extends ServerManager {
     private Configuration configuration;
     private RedisService redisService;
     
-    public ServerManagerImpl() {
+    private ServerManagerImpl() {
         this.platformType = Platform.Type.SPONGE;
         this.logger = new LoggerImpl();
-        this.configuration = new SpongeConfiguration(SpongePlugin.getInstance().getPath());
+        this.configuration = new SpongeConfiguration(SpongeLaunch.getConfigDir().resolve(Reference.ID));
         this.redisService = new RedisServiceImpl();
+    }
+    
+    public static boolean init() {
+        if (getInstance() != null) {
+            return false;
+        }
+        
+        ServerManagerImpl serverManager = new ServerManagerImpl();
+        serverManager.getLogger()
+                .add(Logger.Level.INFO, LoggerFactory.getLogger(Reference.NAME)::info)
+                .add(Logger.Level.WARN, LoggerFactory.getLogger(Reference.NAME)::warn)
+                .add(Logger.Level.ERROR, LoggerFactory.getLogger(Reference.NAME)::error)
+                .add(Logger.Level.DEBUG, LoggerFactory.getLogger(Reference.NAME)::debug);
+        
+        serverManager.loadServerManager();
+        serverManager.reloadServerManager();
+        return true;
     }
     
     @Override

@@ -18,6 +18,7 @@ package nz.co.lolnet.servermanager.server.manager;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.Packet;
+import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 import nz.co.lolnet.servermanager.server.configuration.ServerConfig;
@@ -51,15 +52,16 @@ public class ConnectionManager {
         }
     }
     
-    public static void forwardState(Packet packet) {
+    public static void forwardPacket(Packet packet) {
+        List<String> clientNames = ServerManagerImpl.getInstance().getRedisService().getClientNames();
         for (Connection connection : getConnections()) {
-            if (connection.getName().equalsIgnoreCase(packet.getSender()) || !connection.isReceiveStatuses()) {
+            if (connection.getSetting() == null || connection.getName().equalsIgnoreCase(packet.getSender()) || !clientNames.contains(connection.getChannel())) {
                 continue;
             }
             
-            // TODO Check if alive
-            
-            ServerManager.getInstance().sendPacket(connection.getChannel(), packet);
+            if (packet instanceof StatePacket && connection.getSetting().isForwardState()) {
+                ServerManager.getInstance().sendPacket(connection.getChannel(), packet);
+            }
         }
     }
     

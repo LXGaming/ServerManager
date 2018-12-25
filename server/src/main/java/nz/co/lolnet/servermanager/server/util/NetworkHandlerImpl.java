@@ -43,7 +43,12 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
             return false;
         }
         
-        return packet.getType().equals(Packet.Type.RESPONSE);
+        if (packet.getType().equals(Packet.Type.RESPONSE)) {
+            ConnectionManager.forwardPacket(packet);
+            return true;
+        }
+        
+        return false;
     }
     
     @Override
@@ -66,7 +71,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     @Override
     public void handleSetting(SettingPacket packet) {
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
-            connection.setReceiveStatuses(packet.getSetting().isForwardState());
+            connection.setSetting(packet.getSetting());
         });
         
         ServerManager.getInstance().getLogger().info("Received Setting from {}", packet.getSender());
@@ -87,8 +92,6 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         
         connection.getServerInfo().setState(packet.getState());
         ServerManager.getInstance().getLogger().info("{} State from {}", packet.getState().getFriendlyName(), packet.getSender());
-        
-        ConnectionManager.forwardState(packet);
     }
     
     @Override

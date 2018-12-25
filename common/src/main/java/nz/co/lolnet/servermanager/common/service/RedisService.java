@@ -71,6 +71,20 @@ public abstract class RedisService extends AbstractService {
         return clients;
     }
     
+    public List<String> getClientNames() {
+        List<String> clientNames = Toolbox.newArrayList();
+        for (Properties properties : getClientList()) {
+            String clientName = properties.getProperty("name");
+            if (Toolbox.isBlank(clientName) || !clientName.startsWith(Reference.ID)) {
+                continue;
+            }
+            
+            clientNames.add(clientName);
+        }
+        
+        return clientNames;
+    }
+    
     public Set<String> getChannels() {
         return channels;
     }

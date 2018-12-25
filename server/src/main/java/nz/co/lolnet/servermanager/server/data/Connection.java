@@ -17,15 +17,16 @@
 package nz.co.lolnet.servermanager.server.data;
 
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
+import nz.co.lolnet.servermanager.api.data.Setting;
 
 public class Connection {
     
     private final String channel;
     private final String name;
-    private boolean receiveStatuses;
     private long lastPacketTime;
     private long lastPingTime;
     private ServerInfo serverInfo;
+    private Setting setting;
     
     public Connection(String channel, String name) {
         this.channel = channel;
@@ -38,14 +39,6 @@ public class Connection {
     
     public String getName() {
         return name;
-    }
-    
-    public boolean isReceiveStatuses() {
-        return receiveStatuses;
-    }
-    
-    public void setReceiveStatuses(boolean receiveStatuses) {
-        this.receiveStatuses = receiveStatuses;
     }
     
     public long getLastPacketTime() {
@@ -70,5 +63,13 @@ public class Connection {
     
     public void setServerInfo(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
+    }
+    
+    public Setting getSetting() {
+        return setting;
+    }
+    
+    public void setSetting(Setting setting) {
+        this.setting = setting;
     }
 }

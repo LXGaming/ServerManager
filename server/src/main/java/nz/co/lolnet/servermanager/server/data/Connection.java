@@ -24,7 +24,6 @@ public class Connection {
     private final String channel;
     private final String name;
     private long lastPacketTime;
-    private long lastPingTime;
     private ServerInfo serverInfo;
     private Setting setting;
     
@@ -47,14 +46,6 @@ public class Connection {
     
     public void setLastPacketTime(long lastPacketTime) {
         this.lastPacketTime = lastPacketTime;
-    }
-    
-    public long getLastPingTime() {
-        return lastPingTime;
-    }
-    
-    public void setLastPingTime(long lastPingTime) {
-        this.lastPingTime = lastPingTime;
     }
     
     public ServerInfo getServerInfo() {

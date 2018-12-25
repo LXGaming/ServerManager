@@ -44,6 +44,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         }
         
         if (packet.getType().equals(Packet.Type.RESPONSE)) {
+            ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> connection.setLastPacketTime(System.currentTimeMillis()));
             ConnectionManager.forwardPacket(packet);
             return true;
         }
@@ -53,7 +54,6 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleCommand(CommandPacket packet) {
-        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> connection.setLastPacketTime(System.currentTimeMillis()));
         if (Toolbox.isBlank(packet.getCommand())) {
             return;
         }
@@ -64,7 +64,6 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handlePing(PingPacket packet) {
-        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> connection.setLastPacketTime(System.currentTimeMillis()));
         ServerManager.getInstance().getLogger().info("{}ms Ping from {}", System.currentTimeMillis() - packet.getTime(), packet.getSender());
     }
     
@@ -85,7 +84,6 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
             return;
         }
         
-        connection.setLastPacketTime(System.currentTimeMillis());
         if (connection.getServerInfo() == null) {
             connection.setServerInfo(new ServerInfo());
         }
@@ -102,7 +100,6 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
             return;
         }
         
-        connection.setLastPacketTime(System.currentTimeMillis());
         connection.setServerInfo(packet.getServerInfo());
         ServerManager.getInstance().getLogger().info("{} Status from {}", packet.getServerInfo().toString(), packet.getSender());
     }

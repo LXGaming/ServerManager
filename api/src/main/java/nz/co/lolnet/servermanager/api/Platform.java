@@ -72,8 +72,6 @@ public interface Platform {
     
     enum Type {
         
-        BUKKIT("Bukkit"),
-        
         BUNGEECORD("BungeeCord"),
         
         SERVER("Server"),

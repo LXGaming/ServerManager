@@ -17,11 +17,12 @@
 package nz.co.lolnet.servermanager.server.command;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.common.util.Toolbox;
+import nz.co.lolnet.servermanager.server.data.Connection;
 import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ListCommand extends AbstractCommand {
     
@@ -32,8 +33,7 @@ public class ListCommand extends AbstractCommand {
     
     @Override
     public void execute(List<String> arguments) {
-        Set<String> connections = Toolbox.newHashSet();
-        ConnectionManager.getConnections().forEach(connection -> connections.add(connection.getName()));
+        Set<String> connections = ConnectionManager.getConnections().stream().map(Connection::getName).collect(Collectors.toSet());
         if (connections.isEmpty()) {
             ServerManager.getInstance().getLogger().warn("No connections present");
             return;

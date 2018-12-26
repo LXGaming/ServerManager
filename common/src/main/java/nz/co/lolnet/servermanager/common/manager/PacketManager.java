@@ -24,6 +24,7 @@ import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
+import nz.co.lolnet.servermanager.api.network.packet.ListPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
@@ -42,6 +43,7 @@ public class PacketManager {
     
     public static void buildPackets() {
         registerPacket(CommandPacket.class);
+        registerPacket(ListPacket.class);
         registerPacket(PingPacket.class);
         registerPacket(SettingPacket.class);
         registerPacket(StatePacket.class);

@@ -22,6 +22,7 @@ import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
+import nz.co.lolnet.servermanager.api.network.packet.ListPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
@@ -31,6 +32,8 @@ import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 import nz.co.lolnet.servermanager.server.data.Connection;
 import nz.co.lolnet.servermanager.server.manager.CommandManager;
 import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
+
+import java.util.stream.Collectors;
 
 public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
@@ -62,6 +65,14 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         
         ServerManager.getInstance().getLogger().info("Processing {} for {}", packet.getCommand(), packet.getUser());
         CommandManager.process(packet.getCommand());
+    }
+    
+    @Override
+    public void handleList(ListPacket packet) {
+        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
+            packet.setServers(ConnectionManager.getConnections().stream().map(Connection::getName).collect(Collectors.toSet()));
+            ServerManagerImpl.getInstance().sendResponse(connection.getChannel(), packet);
+        });
     }
     
     @Override

@@ -75,7 +75,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         ServerInfo serverInfo = new ServerInfo();
         serverInfo.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
         serverInfo.setState(Platform.State.SERVER_STARTED);
-        serverInfo.setType(Platform.Type.BUNGEECORD);
+        serverInfo.setType(ServerManager.getInstance().getPlatformType());
         serverInfo.setUsers(ProxyServer.getInstance().getPlayers().stream()
                 .map(player -> new User(player.getName(), player.getUniqueId()))
                 .collect(Collectors.toCollection(HashSet::new)));

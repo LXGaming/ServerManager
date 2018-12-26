@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package nz.co.lolnet.servermanager.sponge.util;
+package nz.co.lolnet.servermanager.velocity.util;
 
-import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.server.dedicated.ServerHangWatchdog;
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
@@ -28,12 +26,10 @@ import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
+import nz.co.lolnet.servermanager.common.manager.ServiceManager;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
-import nz.co.lolnet.servermanager.sponge.ServerManagerImpl;
-import nz.co.lolnet.servermanager.sponge.SpongePlugin;
-import nz.co.lolnet.servermanager.sponge.interfaces.server.dedicated.IMixinServerHangWatchdog;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.scheduler.Task;
+import nz.co.lolnet.servermanager.velocity.ServerManagerImpl;
+import nz.co.lolnet.servermanager.velocity.VelocityPlugin;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashSet;
@@ -43,7 +39,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public boolean handle(Packet packet) {
-        return packet.getType().equals(Packet.Type.REQUEST);
+        return Toolbox.isBlank(packet.getForwardTo()) && packet.getType().equals(Packet.Type.REQUEST);
     }
     
     @Override
@@ -54,13 +50,12 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         
         ServerManagerImpl.getInstance().getLogger().info("Processing {} for {}", packet.getCommand(), packet.getUser());
         if (packet.getCommand().equals("servermanager:terminate")) {
-            Toolbox.cast(new ServerHangWatchdog(Toolbox.cast(Sponge.getServer(), DedicatedServer.class)), IMixinServerHangWatchdog.class).scheduleHalt();
+            ServiceManager.schedule(() -> Runtime.getRuntime().halt(1), 30000L, 0L);
+            Runtime.getRuntime().exit(1);
             return;
         }
         
-        Task.builder().execute(() -> {
-            Sponge.getCommandManager().process(new SpongeCommandSource(), packet.getCommand());
-        }).submit(SpongePlugin.getInstance().getPluginContainer());
+        VelocityPlugin.getInstance().getProxy().getCommandManager().execute(new VelocityCommandSource(), packet.getCommand());
     }
     
     @Override
@@ -70,7 +65,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleState(StatePacket packet) {
-        packet.setState(SpongePlugin.getInstance().getState());
+        packet.setState(Platform.State.SERVER_STARTED);
         ServerManager.getInstance().sendResponse(packet);
     }
     
@@ -78,17 +73,12 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     public void handleStatus(StatusPacket packet) {
         ServerInfo serverInfo = new ServerInfo();
         serverInfo.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
-        serverInfo.setState(SpongePlugin.getInstance().getState());
+        serverInfo.setState(Platform.State.SERVER_STARTED);
         serverInfo.setType(ServerManager.getInstance().getPlatformType());
-        
-        if (Sponge.isServerAvailable()) {
-            serverInfo.setTicksPerSecond(Sponge.getServer().getTicksPerSecond());
-            serverInfo.setUsers(Sponge.getServer().getOnlinePlayers().stream()
-                    .map(player -> new User(player.getName(), player.getUniqueId()))
-                    .collect(Collectors.toCollection(HashSet::new)));
-            
-            serverInfo.setVersion(Sponge.getPlatform().getMinecraftVersion().getName());
-        }
+        serverInfo.setUsers(VelocityPlugin.getInstance().getProxy().getAllPlayers().stream()
+                .map(player -> new User(player.getUsername(), player.getUniqueId()))
+                .collect(Collectors.toCollection(HashSet::new)));
+        serverInfo.setVersion(VelocityPlugin.getVersion());
         
         packet.setServerInfo(serverInfo);
         ServerManager.getInstance().sendResponse(packet);

@@ -39,15 +39,17 @@ public class BungeePlugin extends Plugin implements Platform {
         ProxyServer.getInstance().getPluginManager().registerListener(this, new BungeeListener());
         
         StatePacket packet = new StatePacket();
-        packet.setState(State.SERVER_STARTED);
+        packet.setState(Platform.State.SERVER_STARTED);
         ServerManager.getInstance().sendResponse(packet);
     }
     
     @Override
     public void onDisable() {
         StatePacket packet = new StatePacket();
-        packet.setState(State.SERVER_STOPPED);
+        packet.setState(Platform.State.SERVER_STOPPED);
         ServerManager.getInstance().sendResponse(packet);
+        
+        ServerManagerImpl.getInstance().shutdownServerManager();
     }
     
     public static String getVersion() {

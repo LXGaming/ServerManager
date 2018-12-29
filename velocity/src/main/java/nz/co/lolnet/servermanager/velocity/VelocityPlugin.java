@@ -19,6 +19,7 @@ package nz.co.lolnet.servermanager.velocity;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
@@ -62,6 +63,15 @@ public class VelocityPlugin {
         StatePacket packet = new StatePacket();
         packet.setState(Platform.State.SERVER_STARTED);
         ServerManager.getInstance().sendResponse(packet);
+    }
+    
+    @Subscribe
+    public void onProxyShutdown(ProxyShutdownEvent event) {
+        StatePacket packet = new StatePacket();
+        packet.setState(Platform.State.SERVER_STOPPED);
+        ServerManager.getInstance().sendResponse(packet);
+        
+        ServerManagerImpl.getInstance().shutdownServerManager();
     }
     
     public static String getVersion() {

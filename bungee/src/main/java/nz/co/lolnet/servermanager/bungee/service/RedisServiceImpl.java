@@ -56,10 +56,6 @@ public class RedisServiceImpl extends RedisService {
     
     @Override
     public void shutdown() {
-        if (getJedisPool() == null || getJedisPool().isClosed()) {
-            return;
-        }
-        
         RedisBungee.getApi().unregisterPubSubChannels(getChannels().toArray(new String[0]));
     }
     
@@ -69,7 +65,7 @@ public class RedisServiceImpl extends RedisService {
     }
     
     @Override
-    public String clientList() {
+    protected String clientList() {
         try (Jedis jedis = getJedisPool().getResource()) {
             return jedis.clientList();
         }
@@ -79,7 +75,7 @@ public class RedisServiceImpl extends RedisService {
         return jedisPool;
     }
     
-    public void setJedisPool(JedisPool jedisPool) {
+    private void setJedisPool(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
     }
 }

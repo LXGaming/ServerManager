@@ -62,12 +62,13 @@ public class RedisServiceImpl extends RedisService {
     
     @Override
     public void shutdown() {
-        if (getJedisPool() == null || getJedisPool().isClosed()) {
-            return;
+        if (getRedisListener() != null && getRedisListener().isSubscribed()) {
+            getRedisListener().unsubscribe(getChannels().toArray(new String[0]));
         }
         
-        getJedisPool().close();
-        getJedisPool().destroy();
+        if (getJedisPool() != null && !getJedisPool().isClosed()) {
+            getJedisPool().close();
+        }
     }
     
     @Override
@@ -78,7 +79,7 @@ public class RedisServiceImpl extends RedisService {
     }
     
     @Override
-    public String clientList() {
+    protected String clientList() {
         try (Jedis jedis = getJedisPool().getResource()) {
             return jedis.clientList();
         }
@@ -88,7 +89,7 @@ public class RedisServiceImpl extends RedisService {
         return jedisPool;
     }
     
-    public void setJedisPool(JedisPool jedisPool) {
+    private void setJedisPool(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
     }
     
@@ -96,7 +97,7 @@ public class RedisServiceImpl extends RedisService {
         return redisListener;
     }
     
-    public void setRedisListener(RedisListener redisListener) {
+    private void setRedisListener(RedisListener redisListener) {
         this.redisListener = redisListener;
     }
 }

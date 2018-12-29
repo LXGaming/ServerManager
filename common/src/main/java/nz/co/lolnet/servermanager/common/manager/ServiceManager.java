@@ -55,7 +55,20 @@ public class ServiceManager {
         }
     }
     
-    public static ScheduledExecutorService getScheduledExecutorService() {
+    public static void shutdown() {
+        try {
+            getScheduledExecutorService().shutdown();
+            if (!getScheduledExecutorService().awaitTermination(5000L, TimeUnit.MILLISECONDS)) {
+                throw new InterruptedException();
+            }
+            
+            ServerManager.getInstance().getLogger().info("Successfully terminated threads, continuing with shutdown process...");
+        } catch (InterruptedException | RuntimeException ex) {
+            ServerManager.getInstance().getLogger().error("Failed to terminate threads, continuing with shutdown process...");
+        }
+    }
+    
+    private static ScheduledExecutorService getScheduledExecutorService() {
         return SCHEDULED_EXECUTOR_SERVICE;
     }
 }

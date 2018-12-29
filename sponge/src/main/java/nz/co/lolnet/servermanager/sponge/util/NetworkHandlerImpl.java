@@ -18,7 +18,6 @@ package nz.co.lolnet.servermanager.sponge.util;
 
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.ServerHangWatchdog;
-import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.data.User;

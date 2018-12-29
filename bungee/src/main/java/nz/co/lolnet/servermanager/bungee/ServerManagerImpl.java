@@ -84,6 +84,12 @@ public class ServerManagerImpl extends ServerManager {
     }
     
     @Override
+    public void shutdownServerManager() {
+        getRedisService().shutdown();
+        ServiceManager.shutdown();
+    }
+    
+    @Override
     public boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass) {
         return PacketManager.registerNetworkHandler(networkHandlerClass);
     }
@@ -112,7 +118,7 @@ public class ServerManagerImpl extends ServerManager {
         return Optional.empty();
     }
     
-    private RedisServiceImpl getRedisService() {
+    public RedisServiceImpl getRedisService() {
         return redisService;
     }
 }

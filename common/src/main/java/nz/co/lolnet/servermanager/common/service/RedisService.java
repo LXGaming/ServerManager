@@ -45,9 +45,9 @@ public abstract class RedisService extends AbstractService {
     
     public abstract void publish(String channel, String message);
     
-    public abstract String clientList();
+    protected abstract String clientList();
     
-    public List<Properties> getClientList() {
+    protected List<Properties> getClientList() {
         List<Properties> clients = Toolbox.newArrayList();
         String clientList = clientList();
         if (Toolbox.isBlank(clientList)) {
@@ -85,7 +85,7 @@ public abstract class RedisService extends AbstractService {
         return clientNames;
     }
     
-    public Set<String> getChannels() {
+    protected Set<String> getChannels() {
         return channels;
     }
 }

@@ -20,6 +20,7 @@ import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
+import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.util.Logger;
 import nz.co.lolnet.servermanager.api.util.Reference;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
@@ -59,6 +60,17 @@ public class ServerManagerImpl extends ServerManager {
                 .add(Logger.Level.ERROR, LoggerFactory.getLogger(Reference.NAME)::error)
                 .add(Logger.Level.DEBUG, LoggerFactory.getLogger(Reference.NAME)::debug);
         
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Thread.currentThread().setName("Shutdown Thread");
+            ServerManager.getInstance().getLogger().info("Shutting down...");
+            
+            StatePacket packet = new StatePacket();
+            packet.setState(Platform.State.JVM_STOPPED);
+            ServerManager.getInstance().sendResponse(packet);
+            
+            ServerManagerImpl.getInstance().shutdownServerManager();
+        }));
+        
         serverManager.loadServerManager();
         return true;
     }
@@ -82,6 +94,12 @@ public class ServerManagerImpl extends ServerManager {
         } else {
             getLogger().info("Debug mode disabled");
         }
+    }
+    
+    @Override
+    public void shutdownServerManager() {
+        getRedisService().shutdown();
+        ServiceManager.shutdown();
     }
     
     @Override

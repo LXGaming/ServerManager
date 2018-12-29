@@ -24,6 +24,7 @@ import nz.co.lolnet.servermanager.api.util.Reference;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -44,7 +45,7 @@ public class SpongePlugin implements Platform {
     @Inject
     private PluginContainer pluginContainer;
     
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onGameConstruction(GameConstructionEvent event) {
         instance = this;
         ServerManagerImpl.init();
@@ -52,38 +53,42 @@ public class SpongePlugin implements Platform {
     
     @Listener
     public void onGameState(GameStateEvent event) {
+        if (ServerManager.getInstance() == null) {
+            return;
+        }
+        
         StatePacket packet = new StatePacket();
         packet.setState(getState());
         ServerManager.getInstance().sendResponse(packet);
     }
     
-    public State getState() {
+    public Platform.State getState() {
         if (Sponge.getGame().getState() == GameState.CONSTRUCTION) {
-            return State.CONSTRUCTION;
+            return Platform.State.CONSTRUCTION;
         } else if (Sponge.getGame().getState() == GameState.PRE_INITIALIZATION) {
-            return State.PRE_INITIALIZATION;
+            return Platform.State.PRE_INITIALIZATION;
         } else if (Sponge.getGame().getState() == GameState.INITIALIZATION) {
-            return State.INITIALIZATION;
+            return Platform.State.INITIALIZATION;
         } else if (Sponge.getGame().getState() == GameState.POST_INITIALIZATION) {
-            return State.POST_INITIALIZATION;
+            return Platform.State.POST_INITIALIZATION;
         } else if (Sponge.getGame().getState() == GameState.LOAD_COMPLETE) {
-            return State.LOAD_COMPLETE;
+            return Platform.State.LOAD_COMPLETE;
         } else if (Sponge.getGame().getState() == GameState.SERVER_ABOUT_TO_START) {
-            return State.SERVER_ABOUT_TO_START;
+            return Platform.State.SERVER_ABOUT_TO_START;
         } else if (Sponge.getGame().getState() == GameState.SERVER_STARTING) {
-            return State.SERVER_STARTING;
+            return Platform.State.SERVER_STARTING;
         } else if (Sponge.getGame().getState() == GameState.SERVER_STARTED) {
-            return State.SERVER_STARTED;
+            return Platform.State.SERVER_STARTED;
         } else if (Sponge.getGame().getState() == GameState.SERVER_STOPPING) {
-            return State.SERVER_STOPPING;
+            return Platform.State.SERVER_STOPPING;
         } else if (Sponge.getGame().getState() == GameState.SERVER_STOPPED) {
-            return State.SERVER_STOPPED;
+            return Platform.State.SERVER_STOPPED;
         } else if (Sponge.getGame().getState() == GameState.GAME_STOPPING) {
-            return State.GAME_STOPPING;
+            return Platform.State.GAME_STOPPING;
         } else if (Sponge.getGame().getState() == GameState.GAME_STOPPED) {
-            return State.GAME_STOPPED;
+            return Platform.State.GAME_STOPPED;
         } else {
-            return State.UNKNOWN;
+            return Platform.State.UNKNOWN;
         }
     }
     

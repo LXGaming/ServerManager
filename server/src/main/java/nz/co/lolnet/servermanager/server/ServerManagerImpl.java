@@ -33,7 +33,6 @@ import nz.co.lolnet.servermanager.server.handler.ResponseNetworkHandler;
 import nz.co.lolnet.servermanager.server.manager.CommandManager;
 import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
 import nz.co.lolnet.servermanager.server.service.RedisServiceImpl;
-import nz.co.lolnet.servermanager.server.util.ShutdownHook;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -65,6 +64,13 @@ public class ServerManagerImpl extends ServerManager {
                 .add(Logger.Level.ERROR, LogManager.getLogger(Reference.ID)::error)
                 .add(Logger.Level.DEBUG, LogManager.getLogger(Reference.ID)::debug);
         
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Thread.currentThread().setName("Shutdown Thread");
+            ServerManager.getInstance().getLogger().info("Shutting down...");
+            ServerManagerImpl.getInstance().shutdownServerManager();
+            LogManager.shutdown();
+        }));
+        
         serverManager.loadServerManager();
         return true;
     }
@@ -72,7 +78,6 @@ public class ServerManagerImpl extends ServerManager {
     @Override
     public void loadServerManager() {
         getLogger().info("Initializing...");
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
         getConfiguration().loadConfiguration();
         reloadServerManager();
         CommandManager.buildCommands();
@@ -95,6 +100,12 @@ public class ServerManagerImpl extends ServerManager {
             Configurator.setLevel(Reference.ID, Level.INFO);
             getLogger().info("Debug mode disabled");
         }
+    }
+    
+    @Override
+    public void shutdownServerManager() {
+        getRedisService().shutdown();
+        ServiceManager.shutdown();
     }
     
     @Override
@@ -137,7 +148,6 @@ public class ServerManagerImpl extends ServerManager {
     public RedisServiceImpl getRedisService() {
         return redisService;
     }
-    
     
     public boolean isRunning() {
         return running;

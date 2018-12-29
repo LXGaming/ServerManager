@@ -37,6 +37,8 @@ public abstract class ServerManager {
     
     protected abstract void reloadServerManager();
     
+    protected abstract void shutdownServerManager();
+    
     public abstract boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass);
     
     public void sendRequest(Packet packet) {

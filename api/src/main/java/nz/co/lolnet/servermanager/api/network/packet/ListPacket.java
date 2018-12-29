@@ -18,22 +18,22 @@ package nz.co.lolnet.servermanager.api.network.packet;
 
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
-import java.util.Set;
+import java.util.Map;
 
 public class ListPacket extends AbstractPacket {
     
-    private Set<String> servers;
+    private Map<String, String> servers;
     
     @Override
     public void process(NetworkHandler networkHandler) {
         networkHandler.handleList(this);
     }
     
-    public Set<String> getServers() {
+    public Map<String, String> getServers() {
         return servers;
     }
     
-    public void setServers(Set<String> servers) {
+    public void setServers(Map<String, String> servers) {
         this.servers = servers;
     }
 }

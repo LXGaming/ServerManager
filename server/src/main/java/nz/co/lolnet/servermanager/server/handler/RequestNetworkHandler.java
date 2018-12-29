@@ -49,10 +49,8 @@ public class RequestNetworkHandler extends AbstractNetworkHandler {
     
     @Override
     public void handleList(ListPacket packet) {
-        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
-            packet.setServers(ConnectionManager.getConnections().stream().map(Connection::getName).collect(Collectors.toSet()));
-            ServerManagerImpl.getInstance().sendResponse(connection.getChannel(), packet);
-        });
+        packet.setServers(ConnectionManager.getConnections().stream().collect(Collectors.toMap(Connection::getId, Connection::getName)));
+        ServerManagerImpl.getInstance().sendResponse(packet.getSender(), packet);
     }
     
     @Override

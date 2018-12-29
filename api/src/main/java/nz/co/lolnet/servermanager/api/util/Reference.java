@@ -20,7 +20,7 @@ public class Reference {
     
     public static final String ID = "servermanager";
     public static final String NAME = "ServerManager";
-    public static final String VERSION = "2.0.0-DEV";
+    public static final String VERSION = "2.0.0";
     public static final String DESCRIPTION = "Server Manager";
     public static final String AUTHORS = "LX_Gaming";
     public static final String SOURCE = "https://github.com/lolnetnz/ServerManager";

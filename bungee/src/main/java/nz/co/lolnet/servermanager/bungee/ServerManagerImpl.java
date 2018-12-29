@@ -59,7 +59,6 @@ public class ServerManagerImpl extends ServerManager {
                 .add(Logger.Level.DEBUG, BungeePlugin.getInstance().getLogger()::info);
         
         serverManager.loadServerManager();
-        serverManager.reloadServerManager();
         return true;
     }
     
@@ -67,6 +66,7 @@ public class ServerManagerImpl extends ServerManager {
     public void loadServerManager() {
         getLogger().info("Initializing...");
         getConfiguration().loadConfiguration();
+        reloadServerManager();
         PacketManager.buildPackets();
         registerNetworkHandler(NetworkHandlerImpl.class);
         ServiceManager.schedule(getRedisService());

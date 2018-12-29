@@ -66,7 +66,6 @@ public class ServerManagerImpl extends ServerManager {
                 .add(Logger.Level.DEBUG, LogManager.getLogger(Reference.ID)::debug);
         
         serverManager.loadServerManager();
-        serverManager.reloadServerManager();
         return true;
     }
     
@@ -75,6 +74,7 @@ public class ServerManagerImpl extends ServerManager {
         getLogger().info("Initializing...");
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
         getConfiguration().loadConfiguration();
+        reloadServerManager();
         CommandManager.buildCommands();
         ConnectionManager.buildConnections();
         PacketManager.buildPackets();

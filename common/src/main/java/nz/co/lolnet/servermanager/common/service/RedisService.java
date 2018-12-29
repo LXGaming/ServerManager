@@ -87,7 +87,7 @@ public abstract class RedisService extends AbstractService {
         return clientNames;
     }
     
-    protected Set<String> getChannels() {
+    public Set<String> getChannels() {
         return channels;
     }
 }

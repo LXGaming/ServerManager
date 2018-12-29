@@ -22,11 +22,14 @@ import com.velocitypowered.api.event.Subscribe;
 import nz.co.lolnet.redisvelocity.api.event.RedisMessageEvent;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
+import nz.co.lolnet.servermanager.velocity.ServerManagerImpl;
 
 public class VelocityListener {
     
     @Subscribe(order = PostOrder.LATE)
     public void onRedisMessage(RedisMessageEvent event) {
-        Toolbox.parseJson(event.getMessage(), JsonObject.class).ifPresent(PacketManager::process);
+        if (ServerManagerImpl.getInstance().getRedisService().getChannels().contains(event.getChannel())) {
+            Toolbox.parseJson(event.getMessage(), JsonObject.class).ifPresent(PacketManager::process);
+        }
     }
 }

@@ -21,6 +21,7 @@ import com.imaginarycode.minecraft.redisbungee.events.PubSubMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import nz.co.lolnet.servermanager.bungee.ServerManagerImpl;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 
@@ -28,6 +29,8 @@ public class BungeeListener implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPubSubMessage(PubSubMessageEvent event) {
-        Toolbox.parseJson(event.getMessage(), JsonObject.class).ifPresent(PacketManager::process);
+        if (ServerManagerImpl.getInstance().getRedisService().getChannels().contains(event.getChannel())) {
+            Toolbox.parseJson(event.getMessage(), JsonObject.class).ifPresent(PacketManager::process);
+        }
     }
 }

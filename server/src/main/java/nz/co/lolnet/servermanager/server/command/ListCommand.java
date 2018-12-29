@@ -33,7 +33,7 @@ public class ListCommand extends AbstractCommand {
     
     @Override
     public void execute(List<String> arguments) {
-        Set<String> connections = ConnectionManager.getConnections().stream().map(Connection::getName).collect(Collectors.toSet());
+        Set<String> connections = ConnectionManager.getConnections().stream().map(Connection::getId).collect(Collectors.toSet());
         if (connections.isEmpty()) {
             ServerManager.getInstance().getLogger().warn("No connections present");
             return;

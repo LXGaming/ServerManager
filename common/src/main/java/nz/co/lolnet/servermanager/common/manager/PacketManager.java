@@ -69,7 +69,7 @@ public class PacketManager {
             return;
         }
         
-        ServerManager.getInstance().getLogger().debug("Processing {}", packetClass.getSimpleName());
+        ServerManager.getInstance().getLogger().debug("Processing {} ({}) from {}", packetClass.getSimpleName(), packet.getType(), packet.getSender());
         for (NetworkHandler networkHandler : getNetworkHandlers()) {
             try {
                 if (networkHandler.handle(packet)) {
@@ -81,11 +81,11 @@ public class PacketManager {
         }
     }
     
-    public static void sendPacket(String channel, Packet packet, BiConsumer<String, String> consumer) {
+    public static void sendPacket(String id, Packet packet, BiConsumer<String, String> consumer) {
         if (Toolbox.isBlank(packet.getSender())) {
             ServerManager.getInstance().getConfig()
                     .map(Config::getName)
-                    .map(name -> Toolbox.createName(ServerManager.getInstance().getPlatformType(), name))
+                    .map(name -> Toolbox.createId(ServerManager.getInstance().getPlatformType(), name))
                     .ifPresent(packet::setSender);
         }
         
@@ -94,10 +94,10 @@ public class PacketManager {
             return;
         }
         
-        sendPacket(channel, packet.getClass(), new Gson().toJsonTree(packet), consumer);
+        sendPacket(id, packet.getClass(), new Gson().toJsonTree(packet), consumer);
     }
     
-    public static void sendPacket(String channel, Class<? extends Packet> packetClass, JsonElement jsonElement, BiConsumer<String, String> consumer) {
+    private static void sendPacket(String id, Class<? extends Packet> packetClass, JsonElement jsonElement, BiConsumer<String, String> consumer) {
         if (!getPacketClasses().contains(packetClass)) {
             ServerManager.getInstance().getLogger().error("Can't serialize unregistered packet", packetClass.getSimpleName());
             return;
@@ -106,7 +106,7 @@ public class PacketManager {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("class", packetClass.getName());
         jsonObject.add("data", jsonElement);
-        consumer.accept(channel, new Gson().toJson(jsonObject));
+        consumer.accept(Toolbox.createChannel(id), new Gson().toJson(jsonObject));
     }
     
     public static boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass) {

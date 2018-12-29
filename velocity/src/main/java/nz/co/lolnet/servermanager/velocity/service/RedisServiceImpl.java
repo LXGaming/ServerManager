@@ -45,7 +45,8 @@ public class RedisServiceImpl extends RedisService {
         try (Jedis jedis = getJedisPool().getResource()) {
             ServerManager.getInstance().getConfig()
                     .map(Config::getName)
-                    .map(name -> Toolbox.createChannel(ServerManager.getInstance().getPlatformType(), name))
+                    .map(name -> Toolbox.createId(ServerManager.getInstance().getPlatformType(), name))
+                    .map(Toolbox::createChannel)
                     .ifPresent(jedis::clientSetname);
         }
         

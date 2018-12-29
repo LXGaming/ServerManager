@@ -55,7 +55,7 @@ public class ExecuteCommand extends AbstractCommand {
             return;
         }
         
-        ServerManagerImpl.getInstance().sendRequest(connection.getChannel(), new CommandPacket(command, new User(Reference.NAME, Platform.CONSOLE_UUID)));
+        ServerManagerImpl.getInstance().sendRequest(connection.getId(), new CommandPacket(command, new User(Reference.NAME, Platform.CONSOLE_UUID)));
         ServerManager.getInstance().getLogger().info("Execute sent");
     }
 }

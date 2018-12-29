@@ -23,7 +23,6 @@ public class SpongeConfig implements Config {
     
     private boolean debug = false;
     private String name = "";
-    private String host = "";
     private RedisCategory redisCategory = new RedisCategory();
     
     @Override
@@ -34,10 +33,6 @@ public class SpongeConfig implements Config {
     @Override
     public String getName() {
         return name;
-    }
-    
-    public String getHost() {
-        return host;
     }
     
     public RedisCategory getRedisCategory() {

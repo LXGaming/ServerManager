@@ -113,20 +113,20 @@ public class ServerManagerImpl extends ServerManager {
         return PacketManager.registerNetworkHandler(networkHandlerClass);
     }
     
-    public void sendRequest(String channel, Packet packet) {
+    public void sendRequest(String id, Packet packet) {
         packet.setSender(null);
         packet.setType(Packet.Type.REQUEST);
-        sendPacket(channel, packet);
+        sendPacket(id, packet);
     }
     
-    public void sendResponse(String channel, Packet packet) {
+    public void sendResponse(String id, Packet packet) {
         packet.setSender(null);
         packet.setType(Packet.Type.RESPONSE);
-        sendPacket(channel, packet);
+        sendPacket(id, packet);
     }
     
-    public void sendPacket(String channel, Packet packet) {
-        PacketManager.sendPacket(channel, packet, getRedisService()::publish);
+    public void sendPacket(String id, Packet packet) {
+        PacketManager.sendPacket(id, packet, getRedisService()::publish);
     }
     
     public static ServerManagerImpl getInstance() {

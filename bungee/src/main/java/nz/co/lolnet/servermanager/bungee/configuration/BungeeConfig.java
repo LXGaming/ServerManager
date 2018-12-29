@@ -22,7 +22,6 @@ public class BungeeConfig implements Config {
     
     private boolean debug = false;
     private String name = "";
-    private String host = "";
     
     @Override
     public boolean isDebug() {
@@ -32,9 +31,5 @@ public class BungeeConfig implements Config {
     @Override
     public String getName() {
         return name;
-    }
-    
-    public String getHost() {
-        return host;
     }
 }

@@ -41,14 +41,14 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
         
         if (Toolbox.isNotBlank(packet.getForwardTo())) {
             ConnectionManager.getConnection(packet.getForwardTo()).ifPresent(connection -> {
-                ServerManagerImpl.getInstance().sendPacket(connection.getChannel(), packet);
+                ServerManagerImpl.getInstance().sendPacket(connection.getId(), packet);
             });
             
             return false;
         }
         
-        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> connection.setLastPacketTime(System.currentTimeMillis()));
         ConnectionManager.forwardPacket(packet);
+        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> connection.setLastPacketTime(System.currentTimeMillis()));
         return true;
     }
     
@@ -84,7 +84,7 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
             
             connection.getServerInfo().setState(packet.getState());
             if (connection.getServerInfo().getState().equals(Platform.State.SERVER_STARTED)) {
-                ServerManagerImpl.getInstance().sendRequest(connection.getChannel(), new SettingPacket());
+                ServerManagerImpl.getInstance().sendRequest(connection.getId(), new SettingPacket());
             }
             
             ServerManager.getInstance().getLogger().info("{} State from {}", packet.getState().getFriendlyName(), packet.getSender());

@@ -19,21 +19,23 @@ package nz.co.lolnet.servermanager.server.data;
 import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.data.Setting;
 
+import java.util.Objects;
+
 public class Connection {
     
-    private final String channel;
+    private final String id;
     private final String name;
     private long lastPacketTime;
     private ServerInfo serverInfo;
     private Setting setting;
     
-    public Connection(String channel, String name) {
-        this.channel = channel;
+    public Connection(String id, String name) {
+        this.id = id;
         this.name = name;
     }
     
-    public String getChannel() {
-        return channel;
+    public String getId() {
+        return id;
     }
     
     public String getName() {
@@ -62,5 +64,29 @@ public class Connection {
     
     public void setSetting(Setting setting) {
         this.setting = setting;
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        Connection connection = (Connection) obj;
+        return Objects.equals(getId(), connection.getId());
+    }
+    
+    @Override
+    public String toString() {
+        return getId();
     }
 }

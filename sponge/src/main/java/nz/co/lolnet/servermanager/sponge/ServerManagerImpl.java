@@ -109,10 +109,7 @@ public class ServerManagerImpl extends ServerManager {
     
     @Override
     public void sendPacket(Packet packet) {
-        getConfig()
-                .map(SpongeConfig::getHost)
-                .map(name -> Toolbox.createChannel(Platform.Type.SERVER, name))
-                .ifPresent(channel -> PacketManager.sendPacket(channel, packet, getRedisService()::publish));
+        PacketManager.sendPacket(Toolbox.createId(Platform.Type.SERVER), packet, getRedisService()::publish);
     }
     
     public static ServerManagerImpl getInstance() {

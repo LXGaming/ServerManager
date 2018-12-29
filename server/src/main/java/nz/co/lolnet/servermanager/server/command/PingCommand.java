@@ -44,7 +44,7 @@ public class PingCommand extends AbstractCommand {
             return;
         }
         
-        ServerManagerImpl.getInstance().sendRequest(connection.getChannel(), new PingPacket(System.currentTimeMillis()));
+        ServerManagerImpl.getInstance().sendRequest(connection.getId(), new PingPacket(System.currentTimeMillis()));
         ServerManager.getInstance().getLogger().info("Ping sent");
     }
 }

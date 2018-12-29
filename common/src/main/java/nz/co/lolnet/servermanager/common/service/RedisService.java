@@ -33,11 +33,13 @@ public abstract class RedisService extends AbstractService {
     
     @Override
     public boolean prepareService() {
-        getChannels().add(Reference.ID + "-" + ServerManager.getInstance().getPlatformType());
+        getChannels().add(Toolbox.createChannel(Toolbox.createId(ServerManager.getInstance().getPlatformType())));
         ServerManager.getInstance().getConfig()
                 .map(Config::getName)
-                .map(name -> Toolbox.createChannel(ServerManager.getInstance().getPlatformType(), name))
+                .map(name -> Toolbox.createId(ServerManager.getInstance().getPlatformType(), name))
+                .map(Toolbox::createChannel)
                 .ifPresent(getChannels()::add);
+        
         return true;
     }
     
@@ -79,7 +81,7 @@ public abstract class RedisService extends AbstractService {
                 continue;
             }
             
-            clientNames.add(clientName);
+            clientNames.add(Toolbox.getId(clientName));
         }
         
         return clientNames;

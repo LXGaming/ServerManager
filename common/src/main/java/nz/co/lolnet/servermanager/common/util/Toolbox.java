@@ -71,12 +71,25 @@ public class Toolbox {
         return string.replaceAll("[^\\x20-\\x7E\\x0A\\x0D]", "");
     }
     
-    public static String createChannel(Platform.Type platformType, String name) {
-        return Reference.ID + "-" + platformType + "-" + name.toLowerCase();
+    public static String createChannel(String id) {
+        return Reference.ID + ":" + id;
     }
     
-    public static String createName(Platform.Type platformType, String name) {
-        return platformType.getFriendlyName() + name;
+    public static String createId(Platform.Type platformType, String name) {
+        return createId(platformType) + name.toLowerCase();
+    }
+    
+    public static String createId(Platform.Type platformType) {
+        return platformType.toString();
+    }
+    
+    public static String getId(String string) {
+        int index = string.indexOf(':');
+        if (index >= 0 && index < string.length()) {
+            return string.substring(index + 1);
+        }
+        
+        return string;
     }
     
     public static String getTimeString(long time) {

@@ -37,14 +37,13 @@ public class RequestNetworkHandler extends AbstractNetworkHandler {
         
         if (Toolbox.isNotBlank(packet.getForwardTo())) {
             ConnectionManager.getConnection(packet.getForwardTo()).ifPresent(connection -> {
-                ServerManagerImpl.getInstance().sendPacket(connection.getChannel(), packet);
+                ServerManagerImpl.getInstance().sendPacket(connection.getId(), packet);
             });
             
             return false;
         }
         
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> connection.setLastPacketTime(System.currentTimeMillis()));
-        ConnectionManager.forwardPacket(packet);
         return true;
     }
     
@@ -59,7 +58,7 @@ public class RequestNetworkHandler extends AbstractNetworkHandler {
     @Override
     public void handlePing(PingPacket packet) {
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
-            ServerManagerImpl.getInstance().sendResponse(connection.getChannel(), packet);
+            ServerManagerImpl.getInstance().sendResponse(connection.getId(), packet);
         });
     }
 }

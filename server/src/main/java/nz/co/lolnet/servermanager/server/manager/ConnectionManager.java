@@ -35,7 +35,7 @@ public class ConnectionManager {
     private static final Set<Connection> CONNECTIONS = Collections.synchronizedSet(Toolbox.newHashSet());
     
     public static void buildConnections() {
-        List<ServerCategory> serverCategories = ServerManagerImpl.getInstance().getConfig().map(ServerConfig::getServerCategories).orElse(null);
+        List<ServerCategory> serverCategories = getServerCategories();
         if (serverCategories == null || serverCategories.isEmpty()) {
             ServerManager.getInstance().getLogger().warn("Cannot build connections as Server Categories is unavailable or empty");
             return;
@@ -46,32 +46,33 @@ public class ConnectionManager {
                 continue;
             }
             
-            String channel = Toolbox.createChannel(serverCategory.getPlatform(), serverCategory.getName());
-            String name = Toolbox.createName(serverCategory.getPlatform(), serverCategory.getName());
-            getConnections().add(new Connection(channel, name));
+            String id = Toolbox.createId(serverCategory.getPlatform(), serverCategory.getName());
+            if (getConnections().add(new Connection(id, serverCategory.getName()))) {
+                ServerManager.getInstance().getLogger().debug("{} Connection registered", id);
+            }
         }
     }
     
     public static void forwardPacket(Packet packet) {
         List<String> clientNames = ServerManagerImpl.getInstance().getRedisService().getClientNames();
-        for (Connection connection : getConnections()) {
-            if (connection.getSetting() == null || connection.getName().equalsIgnoreCase(packet.getSender()) || !clientNames.contains(connection.getChannel())) {
-                continue;
+        getConnections().forEach(connection -> {
+            if (connection.getSetting() == null || connection.getId().equalsIgnoreCase(packet.getSender()) || !clientNames.contains(connection.getId())) {
+                return;
             }
             
             if (packet instanceof StatePacket && connection.getSetting().isForwardState()) {
-                ServerManagerImpl.getInstance().sendPacket(connection.getChannel(), packet);
+                ServerManagerImpl.getInstance().sendPacket(connection.getId(), packet);
             }
-        }
+        });
     }
     
-    public static Optional<Connection> getConnection(String name) {
+    public static Optional<Connection> getConnection(String id) {
         for (Connection connection : getConnections()) {
-            if (Toolbox.isBlank(connection.getName())) {
+            if (Toolbox.isBlank(connection.getId())) {
                 continue;
             }
             
-            if (connection.getName().equalsIgnoreCase(name)) {
+            if (connection.getId().equalsIgnoreCase(id)) {
                 return Optional.of(connection);
             }
         }
@@ -79,8 +80,8 @@ public class ConnectionManager {
         return Optional.empty();
     }
     
-    public static Optional<ServerCategory> getServerCategory(String name) {
-        List<ServerCategory> serverCategories = ServerManagerImpl.getInstance().getConfig().map(ServerConfig::getServerCategories).orElse(null);
+    public static Optional<ServerCategory> getServerCategory(String id) {
+        List<ServerCategory> serverCategories = getServerCategories();
         if (serverCategories == null || serverCategories.isEmpty()) {
             return Optional.empty();
         }
@@ -90,12 +91,18 @@ public class ConnectionManager {
                 continue;
             }
             
-            if (Toolbox.createName(serverCategory.getPlatform(), serverCategory.getName()).equalsIgnoreCase(name)) {
+            if (Toolbox.createId(serverCategory.getPlatform(), serverCategory.getName()).equalsIgnoreCase(id)) {
                 return Optional.of(serverCategory);
             }
         }
         
         return Optional.empty();
+    }
+    
+    public static List<ServerCategory> getServerCategories() {
+        return ServerManagerImpl.getInstance().getConfig()
+                .map(ServerConfig::getServerCategories)
+                .orElse(null);
     }
     
     public static Set<Connection> getConnections() {

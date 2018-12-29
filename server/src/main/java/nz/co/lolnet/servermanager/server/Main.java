@@ -30,5 +30,7 @@ public class Main {
         while (ServerManagerImpl.getInstance().isRunning()) {
             TerminalConsoleAppender.readline().ifPresent(CommandManager::process);
         }
+        
+        Runtime.getRuntime().exit(0);
     }
 }

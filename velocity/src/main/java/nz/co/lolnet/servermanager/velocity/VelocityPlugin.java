@@ -29,6 +29,7 @@ import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.util.Reference;
+import nz.co.lolnet.servermanager.velocity.listener.VelocityListener;
 
 import java.nio.file.Path;
 
@@ -58,7 +59,7 @@ public class VelocityPlugin {
     public void onProxyInitialize(ProxyInitializeEvent event) {
         instance = this;
         ServerManagerImpl.init();
-        getProxy().getEventManager().register(this, new VelocityPlugin());
+        getProxy().getEventManager().register(this, new VelocityListener());
         
         StatePacket packet = new StatePacket();
         packet.setState(Platform.State.SERVER_STARTED);

@@ -33,6 +33,7 @@ import nz.co.lolnet.servermanager.server.handler.ResponseNetworkHandler;
 import nz.co.lolnet.servermanager.server.manager.CommandManager;
 import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
 import nz.co.lolnet.servermanager.server.service.RedisServiceImpl;
+import nz.co.lolnet.servermanager.server.service.StatusService;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -86,6 +87,7 @@ public class ServerManagerImpl extends ServerManager {
         registerNetworkHandler(RequestNetworkHandler.class);
         registerNetworkHandler(ResponseNetworkHandler.class);
         ServiceManager.schedule(getRedisService());
+        ServiceManager.schedule(new StatusService());
         getConfiguration().saveConfiguration();
         setRunning(true);
         getLogger().info("{} v{} has loaded", Reference.NAME, Reference.VERSION);

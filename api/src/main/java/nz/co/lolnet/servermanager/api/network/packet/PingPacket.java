@@ -22,9 +22,9 @@ import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 public class PingPacket extends AbstractPacket {
     
     @Expose
-    private final long time;
+    private final Long time;
     
-    public PingPacket(long time) {
+    public PingPacket(Long time) {
         this.time = time;
     }
     
@@ -33,7 +33,7 @@ public class PingPacket extends AbstractPacket {
         networkHandler.handlePing(this);
     }
     
-    public long getTime() {
+    public Long getTime() {
         return time;
     }
 }

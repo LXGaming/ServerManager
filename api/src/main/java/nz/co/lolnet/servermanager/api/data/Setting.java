@@ -21,13 +21,13 @@ import com.google.gson.annotations.Expose;
 public class Setting {
     
     @Expose
-    private boolean forwardState;
+    private Boolean forwardState;
     
-    public boolean isForwardState() {
+    public Boolean isForwardState() {
         return forwardState;
     }
     
-    public void setForwardState(boolean forwardState) {
+    public void setForwardState(Boolean forwardState) {
         this.forwardState = forwardState;
     }
 }

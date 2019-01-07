@@ -23,7 +23,7 @@ public class Setting {
     @Expose
     private Boolean forwardState;
     
-    public Boolean isForwardState() {
+    public Boolean getForwardState() {
         return forwardState;
     }
     

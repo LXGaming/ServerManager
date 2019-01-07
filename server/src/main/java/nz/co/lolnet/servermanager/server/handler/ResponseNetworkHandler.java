@@ -69,6 +69,10 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
     @Override
     public void handleSetting(SettingPacket packet) {
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
+            if (packet.getSetting() == null) {
+                return;
+            }
+            
             connection.setSetting(packet.getSetting());
             ServerManager.getInstance().getLogger().info("Received Setting from {}", packet.getSender());
         });
@@ -77,6 +81,10 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
     @Override
     public void handleState(StatePacket packet) {
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
+            if (packet.getState() == null) {
+                return;
+            }
+            
             connection.getData().setState(packet.getState());
             if (connection.getData().getState().equals(Platform.State.SERVER_STARTED)) {
                 ServerManagerImpl.getInstance().sendRequest(connection.getId(), new SettingPacket());
@@ -89,7 +97,17 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
     @Override
     public void handleStatus(StatusPacket packet) {
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
-            ServerManager.getInstance().getLogger().info("{} Status from {}", packet.getData().toString(), packet.getSender());
+            connection.getData().setLastTickTime(packet.getData().getLastTickTime());
+            connection.getData().setStartTime(packet.getData().getStartTime());
+            
+            if (connection.getData().getState() != Platform.State.FROZEN || packet.getData().getState() != Platform.State.SERVER_STARTED) {
+                connection.getData().setState(packet.getData().getState());
+            }
+            
+            connection.getData().setTicksPerSecond(packet.getData().getTicksPerSecond());
+            connection.getData().setUsers(packet.getData().getUsers());
+            connection.getData().setVersion(packet.getData().getVersion());
+            ServerManager.getInstance().getLogger().info("Received Status from {}", packet.getSender());
         });
     }
 }

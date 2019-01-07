@@ -19,6 +19,7 @@ package nz.co.lolnet.servermanager.sponge.util;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.ServerHangWatchdog;
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.Implementation;
 import nz.co.lolnet.servermanager.api.data.User;
@@ -78,7 +79,12 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     public void handleStatus(StatusPacket packet) {
         Implementation.Data data = new Implementation.Data();
         data.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
-        data.setState(SpongePlugin.getInstance().getState());
+        
+        if (SpongePlugin.getInstance() != null) {
+            data.setState(SpongePlugin.getInstance().getState());
+        } else {
+            data.setState(Platform.State.CONSTRUCTION);
+        }
         
         if (Sponge.isServerAvailable()) {
             data.setLastTickTime(((MinecraftServer) Sponge.getServer()).getCurrentTime());

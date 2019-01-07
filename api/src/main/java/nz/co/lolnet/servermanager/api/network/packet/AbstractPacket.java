@@ -16,12 +16,18 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
+import com.google.gson.annotations.Expose;
 import nz.co.lolnet.servermanager.api.network.Packet;
 
 public abstract class AbstractPacket implements Packet {
     
+    @Expose
     private String forwardTo;
+    
+    @Expose
     private String sender;
+    
+    @Expose
     private Type type;
     
     @Override

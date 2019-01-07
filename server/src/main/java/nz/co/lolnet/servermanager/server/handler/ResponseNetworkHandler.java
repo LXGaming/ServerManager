@@ -18,7 +18,6 @@ package nz.co.lolnet.servermanager.server.handler;
 
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.ServerInfo;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
@@ -78,12 +77,8 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
     @Override
     public void handleState(StatePacket packet) {
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
-            if (connection.getServerInfo() == null) {
-                connection.setServerInfo(new ServerInfo());
-            }
-            
-            connection.getServerInfo().setState(packet.getState());
-            if (connection.getServerInfo().getState().equals(Platform.State.SERVER_STARTED)) {
+            connection.getData().setState(packet.getState());
+            if (connection.getData().getState().equals(Platform.State.SERVER_STARTED)) {
                 ServerManagerImpl.getInstance().sendRequest(connection.getId(), new SettingPacket());
             }
             
@@ -94,8 +89,7 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
     @Override
     public void handleStatus(StatusPacket packet) {
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
-            connection.setServerInfo(packet.getServerInfo());
-            ServerManager.getInstance().getLogger().info("{} Status from {}", packet.getServerInfo().toString(), packet.getSender());
+            ServerManager.getInstance().getLogger().info("{} Status from {}", packet.getData().toString(), packet.getSender());
         });
     }
 }

@@ -16,8 +16,11 @@
 
 package nz.co.lolnet.servermanager.api.data;
 
+import com.google.gson.annotations.Expose;
+
 public class Setting {
     
+    @Expose
     private boolean forwardState;
     
     public boolean isForwardState() {

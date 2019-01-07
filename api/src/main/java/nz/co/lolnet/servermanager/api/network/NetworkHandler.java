@@ -29,7 +29,9 @@ public interface NetworkHandler {
     
     void handleCommand(CommandPacket packet);
     
-    void handleList(ListPacket packet);
+    void handleListBasic(ListPacket.Basic packet);
+    
+    void handleListFull(ListPacket.Full packet);
     
     void handlePing(PingPacket packet);
     

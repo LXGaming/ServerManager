@@ -16,24 +16,51 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
+import com.google.gson.annotations.Expose;
+import nz.co.lolnet.servermanager.api.data.Implementation;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
+import java.util.Collection;
 import java.util.Map;
 
-public class ListPacket extends AbstractPacket {
-    
-    private Map<String, String> servers;
+public abstract class ListPacket extends AbstractPacket {
     
     @Override
     public void process(NetworkHandler networkHandler) {
-        networkHandler.handleList(this);
+        if (this instanceof ListPacket.Basic) {
+            networkHandler.handleListBasic((ListPacket.Basic) this);
+        }
+        
+        if (this instanceof ListPacket.Full) {
+            networkHandler.handleListFull((ListPacket.Full) this);
+        }
     }
     
-    public Map<String, String> getServers() {
-        return servers;
+    public static class Basic extends ListPacket {
+        
+        @Expose
+        private Collection<Implementation> implementations;
+        
+        public Collection<Implementation> getImplementations() {
+            return implementations;
+        }
+        
+        public void setImplementations(Collection<Implementation> implementations) {
+            this.implementations = implementations;
+        }
     }
     
-    public void setServers(Map<String, String> servers) {
-        this.servers = servers;
+    public static class Full extends ListPacket {
+        
+        @Expose
+        private Map<Implementation, Implementation.Data> implementations;
+        
+        public Map<Implementation, Implementation.Data> getImplementations() {
+            return implementations;
+        }
+        
+        public void setImplementations(Map<Implementation, Implementation.Data> implementations) {
+            this.implementations = implementations;
+        }
     }
 }

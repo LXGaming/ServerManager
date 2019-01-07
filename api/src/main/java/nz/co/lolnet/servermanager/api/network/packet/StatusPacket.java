@@ -16,23 +16,25 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
-import nz.co.lolnet.servermanager.api.data.ServerInfo;
+import com.google.gson.annotations.Expose;
+import nz.co.lolnet.servermanager.api.data.Implementation;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class StatusPacket extends AbstractPacket {
     
-    private ServerInfo serverInfo;
+    @Expose
+    private Implementation.Data data;
     
     @Override
     public void process(NetworkHandler networkHandler) {
         networkHandler.handleStatus(this);
     }
     
-    public ServerInfo getServerInfo() {
-        return serverInfo;
+    public Implementation.Data getData() {
+        return data;
     }
     
-    public void setServerInfo(ServerInfo serverInfo) {
-        this.serverInfo = serverInfo;
+    public void setData(Implementation.Data data) {
+        this.data = data;
     }
 }

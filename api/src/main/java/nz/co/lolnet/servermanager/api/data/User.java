@@ -16,12 +16,17 @@
 
 package nz.co.lolnet.servermanager.api.data;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.Objects;
 import java.util.UUID;
 
 public class User {
     
+    @Expose
     private final String name;
+    
+    @Expose
     private final UUID uniqueId;
     
     public User(String name, UUID uniqueId) {

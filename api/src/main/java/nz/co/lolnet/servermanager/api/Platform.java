@@ -46,11 +46,9 @@ public interface Platform {
         
         SERVER_STOPPED("Server Stopped"),
         
-        GAME_STOPPING("Game Stopping"),
-        
-        GAME_STOPPED("Game Stopped"),
-        
         JVM_STOPPED("JVM Stopped"),
+        
+        FROZEN("Frozen"),
         
         UNKNOWN("Unknown");
         

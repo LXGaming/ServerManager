@@ -176,6 +176,14 @@ public class Toolbox {
         return false;
     }
     
+    public static String getClassSimpleName(Class<?> clazz) {
+        if (clazz.getEnclosingClass() != null) {
+            return getClassSimpleName(clazz.getEnclosingClass()) + "." + clazz.getSimpleName();
+        }
+        
+        return clazz.getSimpleName();
+    }
+    
     public static <T> T cast(Object object, Class<T> type) {
         return type.cast(object);
     }

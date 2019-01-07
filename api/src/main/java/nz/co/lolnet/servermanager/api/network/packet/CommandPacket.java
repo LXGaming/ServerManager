@@ -16,12 +16,16 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
+import com.google.gson.annotations.Expose;
 import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class CommandPacket extends AbstractPacket {
     
+    @Expose
     private final String command;
+    
+    @Expose
     private final User user;
     
     public CommandPacket(String command, User user) {

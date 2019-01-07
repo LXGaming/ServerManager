@@ -16,10 +16,11 @@
 
 package nz.co.lolnet.servermanager.sponge.util;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.ServerHangWatchdog;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.ServerInfo;
+import nz.co.lolnet.servermanager.api.data.Implementation;
 import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
@@ -75,21 +76,21 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleStatus(StatusPacket packet) {
-        ServerInfo serverInfo = new ServerInfo();
-        serverInfo.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
-        serverInfo.setState(SpongePlugin.getInstance().getState());
-        serverInfo.setType(ServerManager.getInstance().getPlatformType());
+        Implementation.Data data = new Implementation.Data();
+        data.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
+        data.setState(SpongePlugin.getInstance().getState());
         
         if (Sponge.isServerAvailable()) {
-            serverInfo.setTicksPerSecond(Sponge.getServer().getTicksPerSecond());
-            serverInfo.setUsers(Sponge.getServer().getOnlinePlayers().stream()
+            data.setLastTickTime(((MinecraftServer) Sponge.getServer()).getCurrentTime());
+            data.setTicksPerSecond(Sponge.getServer().getTicksPerSecond());
+            data.setUsers(Sponge.getServer().getOnlinePlayers().stream()
                     .map(player -> new User(player.getName(), player.getUniqueId()))
                     .collect(Collectors.toCollection(HashSet::new)));
             
-            serverInfo.setVersion(Sponge.getPlatform().getMinecraftVersion().getName());
+            data.setVersion(Sponge.getPlatform().getMinecraftVersion().getName());
         }
         
-        packet.setServerInfo(serverInfo);
+        packet.setData(data);
         ServerManager.getInstance().sendResponse(packet);
     }
 }

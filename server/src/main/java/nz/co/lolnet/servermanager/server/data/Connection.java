@@ -16,30 +16,24 @@
 
 package nz.co.lolnet.servermanager.server.data;
 
-import nz.co.lolnet.servermanager.api.data.ServerInfo;
+import nz.co.lolnet.servermanager.api.Platform;
+import nz.co.lolnet.servermanager.api.data.Implementation;
 import nz.co.lolnet.servermanager.api.data.Setting;
 
 import java.util.Objects;
 
-public class Connection {
+public class Connection extends Implementation {
     
-    private final String id;
-    private final String name;
+    private final Implementation.Data data = new Implementation.Data();
     private long lastPacketTime;
-    private ServerInfo serverInfo;
     private Setting setting;
     
-    public Connection(String id, String name) {
-        this.id = id;
-        this.name = name;
+    public Connection(String id, String name, Platform.Type type) {
+        super(id, name, type);
     }
     
-    public String getId() {
-        return id;
-    }
-    
-    public String getName() {
-        return name;
+    public Implementation.Data getData() {
+        return data;
     }
     
     public long getLastPacketTime() {
@@ -48,14 +42,6 @@ public class Connection {
     
     public void setLastPacketTime(long lastPacketTime) {
         this.lastPacketTime = lastPacketTime;
-    }
-    
-    public ServerInfo getServerInfo() {
-        return serverInfo;
-    }
-    
-    public void setServerInfo(ServerInfo serverInfo) {
-        this.serverInfo = serverInfo;
     }
     
     public Setting getSetting() {

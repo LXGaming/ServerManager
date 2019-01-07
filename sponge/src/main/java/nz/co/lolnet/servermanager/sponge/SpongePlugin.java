@@ -81,12 +81,10 @@ public class SpongePlugin implements Platform {
             return Platform.State.SERVER_STARTED;
         } else if (Sponge.getGame().getState() == GameState.SERVER_STOPPING) {
             return Platform.State.SERVER_STOPPING;
-        } else if (Sponge.getGame().getState() == GameState.SERVER_STOPPED) {
+        } else if (Sponge.getGame().getState() == GameState.SERVER_STOPPED
+                || Sponge.getGame().getState() == GameState.GAME_STOPPING
+                || Sponge.getGame().getState() == GameState.GAME_STOPPED) {
             return Platform.State.SERVER_STOPPED;
-        } else if (Sponge.getGame().getState() == GameState.GAME_STOPPING) {
-            return Platform.State.GAME_STOPPING;
-        } else if (Sponge.getGame().getState() == GameState.GAME_STOPPED) {
-            return Platform.State.GAME_STOPPED;
         } else {
             return Platform.State.UNKNOWN;
         }

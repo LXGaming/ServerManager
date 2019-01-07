@@ -19,7 +19,7 @@ package nz.co.lolnet.servermanager.bungee.util;
 import net.md_5.bungee.api.ProxyServer;
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.ServerInfo;
+import nz.co.lolnet.servermanager.api.data.Implementation;
 import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
@@ -72,16 +72,15 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleStatus(StatusPacket packet) {
-        ServerInfo serverInfo = new ServerInfo();
-        serverInfo.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
-        serverInfo.setState(Platform.State.SERVER_STARTED);
-        serverInfo.setType(ServerManager.getInstance().getPlatformType());
-        serverInfo.setUsers(ProxyServer.getInstance().getPlayers().stream()
+        Implementation.Data data = new Implementation.Data();
+        data.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
+        data.setState(Platform.State.SERVER_STARTED);
+        data.setUsers(ProxyServer.getInstance().getPlayers().stream()
                 .map(player -> new User(player.getName(), player.getUniqueId()))
                 .collect(Collectors.toCollection(HashSet::new)));
-        serverInfo.setVersion(BungeePlugin.getVersion());
+        data.setVersion(BungeePlugin.getVersion());
         
-        packet.setServerInfo(serverInfo);
+        packet.setData(data);
         ServerManager.getInstance().sendResponse(packet);
     }
 }

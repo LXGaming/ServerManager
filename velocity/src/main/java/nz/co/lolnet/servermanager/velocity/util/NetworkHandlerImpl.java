@@ -18,7 +18,7 @@ package nz.co.lolnet.servermanager.velocity.util;
 
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
-import nz.co.lolnet.servermanager.api.data.ServerInfo;
+import nz.co.lolnet.servermanager.api.data.Implementation;
 import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
@@ -71,16 +71,15 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     
     @Override
     public void handleStatus(StatusPacket packet) {
-        ServerInfo serverInfo = new ServerInfo();
-        serverInfo.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
-        serverInfo.setState(Platform.State.SERVER_STARTED);
-        serverInfo.setType(ServerManager.getInstance().getPlatformType());
-        serverInfo.setUsers(VelocityPlugin.getInstance().getProxy().getAllPlayers().stream()
+        Implementation.Data data = new Implementation.Data();
+        data.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
+        data.setState(Platform.State.SERVER_STARTED);
+        data.setUsers(VelocityPlugin.getInstance().getProxy().getAllPlayers().stream()
                 .map(player -> new User(player.getUsername(), player.getUniqueId()))
                 .collect(Collectors.toCollection(HashSet::new)));
-        serverInfo.setVersion(VelocityPlugin.getVersion());
+        data.setVersion(VelocityPlugin.getVersion());
         
-        packet.setServerInfo(serverInfo);
+        packet.setData(data);
         ServerManager.getInstance().sendResponse(packet);
     }
 }

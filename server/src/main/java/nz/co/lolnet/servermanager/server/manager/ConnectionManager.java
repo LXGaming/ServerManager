@@ -47,7 +47,7 @@ public class ConnectionManager {
             }
             
             String id = Toolbox.createId(serverCategory.getPlatform(), serverCategory.getName());
-            if (getConnections().add(new Connection(id, serverCategory.getName()))) {
+            if (getConnections().add(new Connection(id, serverCategory.getName(), serverCategory.getPlatform()))) {
                 ServerManager.getInstance().getLogger().debug("{} Connection registered", id);
             }
         }

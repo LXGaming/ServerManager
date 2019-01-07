@@ -16,11 +16,13 @@
 
 package nz.co.lolnet.servermanager.api.network.packet;
 
+import com.google.gson.annotations.Expose;
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 
 public class StatePacket extends AbstractPacket {
     
+    @Expose
     private Platform.State state;
     
     @Override

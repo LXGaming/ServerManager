@@ -35,7 +35,11 @@ public abstract class AbstractNetworkHandler implements NetworkHandler {
     }
     
     @Override
-    public void handleList(ListPacket packet) {
+    public void handleListBasic(ListPacket.Basic packet) {
+    }
+    
+    @Override
+    public void handleListFull(ListPacket.Full packet) {
     }
     
     @Override

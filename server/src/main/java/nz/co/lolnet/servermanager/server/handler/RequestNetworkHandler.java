@@ -22,10 +22,7 @@ import nz.co.lolnet.servermanager.api.network.packet.ListPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
-import nz.co.lolnet.servermanager.server.data.Connection;
 import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
-
-import java.util.stream.Collectors;
 
 public class RequestNetworkHandler extends AbstractNetworkHandler {
     
@@ -48,8 +45,30 @@ public class RequestNetworkHandler extends AbstractNetworkHandler {
     }
     
     @Override
-    public void handleList(ListPacket packet) {
-        packet.setServers(ConnectionManager.getConnections().stream().collect(Collectors.toMap(Connection::getId, Connection::getName)));
+    public void handleListBasic(ListPacket.Basic packet) {
+        packet.setImplementations(Toolbox.newHashSet());
+        ConnectionManager.getConnections().forEach(connection -> {
+            if (connection.getId().equalsIgnoreCase(packet.getSender())) {
+                return;
+            }
+            
+            packet.getImplementations().add(connection);
+        });
+        
+        ServerManagerImpl.getInstance().sendResponse(packet.getSender(), packet);
+    }
+    
+    @Override
+    public void handleListFull(ListPacket.Full packet) {
+        packet.setImplementations(Toolbox.newHashMap());
+        ConnectionManager.getConnections().forEach(connection -> {
+            if (connection.getId().equalsIgnoreCase(packet.getSender())) {
+                return;
+            }
+            
+            packet.getImplementations().put(connection, connection.getData());
+        });
+        
         ServerManagerImpl.getInstance().sendResponse(packet.getSender(), packet);
     }
     

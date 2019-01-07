@@ -1,4 +1,5 @@
 apply plugin: "java"
+apply plugin: "java-library"
 apply plugin: "maven"
 apply plugin: "signing"
 
@@ -15,6 +16,7 @@ configurations {
     }
 
     build.dependsOn("uploadArchives")
+    compileJava.dependsOn(":api:build")
 }
 
 repositories {
@@ -22,8 +24,7 @@ repositories {
 }
 
 dependencies {
-    compile project(path: ":api")
-    provided("com.google.code.gson:gson:2.8.5")
+    api(project(path: ":api"))
     provided("redis.clients:jedis:3.0.1")
 }
 
@@ -36,7 +37,6 @@ task sourcesJar(type: Jar) {
     classifier = "sources"
     from sourceSets.main.allSource
 }
-
 
 jar {
     from {

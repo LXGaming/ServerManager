@@ -69,28 +69,24 @@ public class StatusService extends AbstractService {
     }
     
     private void handleConnected(Connection connection) {
-        if (connection.getData().getState() == null) {
-            updateState(connection, Platform.State.UNKNOWN);
+        if (connection.getData().getState() == null || connection.getData().getState().isUnknown() || connection.getData().getState() == Platform.State.DISCONNECTED) {
+            updateState(connection, Platform.State.CONNECTED);
+        }
+        
+        if (connection.getData().getState().isOnline() && connection.getData().getStartTime() == null) {
+            connection.getData().setStartTime(0L);
+            ServerManagerImpl.getInstance().sendRequest(connection.getId(), new StatusPacket());
         }
         
         if (connection.getData().getState() == Platform.State.SERVER_STARTED && connection.getSetting() == null) {
-            connection.setSetting(new Setting());
+            Setting setting = new Setting();
+            setting.setTickTime(30000L);
+            connection.setSetting(setting);
+            
             SettingPacket packet = new SettingPacket();
             packet.setSetting(connection.getSetting());
             ServerManagerImpl.getInstance().sendRequest(connection.getId(), packet);
         }
-        
-        if (connection.getData().getState() == Platform.State.SERVER_STARTED || connection.getData().getState() == Platform.State.FROZEN) {
-            if (connection.getData().getLastTickTime() != null && connection.getData().getLastTickTime() > 0) {
-                if ((System.currentTimeMillis() - connection.getData().getLastTickTime()) >= 30000L) {
-                    updateState(connection, Platform.State.FROZEN);
-                } else {
-                    updateState(connection, Platform.State.SERVER_STARTED);
-                }
-            }
-        }
-        
-        ServerManagerImpl.getInstance().sendRequest(connection.getId(), new StatusPacket());
     }
     
     private void handleDisconnected(Connection connection) {
@@ -101,24 +97,24 @@ public class StatusService extends AbstractService {
             return;
         }
         
-        if (connection.getData().getState() == null) {
-            updateState(connection, Platform.State.UNKNOWN);
+        if (connection.getData().getState() == null || connection.getData().getState().isUnknown() || connection.getData().getState() == Platform.State.CONNECTED) {
+            updateState(connection, Platform.State.DISCONNECTED);
         }
         
         if (connection.getData().getState() == Platform.State.JVM_STARTED) {
-            if ((System.currentTimeMillis() - connection.getData().getStartTime()) >= 30000L) {
+            if (connection.getData().getStartTime() != null && (System.currentTimeMillis() - connection.getData().getStartTime()) >= 30000L) {
                 ServerManager.getInstance().getLogger().warn("{} has failed to start", connection.getName());
-                updateState(connection, Platform.State.UNKNOWN);
+                updateState(connection, Platform.State.DISCONNECTED);
                 return;
             }
             
             return;
         }
         
-        if (connection.getData().getState() != Platform.State.SERVER_STOPPED && connection.getData().getState() != Platform.State.UNKNOWN) {
+        if (!connection.getData().getState().isOffline()) {
             if ((System.currentTimeMillis() - connection.getLastPacketTime()) >= 30000L) {
                 ServerManager.getInstance().getLogger().warn("{} didn't shutdown correctly?", connection.getName());
-                updateState(connection, Platform.State.UNKNOWN);
+                updateState(connection, Platform.State.DISCONNECTED);
             }
         }
         
@@ -132,7 +128,7 @@ public class StatusService extends AbstractService {
                 connection.getData().setStartTime(System.currentTimeMillis());
                 updateState(connection, Platform.State.JVM_STARTED);
             } else {
-                updateState(connection, Platform.State.UNKNOWN);
+                updateState(connection, Platform.State.DISCONNECTED);
             }
         }
     }

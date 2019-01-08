@@ -18,6 +18,7 @@ package nz.co.lolnet.servermanager.sponge;
 
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.data.Setting;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
@@ -30,8 +31,10 @@ import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfig;
 import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfiguration;
 import nz.co.lolnet.servermanager.sponge.service.RedisServiceImpl;
+import nz.co.lolnet.servermanager.sponge.service.SpongeService;
 import nz.co.lolnet.servermanager.sponge.util.NetworkHandlerImpl;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.launch.SpongeLaunch;
 
 import java.util.Optional;
@@ -40,6 +43,7 @@ public class ServerManagerImpl extends ServerManager {
     
     private SpongeConfiguration configuration;
     private RedisServiceImpl redisService;
+    private Setting setting;
     
     private ServerManagerImpl() {
         this.platformType = Platform.Type.SPONGE;
@@ -72,6 +76,13 @@ public class ServerManagerImpl extends ServerManager {
         }));
         
         serverManager.loadServerManager();
+        
+        if (!SpongeImpl.isInitialized()) {
+            StatePacket packet = new StatePacket();
+            packet.setState(Platform.State.JVM_STARTED);
+            ServerManager.getInstance().sendResponse(packet);
+        }
+        
         return true;
     }
     
@@ -83,6 +94,7 @@ public class ServerManagerImpl extends ServerManager {
         PacketManager.buildPackets();
         registerNetworkHandler(NetworkHandlerImpl.class);
         ServiceManager.schedule(getRedisService());
+        ServiceManager.schedule(new SpongeService());
         getConfiguration().saveConfiguration();
         getLogger().info("{} v{} has loaded", Reference.NAME, Reference.VERSION);
     }
@@ -130,5 +142,13 @@ public class ServerManagerImpl extends ServerManager {
     
     public RedisServiceImpl getRedisService() {
         return redisService;
+    }
+    
+    public Setting getSetting() {
+        return setting;
+    }
+    
+    public void setSetting(Setting setting) {
+        this.setting = setting;
     }
 }

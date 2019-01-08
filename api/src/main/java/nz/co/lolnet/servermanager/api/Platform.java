@@ -24,6 +24,8 @@ public interface Platform {
     
     enum State {
         
+        CONNECTED("Connected"),
+        
         JVM_STARTED("JVM Started"),
         
         CONSTRUCTION("Construction"),
@@ -48,6 +50,8 @@ public interface Platform {
         
         JVM_STOPPED("JVM Stopped"),
         
+        DISCONNECTED("Disconnected"),
+        
         FROZEN("Frozen"),
         
         UNKNOWN("Unknown");
@@ -56,6 +60,38 @@ public interface Platform {
         
         State(String friendlyName) {
             this.friendlyName = friendlyName;
+        }
+        
+        public boolean isOnline() {
+            return this == CONNECTED
+                    || this == JVM_STARTED
+                    || this == CONSTRUCTION
+                    || this == PRE_INITIALIZATION
+                    || this == INITIALIZATION
+                    || this == POST_INITIALIZATION
+                    || this == LOAD_COMPLETE
+                    || this == SERVER_ABOUT_TO_START
+                    || this == SERVER_STARTING
+                    || this == SERVER_STARTED;
+        }
+        
+        public boolean isOffline() {
+            return this == DISCONNECTED
+                    || this == SERVER_STOPPING
+                    || this == SERVER_STOPPED
+                    || this == JVM_STOPPED;
+        }
+        
+        public boolean isFrozen() {
+            return this == FROZEN;
+        }
+        
+        public boolean isKnown() {
+            return !isUnknown();
+        }
+        
+        public boolean isUnknown() {
+            return this == UNKNOWN;
         }
         
         public String getFriendlyName() {

@@ -25,6 +25,7 @@ import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
+import nz.co.lolnet.servermanager.api.network.packet.UserPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 import nz.co.lolnet.servermanager.server.manager.CommandManager;
@@ -85,11 +86,12 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
                 return;
             }
             
-            connection.getData().setState(packet.getState());
-            if (connection.getData().getState().equals(Platform.State.SERVER_STARTED)) {
-                ServerManagerImpl.getInstance().sendRequest(connection.getId(), new SettingPacket());
+            if (connection.getData().getState() != Platform.State.FROZEN && packet.getState() == Platform.State.SERVER_STARTED) {
+                connection.setSetting(null);
+                connection.getData().setStartTime(null);
             }
             
+            connection.getData().setState(packet.getState());
             ServerManager.getInstance().getLogger().info("{} State from {}", packet.getState().getFriendlyName(), packet.getSender());
         });
     }
@@ -98,16 +100,44 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
     public void handleStatus(StatusPacket packet) {
         ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
             connection.getData().setLastTickTime(packet.getData().getLastTickTime());
-            connection.getData().setStartTime(packet.getData().getStartTime());
-            
-            if (connection.getData().getState() != Platform.State.FROZEN || packet.getData().getState() != Platform.State.SERVER_STARTED) {
-                connection.getData().setState(packet.getData().getState());
+            if (!connection.getData().getStartTime().equals(packet.getData().getStartTime())) {
+                connection.setSetting(null);
+                connection.getData().setStartTime(packet.getData().getStartTime());
             }
             
+            connection.getData().setState(packet.getData().getState());
             connection.getData().setTicksPerSecond(packet.getData().getTicksPerSecond());
             connection.getData().setUsers(packet.getData().getUsers());
             connection.getData().setVersion(packet.getData().getVersion());
             ServerManager.getInstance().getLogger().info("Received Status from {}", packet.getSender());
+        });
+    }
+    
+    @Override
+    public void handleUserAdd(UserPacket.Add packet) {
+        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
+            if (packet.getUser() == null) {
+                return;
+            }
+            
+            if (connection.getData().getUsers() == null) {
+                connection.getData().setUsers(Toolbox.newHashSet());
+            }
+            
+            connection.getData().getUsers().add(packet.getUser());
+            ServerManager.getInstance().getLogger().info("Received User.Add from {}", packet.getSender());
+        });
+    }
+    
+    @Override
+    public void handleUserRemove(UserPacket.Remove packet) {
+        ConnectionManager.getConnection(packet.getSender()).ifPresent(connection -> {
+            if (packet.getUser() == null || connection.getData().getUsers() == null) {
+                return;
+            }
+            
+            connection.getData().getUsers().remove(packet.getUser());
+            ServerManager.getInstance().getLogger().info("Received User.Remove from {}", packet.getSender());
         });
     }
 }

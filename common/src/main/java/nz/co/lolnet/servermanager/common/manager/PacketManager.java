@@ -30,6 +30,7 @@ import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
+import nz.co.lolnet.servermanager.api.network.packet.UserPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 
 import java.util.Optional;
@@ -55,6 +56,8 @@ public class PacketManager {
         registerPacket(SettingPacket.class);
         registerPacket(StatePacket.class);
         registerPacket(StatusPacket.class);
+        registerPacket(UserPacket.Add.class);
+        registerPacket(UserPacket.Remove.class);
     }
     
     public static void process(JsonObject jsonObject) {

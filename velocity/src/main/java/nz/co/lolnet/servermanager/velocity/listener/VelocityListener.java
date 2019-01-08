@@ -19,7 +19,12 @@ package nz.co.lolnet.servermanager.velocity.listener;
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import nz.co.lolnet.redisvelocity.api.event.RedisMessageEvent;
+import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.data.User;
+import nz.co.lolnet.servermanager.api.network.packet.UserPacket;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.velocity.ServerManagerImpl;
@@ -31,5 +36,15 @@ public class VelocityListener {
         if (ServerManagerImpl.getInstance().getRedisService().getChannels().contains(event.getChannel())) {
             Toolbox.parseJson(event.getMessage(), JsonObject.class).ifPresent(PacketManager::process);
         }
+    }
+    
+    @Subscribe(order = PostOrder.LATE)
+    public void onPostLogin(PostLoginEvent event) {
+        ServerManager.getInstance().sendResponse(new UserPacket.Add(new User(event.getPlayer().getUsername(), event.getPlayer().getUniqueId())));
+    }
+    
+    @Subscribe(order = PostOrder.LATE)
+    public void onDisconnect(DisconnectEvent event) {
+        ServerManager.getInstance().sendResponse(new UserPacket.Remove(new User(event.getPlayer().getUsername(), event.getPlayer().getUniqueId())));
     }
 }

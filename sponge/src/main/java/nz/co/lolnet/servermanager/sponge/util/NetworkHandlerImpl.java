@@ -27,6 +27,7 @@ import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
+import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
@@ -35,6 +36,7 @@ import nz.co.lolnet.servermanager.sponge.SpongePlugin;
 import nz.co.lolnet.servermanager.sponge.interfaces.server.dedicated.IMixinServerHangWatchdog;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.common.SpongeImpl;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashSet;
@@ -70,6 +72,11 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
     }
     
     @Override
+    public void handleSetting(SettingPacket packet) {
+        ServerManagerImpl.getInstance().setSetting(packet.getSetting());
+    }
+    
+    @Override
     public void handleState(StatePacket packet) {
         packet.setState(SpongePlugin.getInstance().getState());
         ServerManager.getInstance().sendResponse(packet);
@@ -86,7 +93,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
             data.setState(Platform.State.CONSTRUCTION);
         }
         
-        if (Sponge.isServerAvailable()) {
+        if (SpongeImpl.isInitialized() && Sponge.isServerAvailable()) {
             data.setLastTickTime(((MinecraftServer) Sponge.getServer()).getCurrentTime());
             data.setTicksPerSecond(Sponge.getServer().getTicksPerSecond());
             data.setUsers(Sponge.getServer().getOnlinePlayers().stream()

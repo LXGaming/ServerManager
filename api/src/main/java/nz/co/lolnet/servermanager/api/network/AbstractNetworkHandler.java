@@ -22,6 +22,7 @@ import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
+import nz.co.lolnet.servermanager.api.network.packet.UserPacket;
 
 public abstract class AbstractNetworkHandler implements NetworkHandler {
     
@@ -56,5 +57,13 @@ public abstract class AbstractNetworkHandler implements NetworkHandler {
     
     @Override
     public void handleStatus(StatusPacket packet) {
+    }
+    
+    @Override
+    public void handleUserAdd(UserPacket.Add packet) {
+    }
+    
+    @Override
+    public void handleUserRemove(UserPacket.Remove packet) {
     }
 }

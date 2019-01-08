@@ -23,11 +23,22 @@ public class Setting {
     @Expose
     private Boolean forwardState;
     
+    @Expose
+    private Long tickTime;
+    
     public Boolean getForwardState() {
         return forwardState;
     }
     
     public void setForwardState(Boolean forwardState) {
         this.forwardState = forwardState;
+    }
+    
+    public Long getTickTime() {
+        return tickTime;
+    }
+    
+    public void setTickTime(Long tickTime) {
+        this.tickTime = tickTime;
     }
 }

@@ -18,9 +18,14 @@ package nz.co.lolnet.servermanager.bungee.listener;
 
 import com.google.gson.JsonObject;
 import com.imaginarycode.minecraft.redisbungee.events.PubSubMessageEvent;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.data.User;
+import nz.co.lolnet.servermanager.api.network.packet.UserPacket;
 import nz.co.lolnet.servermanager.bungee.ServerManagerImpl;
 import nz.co.lolnet.servermanager.common.manager.PacketManager;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
@@ -32,5 +37,15 @@ public class BungeeListener implements Listener {
         if (ServerManagerImpl.getInstance().getRedisService().getChannels().contains(event.getChannel())) {
             Toolbox.parseJson(event.getMessage(), JsonObject.class).ifPresent(PacketManager::process);
         }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPostLogin(PostLoginEvent event) {
+        ServerManager.getInstance().sendResponse(new UserPacket.Add(new User(event.getPlayer().getName(), event.getPlayer().getUniqueId())));
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerDisconnect(PlayerDisconnectEvent event) {
+        ServerManager.getInstance().sendResponse(new UserPacket.Remove(new User(event.getPlayer().getName(), event.getPlayer().getUniqueId())));
     }
 }

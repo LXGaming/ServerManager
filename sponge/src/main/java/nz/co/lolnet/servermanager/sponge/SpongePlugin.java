@@ -21,6 +21,7 @@ import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.util.Reference;
+import nz.co.lolnet.servermanager.sponge.listener.SpongeListener;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
@@ -49,6 +50,8 @@ public class SpongePlugin implements Platform {
     public void onGameConstruction(GameConstructionEvent event) {
         instance = this;
         ServerManagerImpl.init();
+        
+        Sponge.getEventManager().registerListeners(getInstance(), new SpongeListener());
     }
     
     @Listener

@@ -22,6 +22,7 @@ import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
+import nz.co.lolnet.servermanager.api.network.packet.UserPacket;
 
 public interface NetworkHandler {
     
@@ -40,4 +41,8 @@ public interface NetworkHandler {
     void handleState(StatePacket packet);
     
     void handleStatus(StatusPacket packet);
+    
+    void handleUserAdd(UserPacket.Add packet);
+    
+    void handleUserRemove(UserPacket.Remove packet);
 }

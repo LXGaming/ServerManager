@@ -76,7 +76,7 @@ public class Toolbox {
     }
     
     public static String createId(Platform.Type platformType, String name) {
-        return createId(platformType) + name.toLowerCase();
+        return createId(platformType) + name.toLowerCase().replace(" ", "");
     }
     
     public static String createId(Platform.Type platformType) {

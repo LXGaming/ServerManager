@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ServiceManager {
     
-    private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(2, Toolbox.buildThreadFactory("Service Thread #%d"));
+    private static final ScheduledExecutorService SCHEDULED_EXECUTOR_SERVICE = Executors.newScheduledThreadPool(5, Toolbox.buildThreadFactory("Service Thread #%d"));
     
     public static void schedule(AbstractService abstractService) {
         try {

@@ -32,14 +32,14 @@ public abstract class AbstractService implements Runnable {
         try {
             executeService();
         } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error processing {}::run", getClass().getSimpleName(), ex);
+            ServerManager.getInstance().getLogger().error("Encountered an error while executing {}", getClass().getSimpleName(), ex);
             getScheduledFuture().cancel(false);
         }
     }
     
     public abstract boolean prepareService();
     
-    public abstract void executeService();
+    public abstract void executeService() throws Exception;
     
     public boolean isRunning() {
         return getScheduledFuture() != null && (!getScheduledFuture().isDone() || getScheduledFuture().getDelay(TimeUnit.MILLISECONDS) > 0L);

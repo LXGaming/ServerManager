@@ -18,38 +18,48 @@ package nz.co.lolnet.servermanager.sponge.service;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.configuration.Config;
+import nz.co.lolnet.servermanager.common.manager.ServiceManager;
 import nz.co.lolnet.servermanager.common.service.RedisService;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.sponge.ServerManagerImpl;
 import nz.co.lolnet.servermanager.sponge.configuration.SpongeConfig;
-import nz.co.lolnet.servermanager.sponge.configuration.category.RedisCategory;
 import nz.co.lolnet.servermanager.sponge.listener.RedisListener;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisServiceImpl extends RedisService {
     
+    private final RedisListener redisListener = new RedisListener();
     private JedisPool jedisPool;
-    private RedisListener redisListener;
+    private int maximumReconnectDelay;
+    private int reconnectTimeout = 2;
     
     @Override
     public boolean prepareService() {
-        RedisCategory redisCategory = ServerManagerImpl.getInstance().getConfig().map(SpongeConfig::getRedisCategory).orElse(null);
-        if (redisCategory == null) {
-            return false;
-        }
+        ServerManagerImpl.getInstance().getConfig().map(SpongeConfig::getRedisCategory).ifPresent(redis -> {
+            if (redis.isAutoReconnect()) {
+                maximumReconnectDelay = redis.getMaximumReconnectDelay();
+            } else {
+                maximumReconnectDelay = 0;
+            }
+            
+            if (getJedisPool() == null) {
+                JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+                jedisPoolConfig.setMaxTotal(redis.getMaximumPoolSize());
+                jedisPoolConfig.setMaxIdle(redis.getMaximumIdle());
+                jedisPoolConfig.setMinIdle(redis.getMinimumIdle());
+                this.jedisPool = new JedisPool(jedisPoolConfig, redis.getHost(), redis.getPort(), Protocol.DEFAULT_TIMEOUT, redis.getPassword());
+            }
+        });
         
-        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMaxTotal(10);
-        setJedisPool(new JedisPool(jedisPoolConfig, redisCategory.getHost(), redisCategory.getPort(), Protocol.DEFAULT_TIMEOUT, redisCategory.getPassword()));
-        setRedisListener(new RedisListener());
-        return super.prepareService();
+        return super.prepareService() && getJedisPool() != null && !getJedisPool().isClosed();
     }
     
     @Override
-    public void executeService() {
+    public void executeService() throws Exception {
         try (Jedis jedis = getJedisPool().getResource()) {
             ServerManager.getInstance().getConfig()
                     .map(Config::getName)
@@ -57,8 +67,36 @@ public class RedisServiceImpl extends RedisService {
                     .map(Toolbox::createChannel)
                     .ifPresent(jedis::clientSetname);
             
+            ServerManager.getInstance().getLogger().info("Connected to Redis");
             jedis.subscribe(getRedisListener(), getChannels().toArray(new String[0]));
+        } catch (JedisConnectionException ex) {
+            ServerManager.getInstance().getLogger().warn("Got disconnected from Redis...");
+            if (reconnect()) {
+                ServiceManager.schedule(this);
+            }
         }
+    }
+    
+    private boolean reconnect() throws InterruptedException {
+        if (maximumReconnectDelay <= 0) {
+            return false;
+        }
+        
+        ServerManager.getInstance().getLogger().warn("Attempting to reconnect in {}", Toolbox.getTimeString(reconnectTimeout * 1000));
+        while (!getJedisPool().isClosed()) {
+            Thread.sleep(reconnectTimeout * 1000);
+            ServerManager.getInstance().getLogger().warn("Attempting to reconnect!");
+            
+            try (Jedis jedis = getJedisPool().getResource()) {
+                reconnectTimeout = 2;
+                return true;
+            } catch (JedisConnectionException ex) {
+                reconnectTimeout = Math.min(reconnectTimeout << 1, maximumReconnectDelay);
+                ServerManager.getInstance().getLogger().warn("Reconnect failed! Next attempt in {}", Toolbox.getTimeString(reconnectTimeout * 1000));
+            }
+        }
+        
+        return false;
     }
     
     @Override
@@ -70,12 +108,17 @@ public class RedisServiceImpl extends RedisService {
         if (getJedisPool() != null && !getJedisPool().isClosed()) {
             getJedisPool().close();
         }
+        
+        if (isRunning()) {
+            getScheduledFuture().cancel(true);
+        }
     }
     
     @Override
     public void publish(String channel, String message) {
         try (Jedis jedis = getJedisPool().getResource()) {
             jedis.publish(channel, message);
+        } catch (JedisConnectionException ex) {
         }
     }
     
@@ -83,6 +126,8 @@ public class RedisServiceImpl extends RedisService {
     protected String clientList() {
         try (Jedis jedis = getJedisPool().getResource()) {
             return jedis.clientList();
+        } catch (JedisConnectionException ex) {
+            return null;
         }
     }
     
@@ -90,15 +135,7 @@ public class RedisServiceImpl extends RedisService {
         return jedisPool;
     }
     
-    private void setJedisPool(JedisPool jedisPool) {
-        this.jedisPool = jedisPool;
-    }
-    
     public RedisListener getRedisListener() {
         return redisListener;
-    }
-    
-    private void setRedisListener(RedisListener redisListener) {
-        this.redisListener = redisListener;
     }
 }

@@ -97,9 +97,11 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
             data.setLastTickTime(((MinecraftServer) Sponge.getServer()).getCurrentTime());
             data.setTicksPerSecond(Sponge.getServer().getTicksPerSecond());
             data.setUsers(Sponge.getServer().getOnlinePlayers().stream()
-                    .map(player -> new User(player.getName(), player.getUniqueId()))
-                    .collect(Collectors.toCollection(HashSet::new)));
-            
+                    .map(player -> {
+                        User user = new User(player.getName(), player.getUniqueId());
+                        user.setAddress(player.getConnection().getAddress().getHostString());
+                        return user;
+                    }).collect(Collectors.toCollection(HashSet::new)));
             data.setVersion(Sponge.getPlatform().getMinecraftVersion().getName());
         }
         

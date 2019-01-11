@@ -18,6 +18,7 @@ package nz.co.lolnet.servermanager.bungee.listener;
 
 import com.google.gson.JsonObject;
 import com.imaginarycode.minecraft.redisbungee.events.PubSubMessageEvent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -41,11 +42,17 @@ public class BungeeListener implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPostLogin(PostLoginEvent event) {
-        ServerManager.getInstance().sendResponse(new UserPacket.Add(new User(event.getPlayer().getName(), event.getPlayer().getUniqueId())));
+        ProxiedPlayer player = event.getPlayer();
+        User user = new User(player.getName(), player.getUniqueId());
+        user.setAddress(player.getAddress().getHostString());
+        ServerManager.getInstance().sendResponse(new UserPacket.Add(user));
     }
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
-        ServerManager.getInstance().sendResponse(new UserPacket.Remove(new User(event.getPlayer().getName(), event.getPlayer().getUniqueId())));
+        ProxiedPlayer player = event.getPlayer();
+        User user = new User(player.getName(), player.getUniqueId());
+        user.setAddress(player.getAddress().getHostString());
+        ServerManager.getInstance().sendResponse(new UserPacket.Remove(user));
     }
 }

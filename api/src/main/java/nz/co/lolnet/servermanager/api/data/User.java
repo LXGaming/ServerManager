@@ -29,6 +29,9 @@ public class User {
     @Expose
     private final UUID uniqueId;
     
+    @Expose
+    private String address;
+    
     public User(String name, UUID uniqueId) {
         this.name = name;
         this.uniqueId = uniqueId;
@@ -40,6 +43,14 @@ public class User {
     
     public UUID getUniqueId() {
         return uniqueId;
+    }
+    
+    public String getAddress() {
+        return address;
+    }
+    
+    public void setAddress(String address) {
+        this.address = address;
     }
     
     @Override

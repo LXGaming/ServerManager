@@ -75,8 +75,11 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         data.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
         data.setState(Platform.State.SERVER_STARTED);
         data.setUsers(VelocityPlugin.getInstance().getProxy().getAllPlayers().stream()
-                .map(player -> new User(player.getUsername(), player.getUniqueId()))
-                .collect(Collectors.toCollection(HashSet::new)));
+                .map(player -> {
+                    User user = new User(player.getUsername(), player.getUniqueId());
+                    user.setAddress(player.getRemoteAddress().getHostString());
+                    return user;
+                }).collect(Collectors.toCollection(HashSet::new)));
         data.setVersion(VelocityPlugin.getVersion());
         
         packet.setData(data);

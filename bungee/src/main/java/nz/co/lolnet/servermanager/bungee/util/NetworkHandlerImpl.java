@@ -76,8 +76,11 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         data.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
         data.setState(Platform.State.SERVER_STARTED);
         data.setUsers(ProxyServer.getInstance().getPlayers().stream()
-                .map(player -> new User(player.getName(), player.getUniqueId()))
-                .collect(Collectors.toCollection(HashSet::new)));
+                .map(player -> {
+                    User user = new User(player.getName(), player.getUniqueId());
+                    user.setAddress(player.getAddress().getHostString());
+                    return user;
+                }).collect(Collectors.toCollection(HashSet::new)));
         data.setVersion(BungeePlugin.getVersion());
         
         packet.setData(data);

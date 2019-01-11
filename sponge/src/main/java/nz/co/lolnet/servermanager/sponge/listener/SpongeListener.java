@@ -19,19 +19,25 @@ package nz.co.lolnet.servermanager.sponge.listener;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.packet.UserPacket;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 public class SpongeListener {
     
     @Listener(order = Order.LATE)
-    public void onClientConnectionJoin(ClientConnectionEvent.Join event) {
-        ServerManager.getInstance().sendResponse(new UserPacket.Add(new User(event.getTargetEntity().getName(), event.getTargetEntity().getUniqueId())));
+    public void onClientConnectionJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+        User user = new User(player.getName(), player.getUniqueId());
+        user.setAddress(player.getConnection().getAddress().getHostString());
+        ServerManager.getInstance().sendResponse(new UserPacket.Add(user));
     }
     
     @Listener(order = Order.LATE)
-    public void onClientConnectionDisconnect(ClientConnectionEvent.Disconnect event) {
-        ServerManager.getInstance().sendResponse(new UserPacket.Remove(new User(event.getTargetEntity().getName(), event.getTargetEntity().getUniqueId())));
+    public void onClientConnectionDisconnect(ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") Player player) {
+        User user = new User(player.getName(), player.getUniqueId());
+        user.setAddress(player.getConnection().getAddress().getHostString());
+        ServerManager.getInstance().sendResponse(new UserPacket.Remove(user));
     }
 }

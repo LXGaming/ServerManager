@@ -21,6 +21,7 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.proxy.Player;
 import nz.co.lolnet.redisvelocity.api.event.RedisMessageEvent;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.User;
@@ -40,11 +41,17 @@ public class VelocityListener {
     
     @Subscribe(order = PostOrder.LATE)
     public void onPostLogin(PostLoginEvent event) {
-        ServerManager.getInstance().sendResponse(new UserPacket.Add(new User(event.getPlayer().getUsername(), event.getPlayer().getUniqueId())));
+        Player player = event.getPlayer();
+        User user = new User(player.getUsername(), player.getUniqueId());
+        user.setAddress(player.getRemoteAddress().getHostString());
+        ServerManager.getInstance().sendResponse(new UserPacket.Add(user));
     }
     
     @Subscribe(order = PostOrder.LATE)
     public void onDisconnect(DisconnectEvent event) {
-        ServerManager.getInstance().sendResponse(new UserPacket.Remove(new User(event.getPlayer().getUsername(), event.getPlayer().getUniqueId())));
+        Player player = event.getPlayer();
+        User user = new User(player.getUsername(), player.getUniqueId());
+        user.setAddress(player.getRemoteAddress().getHostString());
+        ServerManager.getInstance().sendResponse(new UserPacket.Remove(user));
     }
 }

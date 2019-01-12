@@ -19,10 +19,11 @@ package nz.co.lolnet.servermanager.server.manager;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.command.AbstractCommand;
+import nz.co.lolnet.servermanager.server.command.ConnectionCommand;
 import nz.co.lolnet.servermanager.server.command.ExecuteCommand;
 import nz.co.lolnet.servermanager.server.command.HelpCommand;
 import nz.co.lolnet.servermanager.server.command.InfoCommand;
-import nz.co.lolnet.servermanager.server.command.ListCommand;
+import nz.co.lolnet.servermanager.server.command.MessageCommand;
 import nz.co.lolnet.servermanager.server.command.PingCommand;
 import nz.co.lolnet.servermanager.server.command.ReloadCommand;
 import nz.co.lolnet.servermanager.server.command.StopCommand;
@@ -37,10 +38,11 @@ public class CommandManager {
     private static final Set<Class<? extends AbstractCommand>> COMMAND_CLASSES = Toolbox.newLinkedHashSet();
     
     public static void buildCommands() {
+        registerCommand(ConnectionCommand.class);
         registerCommand(ExecuteCommand.class);
         registerCommand(HelpCommand.class);
         registerCommand(InfoCommand.class);
-        registerCommand(ListCommand.class);
+        registerCommand(MessageCommand.class);
         registerCommand(PingCommand.class);
         registerCommand(ReloadCommand.class);
         registerCommand(StopCommand.class);

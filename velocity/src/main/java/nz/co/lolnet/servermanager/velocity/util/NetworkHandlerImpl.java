@@ -16,6 +16,9 @@
 
 package nz.co.lolnet.servermanager.velocity.util;
 
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.util.MessagePosition;
+import net.kyori.text.TextComponent;
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.Implementation;
@@ -23,6 +26,7 @@ import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
+import nz.co.lolnet.servermanager.api.network.packet.MessagePacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
@@ -56,6 +60,21 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         }
         
         VelocityPlugin.getInstance().getProxy().getCommandManager().execute(new VelocityCommandSource(), packet.getCommand());
+    }
+    
+    @Override
+    public void handleMessage(MessagePacket packet) {
+        if (Toolbox.isBlank(packet.getMessage())) {
+            return;
+        }
+        
+        MessagePosition messagePosition = VelocityToolbox.getMessagePosition(packet.getPosition());
+        TextComponent textComponent = VelocityToolbox.deserializeLegacy(packet.getMessage());
+        for (Player player : VelocityPlugin.getInstance().getProxy().getAllPlayers()) {
+            if (Toolbox.isBlank(packet.getPermission()) || player.hasPermission(packet.getPermission())) {
+                player.sendMessage(textComponent, messagePosition);
+            }
+        }
     }
     
     @Override

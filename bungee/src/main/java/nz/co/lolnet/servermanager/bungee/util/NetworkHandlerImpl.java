@@ -16,7 +16,10 @@
 
 package nz.co.lolnet.servermanager.bungee.util;
 
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.data.Implementation;
@@ -24,6 +27,7 @@ import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
+import nz.co.lolnet.servermanager.api.network.packet.MessagePacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatusPacket;
@@ -57,6 +61,21 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         }
         
         ProxyServer.getInstance().getPluginManager().dispatchCommand(new BungeeCommandSender(), packet.getCommand());
+    }
+    
+    @Override
+    public void handleMessage(MessagePacket packet) {
+        if (Toolbox.isBlank(packet.getMessage())) {
+            return;
+        }
+        
+        ChatMessageType chatMessageType = BungeeToolbox.getMessagePosition(packet.getPosition());
+        TextComponent textComponent = new TextComponent(BungeeToolbox.deserializeLegacy(packet.getMessage()));
+        for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
+            if (Toolbox.isBlank(packet.getPermission()) || player.hasPermission(packet.getPermission())) {
+                player.sendMessage(chatMessageType, textComponent);
+            }
+        }
     }
     
     @Override

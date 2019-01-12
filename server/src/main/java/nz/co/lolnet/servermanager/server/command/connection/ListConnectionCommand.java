@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 lolnet.co.nz
+ * Copyright 2019 lolnet.co.nz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package nz.co.lolnet.servermanager.server.command;
+package nz.co.lolnet.servermanager.server.command.connection;
 
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.server.command.AbstractCommand;
 import nz.co.lolnet.servermanager.server.data.Connection;
 import nz.co.lolnet.servermanager.server.manager.ConnectionManager;
 
@@ -24,11 +25,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ListCommand extends AbstractCommand {
+public class ListConnectionCommand extends AbstractCommand {
     
-    public ListCommand() {
+    public ListConnectionCommand() {
         addAlias("list");
-        setDescription("Show a list of connections");
     }
     
     @Override

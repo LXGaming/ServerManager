@@ -26,6 +26,7 @@ import nz.co.lolnet.servermanager.api.data.User;
 import nz.co.lolnet.servermanager.api.network.AbstractNetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
+import nz.co.lolnet.servermanager.api.network.packet.MessagePacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
@@ -35,7 +36,10 @@ import nz.co.lolnet.servermanager.sponge.ServerManagerImpl;
 import nz.co.lolnet.servermanager.sponge.SpongePlugin;
 import nz.co.lolnet.servermanager.sponge.interfaces.server.dedicated.IMixinServerHangWatchdog;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.common.SpongeImpl;
 
 import java.lang.management.ManagementFactory;
@@ -64,6 +68,21 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         Task.builder().execute(() -> {
             Sponge.getCommandManager().process(new SpongeCommandSource(), packet.getCommand());
         }).submit(SpongePlugin.getInstance().getPluginContainer());
+    }
+    
+    @Override
+    public void handleMessage(MessagePacket packet) {
+        if (Toolbox.isBlank(packet.getMessage())) {
+            return;
+        }
+        
+        ChatType chatType = SpongeToolbox.getMessagePosition(packet.getPosition());
+        Text text = SpongeToolbox.deserializeLegacy(packet.getMessage());
+        for (Player player : Sponge.getServer().getOnlinePlayers()) {
+            if (Toolbox.isBlank(packet.getPermission()) || player.hasPermission(packet.getPermission())) {
+                player.sendMessage(chatType, text);
+            }
+        }
     }
     
     @Override

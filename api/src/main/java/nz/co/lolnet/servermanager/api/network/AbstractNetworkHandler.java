@@ -18,6 +18,7 @@ package nz.co.lolnet.servermanager.api.network;
 
 import nz.co.lolnet.servermanager.api.network.packet.CommandPacket;
 import nz.co.lolnet.servermanager.api.network.packet.ListPacket;
+import nz.co.lolnet.servermanager.api.network.packet.MessagePacket;
 import nz.co.lolnet.servermanager.api.network.packet.PingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.SettingPacket;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
@@ -41,6 +42,10 @@ public abstract class AbstractNetworkHandler implements NetworkHandler {
     
     @Override
     public void handleListFull(ListPacket.Full packet) {
+    }
+    
+    @Override
+    public void handleMessage(MessagePacket packet) {
     }
     
     @Override

@@ -19,6 +19,7 @@ package nz.co.lolnet.servermanager.server.manager;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.api.network.Packet;
 import nz.co.lolnet.servermanager.api.network.packet.StatePacket;
+import nz.co.lolnet.servermanager.api.network.packet.UserPacket;
 import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.ServerManagerImpl;
 import nz.co.lolnet.servermanager.server.configuration.ServerConfig;
@@ -61,6 +62,10 @@ public class ConnectionManager {
             }
             
             if (packet instanceof StatePacket && connection.getSetting().getForwardState() != null && connection.getSetting().getForwardState()) {
+                ServerManagerImpl.getInstance().sendPacket(connection.getId(), packet);
+            }
+            
+            if (packet instanceof UserPacket && connection.getSetting().getForwardUser() != null && connection.getSetting().getForwardUser()) {
                 ServerManagerImpl.getInstance().sendPacket(connection.getId(), packet);
             }
         });

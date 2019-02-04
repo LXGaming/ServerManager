@@ -24,6 +24,9 @@ public class Setting {
     private Boolean forwardState;
     
     @Expose
+    private Boolean forwardUser;
+    
+    @Expose
     private Long tickTime;
     
     public Boolean getForwardState() {
@@ -32,6 +35,14 @@ public class Setting {
     
     public void setForwardState(Boolean forwardState) {
         this.forwardState = forwardState;
+    }
+    
+    public Boolean getForwardUser() {
+        return forwardUser;
+    }
+    
+    public void setForwardUser(Boolean forwardUser) {
+        this.forwardUser = forwardUser;
     }
     
     public Long getTickTime() {

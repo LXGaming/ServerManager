@@ -65,8 +65,8 @@ public class CommandManager {
         try {
             command.execute(arguments);
             return true;
-        } catch (Throwable throwable) {
-            ServerManager.getInstance().getLogger().error("Encountered an error processing {}::process", "CommandManager", throwable);
+        } catch (Exception ex) {
+            ServerManager.getInstance().getLogger().error("Encountered an error processing {}::process", "CommandManager", ex);
             return false;
         }
     }

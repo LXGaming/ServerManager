@@ -87,8 +87,8 @@ public class PacketManager {
                 if (networkHandler.handle(packet)) {
                     packet.process(networkHandler);
                 }
-            } catch (Throwable throwable) {
-                ServerManager.getInstance().getLogger().error("Encountered an error processing {}::process", networkHandler.getClass().getName(), throwable);
+            } catch (Exception ex) {
+                ServerManager.getInstance().getLogger().error("Encountered an error processing {}::process", networkHandler.getClass().getName(), ex);
             }
         }
     }

@@ -80,7 +80,11 @@ public class Toolbox {
     }
     
     public static String createId(Platform.Type platformType) {
-        return platformType.toString();
+        if (platformType.isKnown()) {
+            return platformType.toString();
+        }
+        
+        return "";
     }
     
     public static String getId(String string) {

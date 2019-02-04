@@ -57,7 +57,11 @@ public class ConnectionManager {
     public static void forwardPacket(Packet packet) {
         List<String> clientNames = ServerManagerImpl.getInstance().getRedisService().getClientNames();
         getConnections().forEach(connection -> {
-            if (connection.getSetting() == null || connection.getId().equalsIgnoreCase(packet.getSender()) || !clientNames.contains(connection.getId())) {
+            if (connection.getSetting() == null || connection.getId().equalsIgnoreCase(packet.getSender())) {
+                return;
+            }
+            
+            if (connection.getType().isKnown() && !clientNames.contains(connection.getId())) {
                 return;
             }
             

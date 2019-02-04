@@ -57,6 +57,10 @@ public class StatusService extends AbstractService {
         
         List<String> clientNames = ServerManagerImpl.getInstance().getRedisService().getClientNames();
         ConnectionManager.getConnections().forEach(connection -> {
+            if (connection.getType().isUnknown()) {
+                return;
+            }
+            
             if (clientNames.contains(connection.getId())) {
                 handleConnected(connection);
             } else {

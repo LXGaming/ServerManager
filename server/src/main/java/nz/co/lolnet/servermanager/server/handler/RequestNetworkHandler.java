@@ -48,7 +48,7 @@ public class RequestNetworkHandler extends AbstractNetworkHandler {
     public void handleListBasic(ListPacket.Basic packet) {
         packet.setImplementations(Toolbox.newHashSet());
         ConnectionManager.getConnections().forEach(connection -> {
-            if (connection.getId().equalsIgnoreCase(packet.getSender())) {
+            if (connection.getId().equalsIgnoreCase(packet.getSender()) || connection.getType().isUnknown()) {
                 return;
             }
             
@@ -62,7 +62,7 @@ public class RequestNetworkHandler extends AbstractNetworkHandler {
     public void handleListFull(ListPacket.Full packet) {
         packet.setImplementations(Toolbox.newHashMap());
         ConnectionManager.getConnections().forEach(connection -> {
-            if (connection.getId().equalsIgnoreCase(packet.getSender())) {
+            if (connection.getId().equalsIgnoreCase(packet.getSender()) || connection.getType().isUnknown()) {
                 return;
             }
             

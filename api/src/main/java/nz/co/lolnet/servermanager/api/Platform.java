@@ -122,6 +122,30 @@ public interface Platform {
             this.friendlyName = friendlyName;
         }
         
+        public boolean isBungeeCord() {
+            return this == BUNGEECORD;
+        }
+        
+        public boolean isServer() {
+            return this == SERVER;
+        }
+        
+        public boolean isSponge() {
+            return this == SPONGE;
+        }
+        
+        public boolean isVelocity() {
+            return this == VELOCITY;
+        }
+        
+        public boolean isKnown() {
+            return !isUnknown();
+        }
+        
+        public boolean isUnknown() {
+            return this == UNKNOWN;
+        }
+        
         public String getFriendlyName() {
             return friendlyName;
         }

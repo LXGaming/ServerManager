@@ -18,6 +18,7 @@ package nz.co.lolnet.servermanager.sponge;
 
 import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
+import nz.co.lolnet.servermanager.api.configuration.Config;
 import nz.co.lolnet.servermanager.api.data.Setting;
 import nz.co.lolnet.servermanager.api.network.NetworkHandler;
 import nz.co.lolnet.servermanager.api.network.Packet;
@@ -62,7 +63,11 @@ public class ServerManagerImpl extends ServerManager {
                 .add(Logger.Level.INFO, LoggerFactory.getLogger(Reference.NAME)::info)
                 .add(Logger.Level.WARN, LoggerFactory.getLogger(Reference.NAME)::warn)
                 .add(Logger.Level.ERROR, LoggerFactory.getLogger(Reference.NAME)::error)
-                .add(Logger.Level.DEBUG, LoggerFactory.getLogger(Reference.NAME)::debug);
+                .add(Logger.Level.DEBUG, message -> {
+                    if (ServerManager.getInstance().getConfig().map(Config::isDebug).orElse(false)) {
+                        LoggerFactory.getLogger(Reference.NAME).debug(message);
+                    }
+                });
         
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             Thread.currentThread().setName("Shutdown Thread");

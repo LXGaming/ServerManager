@@ -56,7 +56,11 @@ public class ServerManagerImpl extends ServerManager {
                 .add(Logger.Level.INFO, BungeePlugin.getInstance().getLogger()::info)
                 .add(Logger.Level.WARN, BungeePlugin.getInstance().getLogger()::warning)
                 .add(Logger.Level.ERROR, BungeePlugin.getInstance().getLogger()::severe)
-                .add(Logger.Level.DEBUG, BungeePlugin.getInstance().getLogger()::info);
+                .add(Logger.Level.DEBUG, message -> {
+                    if (ServerManager.getInstance().getConfig().map(Config::isDebug).orElse(false)) {
+                        BungeePlugin.getInstance().getLogger().info(message);
+                    }
+                });
         
         serverManager.loadServerManager();
         return true;

@@ -16,9 +16,11 @@
 
 package nz.co.lolnet.servermanager.server.command;
 
+import nz.co.lolnet.servermanager.common.util.Toolbox;
 import nz.co.lolnet.servermanager.server.command.connection.ListConnectionCommand;
 import nz.co.lolnet.servermanager.server.command.connection.StatusConnectionCommand;
 import nz.co.lolnet.servermanager.server.command.connection.UserConnectionCommand;
+import nz.co.lolnet.servermanager.server.manager.CommandManager;
 
 import java.util.List;
 
@@ -34,5 +36,6 @@ public class ConnectionCommand extends AbstractCommand {
     
     @Override
     public void execute(List<String> arguments) {
+        CommandManager.getCommand(HelpCommand.class).ifPresent(command -> command.execute(getPrimaryAlias().map(Toolbox::newArrayList).orElseGet(Toolbox::newArrayList)));
     }
 }

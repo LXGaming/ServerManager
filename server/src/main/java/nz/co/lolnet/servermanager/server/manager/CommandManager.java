@@ -123,6 +123,32 @@ public class CommandManager {
         return true;
     }
     
+    public static Optional<AbstractCommand> getCommand(Class<? extends AbstractCommand> commandClass) {
+        return getCommand(null, commandClass);
+    }
+    
+    public static Optional<AbstractCommand> getCommand(AbstractCommand parentCommand, Class<? extends AbstractCommand> commandClass) {
+        Set<AbstractCommand> commands = Toolbox.newLinkedHashSet();
+        if (parentCommand != null) {
+            commands.addAll(parentCommand.getChildren());
+        } else {
+            commands.addAll(getCommands());
+        }
+        
+        for (AbstractCommand command : commands) {
+            if (command.getClass() == commandClass) {
+                return Optional.of(command);
+            }
+            
+            Optional<AbstractCommand> childCommand = getCommand(command, commandClass);
+            if (childCommand.isPresent()) {
+                return childCommand;
+            }
+        }
+        
+        return Optional.empty();
+    }
+    
     public static Optional<AbstractCommand> getCommand(List<String> arguments) {
         return getCommand(null, arguments);
     }

@@ -27,6 +27,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -50,7 +51,10 @@ public class SpongePlugin implements Platform {
     public void onGameConstruction(GameConstructionEvent event) {
         instance = this;
         ServerManagerImpl.init();
-        
+    }
+    
+    @Listener
+    public void onGameInitialization(GameInitializationEvent event) {
         Sponge.getEventManager().registerListeners(getInstance(), new SpongeListener());
     }
     

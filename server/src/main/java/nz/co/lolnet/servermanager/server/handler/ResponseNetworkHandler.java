@@ -92,7 +92,7 @@ public class ResponseNetworkHandler extends AbstractNetworkHandler {
             }
             
             connection.getData().setState(packet.getState());
-            ServerManager.getInstance().getLogger().info("{} State from {}", packet.getState().getFriendlyName(), packet.getSender());
+            ServerManager.getInstance().getLogger().info("{} State from {}", packet.getState().getName(), packet.getSender());
         });
     }
     

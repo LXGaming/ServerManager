@@ -63,14 +63,14 @@ public class MessagePacket extends AbstractPacket {
         
         CHAT("Chat");
         
-        private final String friendlyName;
+        private final String name;
         
-        Position(String friendlyName) {
-            this.friendlyName = friendlyName;
+        Position(String name) {
+            this.name = name;
         }
         
-        public String getFriendlyName() {
-            return friendlyName;
+        public String getName() {
+            return name;
         }
         
         @Override

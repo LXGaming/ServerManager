@@ -56,10 +56,10 @@ public interface Platform {
         
         UNKNOWN("Unknown");
         
-        private final String friendlyName;
+        private final String name;
         
-        State(String friendlyName) {
-            this.friendlyName = friendlyName;
+        State(String name) {
+            this.name = name;
         }
         
         public boolean isOnline() {
@@ -94,8 +94,8 @@ public interface Platform {
             return this == UNKNOWN;
         }
         
-        public String getFriendlyName() {
-            return friendlyName;
+        public String getName() {
+            return name;
         }
         
         @Override
@@ -116,10 +116,10 @@ public interface Platform {
         
         UNKNOWN("Unknown");
         
-        private final String friendlyName;
+        private final String name;
         
-        Type(String friendlyName) {
-            this.friendlyName = friendlyName;
+        Type(String name) {
+            this.name = name;
         }
         
         public boolean isBungeeCord() {
@@ -146,8 +146,8 @@ public interface Platform {
             return this == UNKNOWN;
         }
         
-        public String getFriendlyName() {
-            return friendlyName;
+        public String getName() {
+            return name;
         }
         
         @Override

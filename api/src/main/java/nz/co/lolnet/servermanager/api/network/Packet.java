@@ -38,14 +38,14 @@ public interface Packet {
         
         RESPONSE("Response");
         
-        private final String friendlyName;
+        private final String name;
         
-        Type(String friendlyName) {
-            this.friendlyName = friendlyName;
+        Type(String name) {
+            this.name = name;
         }
         
-        public String getFriendlyName() {
-            return friendlyName;
+        public String getName() {
+            return name;
         }
         
         @Override

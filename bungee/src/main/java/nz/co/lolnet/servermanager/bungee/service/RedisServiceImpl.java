@@ -31,7 +31,7 @@ public class RedisServiceImpl extends RedisService {
     private JedisPool jedisPool;
     
     @Override
-    public boolean prepareService() {
+    public boolean prepare() {
         Plugin plugin = ProxyServer.getInstance().getPluginManager().getPlugin("RedisBungee");
         if (!(plugin instanceof RedisBungee)) {
             ServerManager.getInstance().getLogger().error("RedisBungee is not loaded");
@@ -39,11 +39,11 @@ public class RedisServiceImpl extends RedisService {
         }
         
         setJedisPool(((RedisBungee) plugin).getPool());
-        return super.prepareService();
+        return super.prepare();
     }
     
     @Override
-    public void executeService() {
+    public void execute() {
         try (Jedis jedis = getJedisPool().getResource()) {
             ServerManager.getInstance().getConfig()
                     .map(Config::getName)

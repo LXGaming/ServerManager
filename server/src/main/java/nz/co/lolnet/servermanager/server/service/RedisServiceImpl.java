@@ -38,7 +38,7 @@ public class RedisServiceImpl extends RedisService {
     private int reconnectTimeout = 2;
     
     @Override
-    public boolean prepareService() {
+    public boolean prepare() {
         ServerManagerImpl.getInstance().getConfig().map(ServerConfig::getRedisCategory).ifPresent(redis -> {
             if (redis.isAutoReconnect()) {
                 maximumReconnectDelay = redis.getMaximumReconnectDelay();
@@ -55,11 +55,11 @@ public class RedisServiceImpl extends RedisService {
             }
         });
         
-        return super.prepareService() && getJedisPool() != null && !getJedisPool().isClosed();
+        return super.prepare() && getJedisPool() != null && !getJedisPool().isClosed();
     }
     
     @Override
-    public void executeService() throws Exception {
+    public void execute() throws Exception {
         try (Jedis jedis = getJedisPool().getResource()) {
             ServerManager.getInstance().getConfig()
                     .map(Config::getName)

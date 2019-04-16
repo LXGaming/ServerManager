@@ -32,7 +32,7 @@ public class ServiceManager {
     
     public static void schedule(AbstractService abstractService) {
         try {
-            if (!abstractService.prepareService()) {
+            if (!abstractService.prepare()) {
                 throw new IllegalStateException("Service preparation failed");
             }
             

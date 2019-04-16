@@ -31,13 +31,13 @@ public class SpongeService extends AbstractService {
     private Platform.State lastState;
     
     @Override
-    public boolean prepareService() {
+    public boolean prepare() {
         setInterval(10000L);
         return true;
     }
     
     @Override
-    public void executeService() {
+    public void execute() {
         if (SpongePlugin.getInstance() == null) {
             return;
         }

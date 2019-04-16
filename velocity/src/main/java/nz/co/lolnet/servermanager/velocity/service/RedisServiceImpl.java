@@ -30,18 +30,18 @@ public class RedisServiceImpl extends RedisService {
     private JedisPool jedisPool;
     
     @Override
-    public boolean prepareService() {
+    public boolean prepare() {
         if (!VelocityPlugin.getInstance().getProxy().getPluginManager().isLoaded("redisvelocity")) {
             ServerManager.getInstance().getLogger().error("RedisVelocity is not loaded");
             return false;
         }
         
         setJedisPool(nz.co.lolnet.redisvelocity.plugin.VelocityPlugin.getInstance().getRedisService().getJedisPool());
-        return super.prepareService();
+        return super.prepare();
     }
     
     @Override
-    public void executeService() {
+    public void execute() {
         try (Jedis jedis = getJedisPool().getResource()) {
             ServerManager.getInstance().getConfig()
                     .map(Config::getName)

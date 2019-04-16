@@ -32,7 +32,7 @@ public abstract class RedisService extends AbstractService {
     private final Set<String> channels = Toolbox.newHashSet();
     
     @Override
-    public boolean prepareService() {
+    public boolean prepare() {
         getChannels().add(Toolbox.createChannel(Toolbox.createId(ServerManager.getInstance().getPlatformType())));
         ServerManager.getInstance().getConfig()
                 .map(Config::getName)

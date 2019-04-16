@@ -43,13 +43,13 @@ public class StatusService extends AbstractService {
     private final Set<Connection> invalidConnections = Toolbox.newHashSet();
     
     @Override
-    public boolean prepareService() {
+    public boolean prepare() {
         setInterval(5000L);
         return true;
     }
     
     @Override
-    public void executeService() {
+    public void execute() {
         List<ServerCategory> serverCategories = ConnectionManager.getServerCategories();
         if (serverCategories == null || serverCategories.isEmpty()) {
             return;

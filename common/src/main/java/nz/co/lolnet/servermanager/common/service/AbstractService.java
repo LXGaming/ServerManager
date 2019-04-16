@@ -30,16 +30,16 @@ public abstract class AbstractService implements Runnable {
     @Override
     public final void run() {
         try {
-            executeService();
+            execute();
         } catch (Exception ex) {
             ServerManager.getInstance().getLogger().error("Encountered an error while executing {}", getClass().getSimpleName(), ex);
             getScheduledFuture().cancel(false);
         }
     }
     
-    public abstract boolean prepareService();
+    public abstract boolean prepare();
     
-    public abstract void executeService() throws Exception;
+    public abstract void execute() throws Exception;
     
     public boolean isRunning() {
         return getScheduledFuture() != null && (!getScheduledFuture().isDone() || getScheduledFuture().getDelay(TimeUnit.MILLISECONDS) > 0L);

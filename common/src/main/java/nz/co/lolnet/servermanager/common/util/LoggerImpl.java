@@ -99,7 +99,7 @@ public class LoggerImpl implements Logger {
             stringBuilder.append(getStackTrace(throwable));
         }
         
-        return stringBuilder.toString().trim();
+        return stringBuilder.toString();
     }
     
     private String getString(Object object) {

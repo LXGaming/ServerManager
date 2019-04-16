@@ -44,13 +44,19 @@ public class HelpCommand extends AbstractCommand {
             ServerManager.getInstance().getLogger().info("Description: {}", command.getDescription());
             
             if (Toolbox.isNotBlank(command.getUsage())) {
-                ServerManager.getInstance().getLogger().info("Usage: {} {}", command.getPrimaryAlias().orElse("Unknown"), command.getUsage());
-            } else {
-                ServerManager.getInstance().getLogger().info("Usage: {}", command.getPrimaryAlias().orElse("Unknown"));
+                ServerManager.getInstance().getLogger().info("Usage: {}", command.getUsage());
             }
             
-            if (command.getAliases() != null && !command.getAliases().isEmpty()) {
+            if (!command.getAliases().isEmpty()) {
                 ServerManager.getInstance().getLogger().info("Aliases: {}", String.join(", ", command.getAliases()));
+            }
+            
+            if (!command.getChildren().isEmpty()) {
+                ServerManager.getInstance().getLogger().info("Children:");
+                
+                command.getChildren().forEach(childCommand -> {
+                    ServerManager.getInstance().getLogger().info("  {}: {}", childCommand.getPrimaryAlias().orElse("Unknown"), childCommand.getDescription());
+                });
             }
             
             return;
@@ -60,7 +66,5 @@ public class HelpCommand extends AbstractCommand {
         CommandManager.getCommands().forEach(command -> {
             ServerManager.getInstance().getLogger().info("{}: {}", command.getPrimaryAlias().orElse("Unknown"), command.getDescription());
         });
-        
-        ServerManager.getInstance().getLogger().info("<> = Required argument, [] = Optional argument");
     }
 }

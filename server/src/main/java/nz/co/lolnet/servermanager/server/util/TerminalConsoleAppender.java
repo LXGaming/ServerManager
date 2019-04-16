@@ -23,6 +23,7 @@ import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
@@ -49,7 +50,7 @@ public class TerminalConsoleAppender extends AbstractAppender {
     private static WrappedLineReader lineReader;
     
     protected TerminalConsoleAppender(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoredExceptions) {
-        super(name, filter, layout, ignoredExceptions);
+        super(name, filter, layout, ignoredExceptions, Property.EMPTY_ARRAY);
     }
     
     @Override

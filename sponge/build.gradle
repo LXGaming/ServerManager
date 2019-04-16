@@ -69,8 +69,8 @@ dependencies {
         exclude(module: "slf4j-api")
     }
 
-    annotationProcessor("org.spongepowered:spongecommon:7.1.0:dev")
-    provided("org.spongepowered:spongecommon:7.1.0:dev")
+    annotationProcessor("org.spongepowered:spongecommon:1.12.2-7.1.5:dev")
+    provided("org.spongepowered:spongecommon:1.12.2-7.1.5:dev")
 }
 
 shadowJar {

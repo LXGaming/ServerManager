@@ -36,7 +36,7 @@ dependencies {
 
     annotationProcessor("com.velocitypowered:velocity-api:1.0-SNAPSHOT")
     provided("com.velocitypowered:velocity-api:1.0-SNAPSHOT")
-    provided("nz.co.lolnet:redisvelocity-plugin:1.0.0")
+    provided("nz.co.lolnet:redisvelocity-plugin:1.1.0")
 }
 
 jar {

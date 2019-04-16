@@ -16,6 +16,7 @@
 
 package nz.co.lolnet.servermanager.server.command.connection;
 
+import nz.co.lolnet.servermanager.api.Platform;
 import nz.co.lolnet.servermanager.api.ServerManager;
 import nz.co.lolnet.servermanager.server.command.AbstractCommand;
 import nz.co.lolnet.servermanager.server.data.Connection;
@@ -50,7 +51,14 @@ public class StatusConnectionCommand extends AbstractCommand {
         }
         
         stringBuilder.append("StartTime: ").append(connection.getData().getStartTime()).append("\n");
-        stringBuilder.append("State: ").append(connection.getData().getState()).append("\n");
+        stringBuilder.append("State: ");
+        if (connection.getData().getState() != null) {
+            stringBuilder.append(connection.getData().getState().getName());
+        } else {
+            stringBuilder.append(Platform.State.UNKNOWN.getName());
+        }
+        
+        stringBuilder.append("\n");
         if (connection.getData().getTicksPerSecond() != null) {
             stringBuilder.append("TicksPerSecond: ").append(connection.getData().getLastTickTime()).append("\n");
         }

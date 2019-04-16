@@ -28,6 +28,7 @@ public class UserConnectionCommand extends AbstractCommand {
     public UserConnectionCommand() {
         addAlias("user");
         addAlias("users");
+        setDescription("View users connected to a specified connection");
         setUsage("<Connection>");
     }
     

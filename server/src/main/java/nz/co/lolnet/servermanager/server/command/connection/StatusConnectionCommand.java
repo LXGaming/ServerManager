@@ -27,6 +27,7 @@ public class StatusConnectionCommand extends AbstractCommand {
     
     public StatusConnectionCommand() {
         addAlias("status");
+        setDescription("View information regarding the specified connection");
         setUsage("<Connection>");
     }
     

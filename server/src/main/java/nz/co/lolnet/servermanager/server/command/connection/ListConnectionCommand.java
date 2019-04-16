@@ -29,6 +29,7 @@ public class ListConnectionCommand extends AbstractCommand {
     
     public ListConnectionCommand() {
         addAlias("list");
+        setDescription("List current connections");
     }
     
     @Override

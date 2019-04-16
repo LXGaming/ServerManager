@@ -32,6 +32,7 @@ public class ConnectionCommand extends AbstractCommand {
         addChild(ListConnectionCommand.class);
         addChild(StatusConnectionCommand.class);
         addChild(UserConnectionCommand.class);
+        setDescription("No description provided");
     }
     
     @Override

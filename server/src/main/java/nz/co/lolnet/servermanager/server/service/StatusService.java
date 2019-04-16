@@ -80,7 +80,7 @@ public class StatusService extends AbstractService {
         
         if (connection.getData().getState() == Platform.State.SERVER_STARTED && connection.getSetting() == null) {
             Setting setting = new Setting();
-            setting.setTickTime(30000L);
+            ConnectionManager.getServerCategory(connection.getId()).map(ServerCategory::getMaxTickTime).ifPresent(setting::setMaxTickTime);
             connection.setSetting(setting);
             
             SettingPacket packet = new SettingPacket();

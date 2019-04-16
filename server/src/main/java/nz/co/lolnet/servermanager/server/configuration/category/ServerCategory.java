@@ -25,6 +25,7 @@ public class ServerCategory {
     private String path = "";
     private String script = "start.sh";
     private boolean autoRestart = false;
+    private long maxTickTime = 60000L;
     
     public String getName() {
         return name;
@@ -48,5 +49,9 @@ public class ServerCategory {
     
     public boolean isAutoRestart() {
         return autoRestart;
+    }
+    
+    public long getMaxTickTime() {
+        return maxTickTime;
     }
 }

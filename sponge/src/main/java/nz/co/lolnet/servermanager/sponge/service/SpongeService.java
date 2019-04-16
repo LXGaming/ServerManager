@@ -57,7 +57,7 @@ public class SpongeService extends AbstractService {
             return false;
         }
         
-        Long tickTime = ServerManagerImpl.getInstance().getSetting().getTickTime();
+        Long tickTime = ServerManagerImpl.getInstance().getSetting().getMaxTickTime();
         if (tickTime == null) {
             return false;
         }

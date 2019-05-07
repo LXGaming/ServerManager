@@ -35,7 +35,7 @@ dependencies {
     }
 
     provided("com.imaginarycode.minecraft:RedisBungee:0.3.8-INTERIM")
-    provided("net.md-5:bungeecord-api:1.13-SNAPSHOT")
+    provided("net.md-5:bungeecord-api:1.14-SNAPSHOT")
 }
 
 jar {

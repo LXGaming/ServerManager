@@ -1,7 +1,7 @@
 name: ServerManager
-main: nz.co.lolnet.servermanager.bungee.BungeePlugin
+main: io.github.lxgaming.servermanager.bungee.BungeePlugin
 version: ${version}
 description: ServerManager.
 author: LX_Gaming
-website: https://www.lolnet.co.nz/
+website: https://lxgaming.github.io/
 depends: [RedisBungee]

@@ -6,7 +6,7 @@ apply plugin: "signing"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "nz.co.lolnet"
+group = "io.github.lxgaming"
 archivesBaseName = "servermanager-api"
 version = version
 
@@ -72,14 +72,14 @@ uploadArchives {
                         packaging = "jar"
 
                         scm {
-                            url = "https://github.com/lolnetnz/ServerManager"
-                            connection = "scm:git:https://github.com/lolnetnz/ServerManager.git"
-                            developerConnection = "scm:git:git@github.com:lolnetnz/ServerManager.git"
+                            url = "https://github.com/LXGaming/ServerManager"
+                            connection = "scm:git:https://github.com/LXGaming/ServerManager.git"
+                            developerConnection = "scm:git:git@github.com:LXGaming/ServerManager.git"
                         }
 
                         issueManagement {
                             system = "GitHub Issues"
-                            url = "https://github.com/lolnetnz/ServerManager/issues"
+                            url = "https://github.com/LXGaming/ServerManager/issues"
                         }
 
                         licenses {

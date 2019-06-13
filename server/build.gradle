@@ -4,7 +4,7 @@ apply plugin: "signing"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "nz.co.lolnet"
+group = "io.github.lxgaming"
 archivesBaseName = "servermanager-server"
 version = version
 
@@ -32,7 +32,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes("Main-Class": "nz.co.lolnet.servermanager.server.Main")
+        attributes("Main-Class": "io.github.lxgaming.servermanager.server.Main")
     }
 
     from {

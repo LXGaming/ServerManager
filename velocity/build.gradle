@@ -1,5 +1,7 @@
-apply plugin: "java"
-apply plugin: "signing"
+plugins {
+    id "java"
+    id "signing"
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -19,6 +21,10 @@ configurations {
 repositories {
     jcenter()
     maven {
+        name = "lxgaming"
+        url = "https://dl.bintray.com/lxgaming/maven"
+    }
+    maven {
         name = "velocity"
         url = "https://repo.velocitypowered.com/snapshots"
     }
@@ -32,7 +38,7 @@ dependencies {
 
     annotationProcessor("com.velocitypowered:velocity-api:1.0.0-SNAPSHOT")
     provided("com.velocitypowered:velocity-api:1.0.0-SNAPSHOT")
-    provided("io.github.lxgaming:redisvelocity-plugin:1.1.1")
+    provided("io.github.lxgaming:redisvelocity-plugin:1.1.2")
 }
 
 jar {

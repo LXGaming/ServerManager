@@ -49,7 +49,7 @@ public class WrappedLineReader extends LineReaderImpl {
     }
     
     public boolean isReading() {
-        return this.reading;
+        return reading;
     }
     
     public static final class Builder {
@@ -65,38 +65,34 @@ public class WrappedLineReader extends LineReaderImpl {
         private Expander expander;
         
         public WrappedLineReader build() throws IOException {
-            if (getTerminal() == null) {
+            if (terminal == null) {
                 terminal(TerminalBuilder.terminal());
             }
             
-            WrappedLineReader lineReader = new WrappedLineReader(getTerminal(), getAppName(), getVariables());
-            getOptions().forEach(lineReader::option);
+            WrappedLineReader lineReader = new WrappedLineReader(terminal, appName, variables);
+            options.forEach(lineReader::option);
             
-            if (getHistory() != null) {
-                lineReader.setHistory(getHistory());
+            if (history != null) {
+                lineReader.setHistory(history);
             }
             
-            if (getCompleter() != null) {
-                lineReader.setCompleter(getCompleter());
+            if (completer != null) {
+                lineReader.setCompleter(completer);
             }
             
-            if (getHighlighter() != null) {
-                lineReader.setHighlighter(getHighlighter());
+            if (highlighter != null) {
+                lineReader.setHighlighter(highlighter);
             }
             
-            if (getParser() != null) {
-                lineReader.setParser(getParser());
+            if (parser != null) {
+                lineReader.setParser(parser);
             }
             
-            if (getExpander() != null) {
-                lineReader.setExpander(getExpander());
+            if (expander != null) {
+                lineReader.setExpander(expander);
             }
             
             return lineReader;
-        }
-        
-        private Terminal getTerminal() {
-            return terminal;
         }
         
         public Builder terminal(Terminal terminal) {
@@ -104,17 +100,9 @@ public class WrappedLineReader extends LineReaderImpl {
             return this;
         }
         
-        private String getAppName() {
-            return appName;
-        }
-        
         public Builder appName(String appName) {
             this.appName = appName;
             return this;
-        }
-        
-        private Map<String, Object> getVariables() {
-            return variables;
         }
         
         public Builder variables(Map<String, Object> variables) {
@@ -122,17 +110,9 @@ public class WrappedLineReader extends LineReaderImpl {
             return this;
         }
         
-        private Map<Option, Boolean> getOptions() {
-            return options;
-        }
-        
         public Builder options(Map<Option, Boolean> options) {
             this.options = options;
             return this;
-        }
-        
-        private History getHistory() {
-            return history;
         }
         
         public Builder history(History history) {
@@ -140,17 +120,9 @@ public class WrappedLineReader extends LineReaderImpl {
             return this;
         }
         
-        private Completer getCompleter() {
-            return completer;
-        }
-        
         public Builder completer(Completer completer) {
             this.completer = completer;
             return this;
-        }
-        
-        private Highlighter getHighlighter() {
-            return highlighter;
         }
         
         public Builder highlighter(Highlighter highlighter) {
@@ -158,17 +130,9 @@ public class WrappedLineReader extends LineReaderImpl {
             return this;
         }
         
-        private Parser getParser() {
-            return parser;
-        }
-        
         public Builder parser(Parser parser) {
             this.parser = parser;
             return this;
-        }
-        
-        private Expander getExpander() {
-            return expander;
         }
         
         public Builder expander(Expander expander) {

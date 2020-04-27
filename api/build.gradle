@@ -1,9 +1,10 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id "com.jfrog.bintray"
     id "java"
     id "java-library"
     id "maven-publish"
-    id "signing"
 }
 
 sourceCompatibility = 1.8
@@ -17,6 +18,8 @@ configurations {
     provided {
         compile.extendsFrom(provided)
     }
+
+    compileJava.dependsOn("filterJava")
 }
 
 repositories {
@@ -28,12 +31,12 @@ dependencies {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = "javadoc"
+    archiveClassifier.set("javadoc")
     from javadoc.destinationDir
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from sourceSets.main.allSource
 }
 
@@ -67,6 +70,12 @@ bintrayUpload {
     onlyIf { System.getenv("TRAVIS_PULL_REQUEST") == "false" }
 }
 
+compileJava {
+    doFirst {
+        source = filterJava.outputs
+    }
+}
+
 jar {
     from {
         (configurations.compile - configurations.provided).findAll({
@@ -82,13 +91,8 @@ javadoc {
 }
 
 processResources {
-    from("LICENSE")
-    rename("LICENSE", "LICENSE-" + archivesBaseName)
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
+    from("../LICENSE")
+    rename("LICENSE", "LICENSE-ServerManager")
 }
 
 publishing {
@@ -104,34 +108,9 @@ publishing {
     }
 }
 
-task signJar {
-    doFirst {
-        if (!project.hasProperty("signing.keyStorePath") || !project.hasProperty("signing.secretKeyRingFile")) {
-            project.logger.warn("========== [WARNING] ==========")
-            project.logger.warn("")
-            project.logger.warn("   This build is not signed!   ")
-            project.logger.warn("")
-            project.logger.warn("========== [WARNING] ==========")
-            throw new StopExecutionException()
-        }
-    }
+task filterJava(type: Sync) {
+    from(sourceSets.main.java)
+    into("$buildDir/tmp/$name")
 
-    doLast {
-        configurations.archives.allArtifacts.files.each {
-            ant.signjar(
-                jar: it,
-                alias: project.property("signing.alias"),
-                storepass: project.property("signing.keyStorePassword"),
-                keystore: project.property("signing.keyStorePath"),
-                keypass: project.property("signing.keyStorePassword"),
-                preservelastmodified: project.property("signing.preserveLastModified"),
-                tsaurl: project.property("signing.timestampAuthority"),
-                digestalg: project.property("signing.digestAlgorithm")
-            )
-            project.logger.lifecycle("JAR Signed: " + it.name)
-
-            signing.sign(it)
-            project.logger.lifecycle("PGP Signed: " + it.name)
-        }
-    }
+    filter(ReplaceTokens, tokens: [version: version])
 }

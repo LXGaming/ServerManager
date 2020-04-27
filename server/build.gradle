@@ -46,11 +46,6 @@ jar {
     }
 }
 
-processResources {
-    from("LICENSE")
-    rename("LICENSE", "LICENSE-" + archivesBaseName)
-}
-
 task signJar {
     doFirst {
         if (!project.hasProperty("signing.keyStorePath") || !project.hasProperty("signing.secretKeyRingFile")) {

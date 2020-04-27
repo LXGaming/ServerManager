@@ -37,6 +37,7 @@ import io.github.lxgaming.servermanager.common.manager.ServiceManager;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 
 import java.lang.management.ManagementFactory;
+import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
@@ -97,7 +98,10 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         data.setUsers(ProxyServer.getInstance().getPlayers().stream()
                 .map(player -> {
                     User user = new User(player.getName(), player.getUniqueId());
-                    user.setAddress(player.getAddress().getHostString());
+                    if (player.getSocketAddress() instanceof InetSocketAddress) {
+                        user.setAddress(((InetSocketAddress) player.getSocketAddress()).getHostString());
+                    }
+                    
                     return user;
                 }).collect(Collectors.toCollection(HashSet::new)));
         data.setVersion(BungeePlugin.getVersion());

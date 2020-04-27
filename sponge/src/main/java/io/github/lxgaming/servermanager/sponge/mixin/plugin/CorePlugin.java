@@ -17,7 +17,7 @@
 package io.github.lxgaming.servermanager.sponge.mixin.plugin;
 
 import io.github.lxgaming.servermanager.sponge.ServerManagerImpl;
-import org.spongepowered.asm.lib.tree.ClassNode;
+import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 

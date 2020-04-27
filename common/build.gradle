@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     api(project(path: ":api"))
-    provided("redis.clients:jedis:3.0.1")
+    provided("redis.clients:jedis:${jedisVersion}")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

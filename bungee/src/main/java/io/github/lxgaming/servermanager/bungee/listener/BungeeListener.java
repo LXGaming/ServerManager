@@ -31,6 +31,8 @@ import io.github.lxgaming.servermanager.bungee.ServerManagerImpl;
 import io.github.lxgaming.servermanager.common.manager.PacketManager;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 
+import java.net.InetSocketAddress;
+
 public class BungeeListener implements Listener {
     
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -44,7 +46,10 @@ public class BungeeListener implements Listener {
     public void onPostLogin(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
         User user = new User(player.getName(), player.getUniqueId());
-        user.setAddress(player.getAddress().getHostString());
+        if (player.getSocketAddress() instanceof InetSocketAddress) {
+            user.setAddress(((InetSocketAddress) player.getSocketAddress()).getHostString());
+        }
+        
         ServerManager.getInstance().sendResponse(new UserPacket.Add(user));
     }
     
@@ -52,7 +57,10 @@ public class BungeeListener implements Listener {
     public void onPlayerDisconnect(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
         User user = new User(player.getName(), player.getUniqueId());
-        user.setAddress(player.getAddress().getHostString());
+        if (player.getSocketAddress() instanceof InetSocketAddress) {
+            user.setAddress(((InetSocketAddress) player.getSocketAddress()).getHostString());
+        }
+        
         ServerManager.getInstance().sendResponse(new UserPacket.Remove(user));
     }
 }

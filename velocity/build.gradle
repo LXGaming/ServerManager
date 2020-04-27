@@ -25,6 +25,10 @@ repositories {
         url = "https://dl.bintray.com/lxgaming/maven"
     }
     maven {
+        name = "spongepowered"
+        url = "https://repo.spongepowered.org/maven"
+    }
+    maven {
         name = "velocity"
         url = "https://repo.velocitypowered.com/snapshots"
     }
@@ -36,9 +40,9 @@ dependencies {
         exclude(module: "jedis")
     }
 
-    annotationProcessor("com.velocitypowered:velocity-api:1.0.0-SNAPSHOT")
-    provided("com.velocitypowered:velocity-api:1.0.0-SNAPSHOT")
-    provided("io.github.lxgaming:redisvelocity-plugin:1.1.2")
+    annotationProcessor("com.velocitypowered:velocity-api:${velocityVersion}")
+    provided("com.velocitypowered:velocity-api:${velocityVersion}")
+    provided("io.github.lxgaming:redisvelocity-plugin:${redisvelocityVersion}")
 }
 
 jar {

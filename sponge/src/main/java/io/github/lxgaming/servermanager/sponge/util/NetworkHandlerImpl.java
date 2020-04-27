@@ -16,6 +16,7 @@
 
 package io.github.lxgaming.servermanager.sponge.util;
 
+import io.github.lxgaming.servermanager.sponge.mixin.core.server.dedicated.ServerHangWatchdogAccessor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.ServerHangWatchdog;
@@ -34,7 +35,6 @@ import io.github.lxgaming.servermanager.api.network.packet.StatusPacket;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.github.lxgaming.servermanager.sponge.ServerManagerImpl;
 import io.github.lxgaming.servermanager.sponge.SpongePlugin;
-import io.github.lxgaming.servermanager.sponge.interfaces.server.dedicated.IMixinServerHangWatchdog;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
@@ -61,7 +61,7 @@ public class NetworkHandlerImpl extends AbstractNetworkHandler {
         
         ServerManagerImpl.getInstance().getLogger().info("Processing {} for {}", packet.getCommand(), packet.getUser());
         if (packet.getCommand().equals("servermanager:terminate")) {
-            Toolbox.cast(new ServerHangWatchdog(Toolbox.cast(Sponge.getServer(), DedicatedServer.class)), IMixinServerHangWatchdog.class).scheduleHalt();
+            Toolbox.cast(new ServerHangWatchdog((DedicatedServer) Sponge.getServer()), ServerHangWatchdogAccessor.class).accessor$scheduleHalt();
             return;
         }
         

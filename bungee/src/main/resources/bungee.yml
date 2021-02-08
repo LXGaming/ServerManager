@@ -1,7 +1,0 @@
-name: ServerManager
-main: io.github.lxgaming.servermanager.bungee.BungeePlugin
-version: ${version}
-description: ServerManager.
-author: LX_Gaming
-website: https://lxgaming.github.io/
-depends: [RedisBungee]

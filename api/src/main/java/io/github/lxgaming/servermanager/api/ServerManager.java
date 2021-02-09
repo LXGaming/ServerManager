@@ -17,6 +17,7 @@
 package io.github.lxgaming.servermanager.api;
 
 import com.google.common.base.Preconditions;
+import io.github.lxgaming.servermanager.api.event.EventManager;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class ServerManager {
@@ -30,6 +31,7 @@ public abstract class ServerManager {
     public static final String WEBSITE = "https://lxgaming.github.io/";
     
     private static ServerManager instance;
+    protected EventManager eventManager;
     
     protected ServerManager() {
         ServerManager.instance = this;
@@ -46,5 +48,9 @@ public abstract class ServerManager {
     
     public static ServerManager getInstance() {
         return check(instance);
+    }
+    
+    public EventManager getEventManager() {
+        return eventManager;
     }
 }

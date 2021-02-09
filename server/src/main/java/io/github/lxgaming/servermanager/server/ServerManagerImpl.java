@@ -20,6 +20,7 @@ import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.common.configuration.Config;
 import io.github.lxgaming.servermanager.common.configuration.category.GeneralCategory;
 import io.github.lxgaming.servermanager.common.entity.InstanceImpl;
+import io.github.lxgaming.servermanager.common.event.EventManagerImpl;
 import io.github.lxgaming.servermanager.common.manager.InstanceManager;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.github.lxgaming.servermanager.server.configuration.ConfigImpl;
@@ -54,6 +55,7 @@ public class ServerManagerImpl extends ServerManager {
     
     private ServerManagerImpl(Path path) {
         super();
+        this.eventManager = new EventManagerImpl();
         this.logger = LoggerFactory.getLogger(ServerManager.NAME);
         this.configuration = new ConfigurationImpl(path);
         this.startTime = Instant.now();

@@ -1,3 +1,13 @@
 include "api"
+include "client"
 include "common"
 include "server"
+
+[
+    "api",
+    "client",
+    "common",
+    "server"
+].each {
+    findProject(":$it")?.name = "servermanager-$it"
+}

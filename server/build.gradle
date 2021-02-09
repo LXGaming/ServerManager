@@ -1,4 +1,5 @@
 plugins {
+    id "com.github.johnrengelman.shadow"
     id "java"
     id "signing"
 }
@@ -8,42 +9,44 @@ targetCompatibility = 1.8
 
 group = "io.github.lxgaming"
 archivesBaseName = "servermanager-server"
-version = version
 
 configurations {
-    provided {
-        compile.extendsFrom(provided)
+    shadow {
+        runtime.extendsFrom(shadow)
     }
 
-    compileJava.dependsOn(":common:build")
+    // build.dependsOn("signJar")
+    compileJava.dependsOn(":servermanager-common:build")
+    jar.enabled = false
+    jar.dependsOn("shadowJar")
 }
 
 repositories {
-    jcenter()
 }
 
 dependencies {
-    compile project(path: ":common")
+    shadow(project(path: ":servermanager-common"))
+    shadow("io.github.lxgaming:common:${commonVersion}")
+    shadow("net.minecrell:terminalconsoleappender:${terminalconsoleappenderVersion}")
     annotationProcessor("org.apache.logging.log4j:log4j-core:${log4jVersion}")
-    compile("org.apache.logging.log4j:log4j-core:${log4jVersion}")
-    compile("org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}")
-    compile("org.fusesource.jansi:jansi:${jansiVersion}")
-    compile("org.jline:jline-reader:${jlineVersion}")
-    compile("org.jline:jline-terminal:${jlineVersion}")
+    shadow("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+    shadow("org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}")
+    shadow("org.fusesource.jansi:jansi:${jansiVersion}")
+    shadow("org.jline:jline-reader:${jlineVersion}")
+    shadow("org.jline:jline-terminal-jansi:${jlineVersion}")
 }
 
 jar {
     manifest {
         attributes("Main-Class": "io.github.lxgaming.servermanager.server.Main")
     }
+}
 
-    from {
-        (configurations.compile - configurations.provided).findAll({
-            it.isDirectory() || it.name.endsWith(".jar")
-        }).collect({
-            it.isDirectory() ? it : zipTree(it)
-        })
-    }
+shadowJar {
+    archiveClassifier.set(null)
+    configurations = [project.configurations.shadow]
+    exclude("META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat")
+    exclude("module-info.class")
 }
 
 task signJar {

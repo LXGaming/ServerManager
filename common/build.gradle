@@ -1,8 +1,8 @@
 plugins {
-    id "com.jfrog.bintray"
     id "java"
     id "java-library"
     id "maven-publish"
+    id "signing"
 }
 
 sourceCompatibility = 1.8
@@ -10,23 +10,20 @@ targetCompatibility = 1.8
 
 group = "io.github.lxgaming"
 archivesBaseName = "servermanager-common"
-version = version
 
 configurations {
-    provided {
-        compile.extendsFrom(provided)
-    }
-
-    compileJava.dependsOn(":api:build")
+    compileJava.dependsOn(":servermanager-api:build")
 }
 
 repositories {
-    jcenter()
 }
 
 dependencies {
-    api(project(path: ":api"))
-    provided("redis.clients:jedis:${jedisVersion}")
+    api(project(path: ":servermanager-api"))
+    api("com.google.code.gson:gson:${gsonVersion}")
+    api("io.netty:netty-all:${nettyVersion}")
+    api("org.apache.commons:commons-lang3:${lang3Version}")
+    api("org.slf4j:slf4j-api:${slf4jVersion}")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -44,41 +41,6 @@ artifacts {
     archives sourcesJar
 }
 
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_KEY")
-    publications = ["mavenPublication"]
-    pkg {
-        repo = "maven"
-        name = "ServerManager"
-        licenses = ["Apache-2.0"]
-        vcsUrl = "https://github.com/LXGaming/ServerManager.git"
-        publish = true
-        version {
-            name = project.version
-            released = new Date()
-        }
-    }
-}
-
-bintrayUpload {
-    onlyIf { System.getenv("BINTRAY_KEY") != null }
-    onlyIf { System.getenv("BINTRAY_USER") != null }
-    onlyIf { System.getenv("TRAVIS_BUILD_NUMBER") != null }
-    onlyIf { System.getenv("TRAVIS_JOB_NUMBER") ==~ /\d+\.1$/ }
-    onlyIf { System.getenv("TRAVIS_PULL_REQUEST") == "false" }
-}
-
-jar {
-    from {
-        (configurations.compile - configurations.provided).findAll({
-            it.isDirectory() || it.name.endsWith(".jar")
-        }).collect({
-            it.isDirectory() ? it : zipTree(it)
-        })
-    }
-}
-
 javadoc {
     failOnError = false
 }
@@ -92,6 +54,48 @@ publishing {
             version version
             artifact javadocJar
             artifact sourcesJar
+            pom {
+                name = "ServerManager"
+                description = "Server Manager"
+                url = "https://github.com/LXGaming/ServerManager"
+                developers {
+                    developer {
+                        id = "lxgaming"
+                        name = "LXGaming"
+                    }
+                }
+                issueManagement {
+                    system = "GitHub Issues"
+                    url = "https://github.com/LXGaming/ServerManager/issues"
+                }
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                scm {
+                    connection = "scm:git@github.com:LXGaming/ServerManager.git"
+                    developerConnection = "scm:git@github.com:LXGaming/ServerManager.git"
+                    url = "https://github.com/LXGaming/ServerManager"
+                }
+            }
         }
     }
+    repositories {
+        if (project.hasProperty("sonatype.username") && project.hasProperty("sonatype.password")) {
+            maven {
+                name = "sonatype"
+                url = version.contains("-SNAPSHOT") ? "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                credentials {
+                    username project.property("sonatype.username")
+                    password project.property("sonatype.password")
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications
 }

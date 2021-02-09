@@ -1,10 +1,9 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-
 plugins {
-    id "com.jfrog.bintray"
     id "java"
     id "java-library"
     id "maven-publish"
+    id "net.kyori.blossom"
+    id "signing"
 }
 
 sourceCompatibility = 1.8
@@ -12,22 +11,21 @@ targetCompatibility = 1.8
 
 group = "io.github.lxgaming"
 archivesBaseName = "servermanager-api"
-version = version
+
+blossom {
+    replaceToken("@version@", version)
+}
 
 configurations {
-    provided {
-        compile.extendsFrom(provided)
-    }
-
-    compileJava.dependsOn("filterJava")
 }
 
 repositories {
-    jcenter()
 }
 
 dependencies {
-    api("com.google.code.gson:gson:${gsonVersion}")
+    api("com.google.guava:guava:${guavaVersion}")
+    api("net.kyori:adventure-nbt:${adventureVersion}")
+    api("org.checkerframework:checker-qual:${checkerqualVersion}")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -43,47 +41,6 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 artifacts {
     archives javadocJar
     archives sourcesJar
-}
-
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_KEY")
-    publications = ["mavenPublication"]
-    pkg {
-        repo = "maven"
-        name = "ServerManager"
-        licenses = ["Apache-2.0"]
-        vcsUrl = "https://github.com/LXGaming/ServerManager.git"
-        publish = true
-        version {
-            name = project.version
-            released = new Date()
-        }
-    }
-}
-
-bintrayUpload {
-    onlyIf { System.getenv("BINTRAY_KEY") != null }
-    onlyIf { System.getenv("BINTRAY_USER") != null }
-    onlyIf { System.getenv("TRAVIS_BUILD_NUMBER") != null }
-    onlyIf { System.getenv("TRAVIS_JOB_NUMBER") ==~ /\d+\.1$/ }
-    onlyIf { System.getenv("TRAVIS_PULL_REQUEST") == "false" }
-}
-
-compileJava {
-    doFirst {
-        source = filterJava.outputs
-    }
-}
-
-jar {
-    from {
-        (configurations.compile - configurations.provided).findAll({
-            it.isDirectory() || it.name.endsWith(".jar")
-        }).collect({
-            it.isDirectory() ? it : zipTree(it)
-        })
-    }
 }
 
 javadoc {
@@ -104,13 +61,48 @@ publishing {
             version version
             artifact javadocJar
             artifact sourcesJar
+            pom {
+                name = "ServerManager"
+                description = "Server Manager"
+                url = "https://github.com/LXGaming/ServerManager"
+                developers {
+                    developer {
+                        id = "lxgaming"
+                        name = "LXGaming"
+                    }
+                }
+                issueManagement {
+                    system = "GitHub Issues"
+                    url = "https://github.com/LXGaming/ServerManager/issues"
+                }
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                scm {
+                    connection = "scm:git@github.com:LXGaming/ServerManager.git"
+                    developerConnection = "scm:git@github.com:LXGaming/ServerManager.git"
+                    url = "https://github.com/LXGaming/ServerManager"
+                }
+            }
+        }
+    }
+    repositories {
+        if (project.hasProperty("sonatype.username") && project.hasProperty("sonatype.password")) {
+            maven {
+                name = "sonatype"
+                url = version.contains("-SNAPSHOT") ? "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                credentials {
+                    username project.property("sonatype.username")
+                    password project.property("sonatype.password")
+                }
+            }
         }
     }
 }
 
-task filterJava(type: Sync) {
-    from(sourceSets.main.java)
-    into("$buildDir/tmp/$name")
-
-    filter(ReplaceTokens, tokens: [version: version])
+signing {
+    sign publishing.publications
 }

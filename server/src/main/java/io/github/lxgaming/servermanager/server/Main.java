@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Alex Thomson
+ * Copyright 2021 Alex Thomson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,17 @@
 
 package io.github.lxgaming.servermanager.server;
 
-import io.github.lxgaming.servermanager.api.util.Reference;
-import io.github.lxgaming.servermanager.server.configuration.ServerConfig;
-import io.github.lxgaming.servermanager.server.manager.CommandManager;
-import io.github.lxgaming.servermanager.server.util.TerminalConsoleAppender;
+import io.github.lxgaming.servermanager.server.util.terminalconsole.TerminalConsole;
 
 public class Main {
     
     public static void main(String[] args) {
         Thread.currentThread().setName("Main Thread");
-        ServerManagerImpl.init();
-        TerminalConsoleAppender.buildTerminal(Reference.NAME, ServerManagerImpl.getInstance().getConfig().map(ServerConfig::isJlineOverride).orElse(false));
-        while (ServerManagerImpl.getInstance().isRunning()) {
-            TerminalConsoleAppender.readline().ifPresent(CommandManager::process);
-        }
+        ServerManagerImpl serverManager = new ServerManagerImpl();
+        serverManager.load();
         
-        Runtime.getRuntime().exit(0);
+        ServerManagerImpl.getInstance().getState().set(true);
+        new TerminalConsole().start();
+        ServerManagerImpl.getInstance().getState().set(false);
     }
 }

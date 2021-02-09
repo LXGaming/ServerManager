@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Alex Thomson
+ * Copyright 2021 Alex Thomson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,58 +16,35 @@
 
 package io.github.lxgaming.servermanager.api;
 
-import io.github.lxgaming.servermanager.api.configuration.Config;
-import io.github.lxgaming.servermanager.api.network.NetworkHandler;
-import io.github.lxgaming.servermanager.api.network.Packet;
-import io.github.lxgaming.servermanager.api.util.Logger;
-
-import java.util.Optional;
+import com.google.common.base.Preconditions;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class ServerManager {
     
+    public static final String ID = "servermanager";
+    public static final String NAME = "ServerManager";
+    public static final String VERSION = "@version@";
+    public static final String DESCRIPTION = "Server Manager";
+    public static final String AUTHORS = "LX_Gaming";
+    public static final String SOURCE = "https://github.com/LXGaming/ServerManager";
+    public static final String WEBSITE = "https://lxgaming.github.io/";
+    
     private static ServerManager instance;
-    protected Platform.Type platformType;
-    protected Logger logger;
     
     protected ServerManager() {
-        instance = this;
+        ServerManager.instance = this;
     }
     
-    protected abstract void loadServerManager();
-    
-    protected abstract void reloadServerManager();
-    
-    protected abstract void shutdownServerManager();
-    
-    public abstract boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass);
-    
-    public void sendRequest(Packet packet) {
-        packet.setSender(null);
-        packet.setType(Packet.Type.REQUEST);
-        sendPacket(packet);
-    }
-    
-    public void sendResponse(Packet packet) {
-        packet.setSender(null);
-        packet.setType(Packet.Type.RESPONSE);
-        sendPacket(packet);
-    }
-    
-    protected void sendPacket(Packet packet) {
-        throw new UnsupportedOperationException("Not supported");
-    }
-    
-    public abstract Optional<? extends Config> getConfig();
-    
-    public static ServerManager getInstance() {
+    private static <T> T check(@Nullable T instance) {
+        Preconditions.checkState(instance != null, "%s has not been initialized!", ServerManager.NAME);
         return instance;
     }
     
-    public final Platform.Type getPlatformType() {
-        return platformType;
+    public static boolean isAvailable() {
+        return instance != null;
     }
     
-    public final Logger getLogger() {
-        return logger;
+    public static ServerManager getInstance() {
+        return check(instance);
     }
 }

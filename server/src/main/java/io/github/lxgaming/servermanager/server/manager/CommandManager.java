@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Alex Thomson
+ * Copyright 2021 Alex Thomson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,178 +16,184 @@
 
 package io.github.lxgaming.servermanager.server.manager;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.github.lxgaming.servermanager.api.ServerManager;
+import io.github.lxgaming.servermanager.common.util.StringUtils;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
-import io.github.lxgaming.servermanager.server.command.AbstractCommand;
-import io.github.lxgaming.servermanager.server.command.ConnectionCommand;
-import io.github.lxgaming.servermanager.server.command.ExecuteCommand;
-import io.github.lxgaming.servermanager.server.command.HelpCommand;
-import io.github.lxgaming.servermanager.server.command.InfoCommand;
-import io.github.lxgaming.servermanager.server.command.MessageCommand;
-import io.github.lxgaming.servermanager.server.command.PingCommand;
-import io.github.lxgaming.servermanager.server.command.ReloadCommand;
-import io.github.lxgaming.servermanager.server.command.StopCommand;
+import io.github.lxgaming.servermanager.server.command.Command;
+import io.github.lxgaming.servermanager.server.command.InformationCommand;
+import io.github.lxgaming.servermanager.server.command.ShutdownCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
-public class CommandManager {
+public final class CommandManager {
     
-    private static final Set<AbstractCommand> COMMANDS = Toolbox.newLinkedHashSet();
-    private static final Set<Class<? extends AbstractCommand>> COMMAND_CLASSES = Toolbox.newLinkedHashSet();
+    public static final Set<Command> COMMANDS = Sets.newLinkedHashSet();
+    private static final Set<Class<? extends Command>> COMMAND_CLASSES = Sets.newHashSet();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.NAME);
     
-    public static void buildCommands() {
-        registerCommand(ConnectionCommand.class);
-        registerCommand(ExecuteCommand.class);
-        registerCommand(HelpCommand.class);
-        registerCommand(InfoCommand.class);
-        registerCommand(MessageCommand.class);
-        registerCommand(PingCommand.class);
-        registerCommand(ReloadCommand.class);
-        registerCommand(StopCommand.class);
+    public static void prepare() {
+        registerCommand(InformationCommand.class);
+        registerCommand(ShutdownCommand.class);
     }
     
-    public static boolean process(String message) {
-        List<String> arguments = getArguments(message).map(Toolbox::newArrayList).orElse(null);
-        if (arguments == null || arguments.isEmpty()) {
+    public static boolean execute(String message) {
+        String content = parseMessage(message);
+        if (StringUtils.isBlank(content)) {
             return false;
         }
         
-        AbstractCommand command = getCommand(arguments).orElse(null);
+        List<String> arguments = getArguments(content);
+        if (arguments.isEmpty()) {
+            return false;
+        }
+        
+        Command command = getCommand(arguments);
         if (command == null) {
-            ServerManager.getInstance().getLogger().error("Unknown command. Try help for a list of commands");
             return false;
         }
-        
-        ServerManager.getInstance().getLogger().debug("Processing {}", command.getPrimaryAlias().orElse("Unknown"));
         
         try {
             command.execute(arguments);
             return true;
         } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error processing {}::process", "CommandManager", ex);
+            LOGGER.error("Encountered an error while executing {}", Toolbox.getClassSimpleName(command.getClass()), ex);
             return false;
         }
     }
     
-    public static boolean registerCommand(Class<? extends AbstractCommand> commandClass) {
-        if (getCommandClasses().contains(commandClass)) {
-            ServerManager.getInstance().getLogger().warn("{} is already registered", commandClass.getSimpleName());
-            return false;
-        }
-        
-        getCommandClasses().add(commandClass);
-        AbstractCommand command = Toolbox.newInstance(commandClass).orElse(null);
-        if (command == null) {
-            ServerManager.getInstance().getLogger().error("{} failed to initialize", commandClass.getSimpleName());
-            return false;
-        }
-        
-        getCommands().add(command);
-        ServerManager.getInstance().getLogger().debug("{} registered", commandClass.getSimpleName());
-        return true;
-    }
-    
-    public static boolean registerAlias(AbstractCommand command, String alias) {
-        if (Toolbox.containsIgnoreCase(command.getAliases(), alias)) {
-            ServerManager.getInstance().getLogger().warn("{} is already registered for {}", alias, command.getClass().getSimpleName());
+    public static boolean registerAlias(Command command, String alias) {
+        if (StringUtils.containsIgnoreCase(command.getAliases(), alias)) {
+            LOGGER.warn("{} is already registered for {}", alias, Toolbox.getClassSimpleName(command.getClass()));
             return false;
         }
         
         command.getAliases().add(alias);
-        ServerManager.getInstance().getLogger().debug("{} registered for {}", alias, command.getClass().getSimpleName());
+        LOGGER.debug("{} registered for {}", alias, Toolbox.getClassSimpleName(command.getClass()));
         return true;
     }
     
-    public static boolean registerCommand(AbstractCommand parentCommand, Class<? extends AbstractCommand> commandClass) {
+    public static boolean registerCommand(Class<? extends Command> commandClass) {
+        Command command = registerCommand(COMMANDS, commandClass);
+        if (command != null) {
+            LOGGER.debug("{} registered", Toolbox.getClassSimpleName(commandClass));
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public static boolean registerCommand(Command parentCommand, Class<? extends Command> commandClass) {
         if (parentCommand.getClass() == commandClass) {
-            ServerManager.getInstance().getLogger().warn("{} attempted to register itself", parentCommand.getClass().getSimpleName());
+            LOGGER.warn("{} attempted to register itself", Toolbox.getClassSimpleName(parentCommand.getClass()));
             return false;
         }
         
-        if (getCommandClasses().contains(commandClass)) {
-            ServerManager.getInstance().getLogger().warn("{} is already registered", commandClass.getSimpleName());
-            return false;
+        Command command = registerCommand(parentCommand.getChildren(), commandClass);
+        if (command != null) {
+            command.parentCommand(parentCommand);
+            LOGGER.debug("{} registered for {}", Toolbox.getClassSimpleName(commandClass), Toolbox.getClassSimpleName(parentCommand.getClass()));
+            return true;
         }
         
-        getCommandClasses().add(commandClass);
-        AbstractCommand command = Toolbox.newInstance(commandClass).orElse(null);
-        if (command == null) {
-            ServerManager.getInstance().getLogger().error("{} failed to initialize", commandClass.getSimpleName());
-            return false;
-        }
-        
-        parentCommand.getChildren().add(command);
-        ServerManager.getInstance().getLogger().debug("{} registered for {}", commandClass.getSimpleName(), parentCommand.getClass().getSimpleName());
-        return true;
+        return false;
     }
     
-    public static Optional<AbstractCommand> getCommand(Class<? extends AbstractCommand> commandClass) {
+    private static Command registerCommand(Set<Command> commands, Class<? extends Command> commandClass) {
+        if (COMMAND_CLASSES.contains(commandClass)) {
+            LOGGER.warn("{} is already registered", Toolbox.getClassSimpleName(commandClass));
+            return null;
+        }
+        
+        COMMAND_CLASSES.add(commandClass);
+        Command command = Toolbox.newInstance(commandClass);
+        if (command == null) {
+            LOGGER.error("{} failed to initialize", Toolbox.getClassSimpleName(commandClass));
+            return null;
+        }
+        
+        try {
+            if (!command.prepare()) {
+                LOGGER.warn("{} failed to prepare", Toolbox.getClassSimpleName(commandClass));
+                return null;
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Encountered an error while preparing {}", Toolbox.getClassSimpleName(commandClass), ex);
+            return null;
+        }
+        
+        if (commands.add(command)) {
+            return command;
+        }
+        
+        return null;
+    }
+    
+    public static Command getCommand(Class<? extends Command> commandClass) {
         return getCommand(null, commandClass);
     }
     
-    public static Optional<AbstractCommand> getCommand(AbstractCommand parentCommand, Class<? extends AbstractCommand> commandClass) {
-        Set<AbstractCommand> commands = Toolbox.newLinkedHashSet();
+    public static Command getCommand(Command parentCommand, Class<? extends Command> commandClass) {
+        Set<Command> commands = Sets.newLinkedHashSet();
         if (parentCommand != null) {
             commands.addAll(parentCommand.getChildren());
         } else {
-            commands.addAll(getCommands());
+            commands.addAll(COMMANDS);
         }
         
-        for (AbstractCommand command : commands) {
+        for (Command command : commands) {
             if (command.getClass() == commandClass) {
-                return Optional.of(command);
+                return command;
             }
             
-            Optional<AbstractCommand> childCommand = getCommand(command, commandClass);
-            if (childCommand.isPresent()) {
+            Command childCommand = getCommand(command, commandClass);
+            if (childCommand != null) {
                 return childCommand;
             }
         }
         
-        return Optional.empty();
+        return null;
     }
     
-    public static Optional<AbstractCommand> getCommand(List<String> arguments) {
+    public static Command getCommand(List<String> arguments) {
         return getCommand(null, arguments);
     }
     
-    private static Optional<AbstractCommand> getCommand(AbstractCommand parentCommand, List<String> arguments) {
-        Set<AbstractCommand> commands = Toolbox.newLinkedHashSet();
+    private static Command getCommand(Command parentCommand, List<String> arguments) {
+        if (arguments.isEmpty()) {
+            return parentCommand;
+        }
+        
+        Set<Command> commands = Sets.newLinkedHashSet();
         if (parentCommand != null) {
             commands.addAll(parentCommand.getChildren());
         } else {
-            commands.addAll(getCommands());
+            commands.addAll(COMMANDS);
         }
         
-        if (arguments.isEmpty() || commands.isEmpty()) {
-            return Optional.ofNullable(parentCommand);
-        }
-        
-        for (AbstractCommand command : commands) {
-            if (Toolbox.containsIgnoreCase(command.getAliases(), arguments.get(0))) {
+        for (Command command : commands) {
+            if (StringUtils.containsIgnoreCase(command.getAliases(), arguments.get(0))) {
                 arguments.remove(0);
                 return getCommand(command, arguments);
             }
         }
         
-        return Optional.ofNullable(parentCommand);
+        return parentCommand;
     }
     
-    private static Optional<String[]> getArguments(String message) {
+    private static List<String> getArguments(String string) {
+        return Lists.newArrayList(string.split(" "));
+    }
+    
+    private static String parseMessage(String message) {
         if (message.startsWith("/")) {
-            return Optional.of(Toolbox.filter(message.substring(1)).split(" "));
+            return message.substring(1).trim();
         }
         
-        return Optional.of(Toolbox.filter(message).split(" "));
-    }
-    
-    public static Set<AbstractCommand> getCommands() {
-        return COMMANDS;
-    }
-    
-    private static Set<Class<? extends AbstractCommand>> getCommandClasses() {
-        return COMMAND_CLASSES;
+        return message.trim();
     }
 }

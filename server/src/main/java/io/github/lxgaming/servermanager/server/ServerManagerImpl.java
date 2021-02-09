@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Alex Thomson
+ * Copyright 2021 Alex Thomson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,146 +16,118 @@
 
 package io.github.lxgaming.servermanager.server;
 
-import io.github.lxgaming.servermanager.api.Platform;
 import io.github.lxgaming.servermanager.api.ServerManager;
-import io.github.lxgaming.servermanager.api.network.NetworkHandler;
-import io.github.lxgaming.servermanager.api.network.Packet;
-import io.github.lxgaming.servermanager.api.util.Logger;
-import io.github.lxgaming.servermanager.api.util.Reference;
-import io.github.lxgaming.servermanager.common.manager.PacketManager;
-import io.github.lxgaming.servermanager.common.manager.ServiceManager;
-import io.github.lxgaming.servermanager.common.util.LoggerImpl;
+import io.github.lxgaming.servermanager.common.configuration.Config;
+import io.github.lxgaming.servermanager.common.configuration.category.GeneralCategory;
+import io.github.lxgaming.servermanager.common.entity.InstanceImpl;
+import io.github.lxgaming.servermanager.common.manager.InstanceManager;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
-import io.github.lxgaming.servermanager.server.configuration.ServerConfig;
-import io.github.lxgaming.servermanager.server.configuration.ServerConfiguration;
-import io.github.lxgaming.servermanager.server.handler.RequestNetworkHandler;
-import io.github.lxgaming.servermanager.server.handler.ResponseNetworkHandler;
+import io.github.lxgaming.servermanager.server.configuration.ConfigImpl;
+import io.github.lxgaming.servermanager.server.configuration.ConfigurationImpl;
+import io.github.lxgaming.servermanager.server.configuration.category.InstanceCategory;
 import io.github.lxgaming.servermanager.server.manager.CommandManager;
-import io.github.lxgaming.servermanager.server.manager.ConnectionManager;
-import io.github.lxgaming.servermanager.server.service.RedisServiceImpl;
-import io.github.lxgaming.servermanager.server.service.StatusService;
+import io.github.lxgaming.servermanager.server.manager.NetworkManager;
+import io.github.lxgaming.servermanager.server.manager.TaskManager;
+import io.github.lxgaming.servermanager.server.util.ShutdownHook;
+import io.netty.util.ResourceLeakDetector;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ServerManagerImpl extends ServerManager {
     
-    private ServerConfiguration configuration;
-    private RedisServiceImpl redisService;
-    private volatile boolean running;
+    private final Logger logger;
+    private final ConfigurationImpl configuration;
+    private final Instant startTime;
+    private final AtomicBoolean state;
     
-    private ServerManagerImpl() {
-        this.platformType = Platform.Type.SERVER;
-        this.logger = new LoggerImpl();
-        this.configuration = new ServerConfiguration(Toolbox.getPath().orElse(null));
-        this.redisService = new RedisServiceImpl();
+    public ServerManagerImpl() {
+        this(Toolbox.getPath());
     }
     
-    public static boolean init() {
-        if (getInstance() != null) {
+    private ServerManagerImpl(Path path) {
+        super();
+        this.logger = LoggerFactory.getLogger(ServerManager.NAME);
+        this.configuration = new ConfigurationImpl(path);
+        this.startTime = Instant.now();
+        this.state = new AtomicBoolean(false);
+    }
+    
+    public void load() {
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+        getLogger().info("Initializing...");
+        if (!reload()) {
+            getLogger().error("Failed to load");
+            return;
+        }
+        
+        CommandManager.prepare();
+        NetworkManager.prepare();
+        TaskManager.prepare();
+        
+        getConfiguration().saveConfiguration();
+        
+        NetworkManager.execute();
+        
+        Set<InstanceCategory> instanceCategories = getConfig().map(ConfigImpl::getInstanceCategories).orElseThrow(NullPointerException::new);
+        for (InstanceCategory instanceCategory : instanceCategories) {
+            InstanceManager.INSTANCES.add(new InstanceImpl(instanceCategory.getId(), instanceCategory.getName()));
+        }
+        
+        getLogger().info("{} v{} has loaded", ServerManager.NAME, ServerManager.VERSION);
+    }
+    
+    public boolean reload() {
+        if (!getConfiguration().loadConfiguration()) {
             return false;
         }
         
-        ServerManagerImpl serverManager = new ServerManagerImpl();
-        serverManager.getLogger()
-                .add(Logger.Level.INFO, LogManager.getLogger(Reference.ID)::info)
-                .add(Logger.Level.WARN, LogManager.getLogger(Reference.ID)::warn)
-                .add(Logger.Level.ERROR, LogManager.getLogger(Reference.ID)::error)
-                .add(Logger.Level.DEBUG, LogManager.getLogger(Reference.ID)::debug);
+        getConfiguration().saveConfiguration();
+        reloadLogger();
         
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            Thread.currentThread().setName("Shutdown Thread");
-            ServerManager.getInstance().getLogger().info("Shutting down...");
-            ServerManagerImpl.getInstance().shutdownServerManager();
-            LogManager.shutdown();
-        }));
-        
-        serverManager.loadServerManager();
         return true;
     }
     
-    @Override
-    public void loadServerManager() {
-        getLogger().info("Initializing...");
-        getConfiguration().loadConfiguration();
-        reloadServerManager();
-        CommandManager.buildCommands();
-        ConnectionManager.buildConnections();
-        PacketManager.buildPackets();
-        registerNetworkHandler(RequestNetworkHandler.class);
-        registerNetworkHandler(ResponseNetworkHandler.class);
-        ServiceManager.schedule(getRedisService());
-        ServiceManager.schedule(new StatusService());
-        getConfiguration().saveConfiguration();
-        setRunning(true);
-        getLogger().info("{} v{} has loaded", Reference.NAME, Reference.VERSION);
-    }
-    
-    @Override
-    public void reloadServerManager() {
-        if (getConfig().map(ServerConfig::isDebug).orElse(false)) {
-            Configurator.setLevel(Reference.ID, Level.DEBUG);
+    public void reloadLogger() {
+        if (getConfig().map(Config::getGeneralCategory).map(GeneralCategory::isDebug).orElse(false)) {
+            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
+            Configurator.setLevel(getLogger().getName(), Level.DEBUG);
             getLogger().debug("Debug mode enabled");
         } else {
-            Configurator.setLevel(Reference.ID, Level.INFO);
+            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
+            Configurator.setLevel(getLogger().getName(), Level.INFO);
             getLogger().info("Debug mode disabled");
         }
-    }
-    
-    @Override
-    public void shutdownServerManager() {
-        getRedisService().shutdown();
-        ServiceManager.shutdown();
-    }
-    
-    @Override
-    public boolean registerNetworkHandler(Class<? extends NetworkHandler> networkHandlerClass) {
-        return PacketManager.registerNetworkHandler(networkHandlerClass);
-    }
-    
-    public void sendRequest(String id, Packet packet) {
-        packet.setSender(null);
-        packet.setType(Packet.Type.REQUEST);
-        sendPacket(id, packet);
-    }
-    
-    public void sendResponse(String id, Packet packet) {
-        packet.setSender(null);
-        packet.setType(Packet.Type.RESPONSE);
-        sendPacket(id, packet);
-    }
-    
-    public void sendPacket(String id, Packet packet) {
-        PacketManager.sendPacket(id, packet, getRedisService()::publish);
     }
     
     public static ServerManagerImpl getInstance() {
         return (ServerManagerImpl) ServerManager.getInstance();
     }
     
-    public ServerConfiguration getConfiguration() {
+    public Logger getLogger() {
+        return logger;
+    }
+    
+    public ConfigurationImpl getConfiguration() {
         return configuration;
     }
     
-    public Optional<ServerConfig> getConfig() {
-        if (getConfiguration() != null) {
-            return Optional.ofNullable(getConfiguration().getConfig());
-        }
-        
-        return Optional.empty();
+    public Optional<ConfigImpl> getConfig() {
+        return Optional.ofNullable(getConfiguration().getConfig());
     }
     
-    public RedisServiceImpl getRedisService() {
-        return redisService;
+    public Instant getStartTime() {
+        return startTime;
     }
     
-    public boolean isRunning() {
-        return running;
-    }
-    
-    public void setRunning(boolean running) {
-        this.running = running;
+    public AtomicBoolean getState() {
+        return state;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Alex Thomson
+ * Copyright 2021 Alex Thomson
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@ package io.github.lxgaming.servermanager.common.configuration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.github.lxgaming.servermanager.api.ServerManager;
-import io.github.lxgaming.servermanager.api.configuration.Config;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Reader;
 import java.io.Writer;
@@ -28,27 +29,30 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Optional;
 
 public class Configuration {
     
     private static final Gson GSON = new GsonBuilder()
             .disableHtmlEscaping()
             .enableComplexMapKeySerialization()
+            .serializeNulls()
             .setPrettyPrinting()
             .create();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.NAME);
     
-    private final Path path;
-    protected Config config;
+    protected final Path path;
+    private final Class<? extends Config> configClass;
+    private Config config;
     
-    public Configuration(Path path) {
+    protected Configuration(Path path, Class<? extends Config> configClass) {
         this.path = path;
+        this.configClass = configClass;
     }
     
     public boolean loadConfiguration() {
-        Optional<Config> config = loadFile(getPath().resolve("config.json"), Config.class);
-        if (config.isPresent()) {
-            this.config = config.get();
+        Config config = loadFile(this.path.resolve("config.json"), configClass);
+        if (config != null) {
+            this.config = config;
             return true;
         }
         
@@ -56,15 +60,20 @@ public class Configuration {
     }
     
     public boolean saveConfiguration() {
-        return saveFile(getPath().resolve("config.json"), config);
+        return saveFile(this.path.resolve("config.json"), config);
     }
     
-    public static <T> Optional<T> loadFile(Path path, Class<T> typeOfT) {
+    public static <T> T loadFile(Path path, Class<T> type) {
         if (Files.exists(path)) {
-            return deserializeFile(path, typeOfT);
+            return deserializeFile(path, type);
         }
         
-        return Toolbox.newInstance(typeOfT).filter(object -> saveFile(path, object));
+        T object = Toolbox.newInstance(type);
+        if (object != null && saveFile(path, object)) {
+            return object;
+        }
+        
+        return null;
     }
     
     public static boolean saveFile(Path path, Object object) {
@@ -75,21 +84,21 @@ public class Configuration {
         return false;
     }
     
-    public static <T> Optional<T> deserializeFile(Path path, Class<T> typeOfT) {
+    public static <T> T deserializeFile(Path path, Class<T> type) {
         try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-            return Optional.ofNullable(getGson().fromJson(reader, typeOfT));
+            return GSON.fromJson(reader, type);
         } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error while deserializing {}", path, ex);
-            return Optional.empty();
+            LOGGER.error("Encountered an error while deserializing {}", path, ex);
+            return null;
         }
     }
     
     public static boolean serializeFile(Path path, Object object) {
         try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
-            getGson().toJson(object, writer);
+            GSON.toJson(object, writer);
             return true;
         } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error while serializing {}", path, ex);
+            LOGGER.error("Encountered an error while serializing {}", path, ex);
             return false;
         }
     }
@@ -103,17 +112,9 @@ public class Configuration {
             Files.createFile(path);
             return true;
         } catch (Exception ex) {
-            ServerManager.getInstance().getLogger().error("Encountered an error while creating {}", path, ex);
+            LOGGER.error("Encountered an error while creating {}", path, ex);
             return false;
         }
-    }
-    
-    public static Gson getGson() {
-        return GSON;
-    }
-    
-    protected Path getPath() {
-        return path;
     }
     
     public Config getConfig() {

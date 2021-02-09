@@ -24,6 +24,7 @@ dependencies {
     api("io.netty:netty-all:${nettyVersion}")
     api("org.apache.commons:commons-lang3:${lang3Version}")
     api("org.slf4j:slf4j-api:${slf4jVersion}")
+    testCompile("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -98,4 +99,12 @@ publishing {
 
 signing {
     sign publishing.publications
+}
+
+test {
+    testLogging {
+        exceptionFormat = "full"
+    }
+
+    useJUnitPlatform()
 }

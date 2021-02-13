@@ -26,7 +26,6 @@ repositories {
 
 dependencies {
     shadow(project(path: ":servermanager-common"))
-    shadow("io.github.lxgaming:common:${commonVersion}")
     shadow("net.minecrell:terminalconsoleappender:${terminalconsoleappenderVersion}")
     annotationProcessor("org.apache.logging.log4j:log4j-core:${log4jVersion}")
     shadow("org.apache.logging.log4j:log4j-core:${log4jVersion}")

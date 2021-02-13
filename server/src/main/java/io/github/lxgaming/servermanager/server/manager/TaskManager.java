@@ -16,12 +16,12 @@
 
 package io.github.lxgaming.servermanager.server.manager;
 
-import io.github.lxgaming.common.task.Task;
 import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.github.lxgaming.servermanager.server.ServerManagerImpl;
 import io.github.lxgaming.servermanager.server.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.server.configuration.category.TaskCategory;
+import io.github.lxgaming.servermanager.server.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

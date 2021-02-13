@@ -16,7 +16,6 @@
 
 package io.github.lxgaming.servermanager.server.task;
 
-import io.github.lxgaming.common.task.Task;
 import io.github.lxgaming.servermanager.common.configuration.category.NetworkCategory;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;

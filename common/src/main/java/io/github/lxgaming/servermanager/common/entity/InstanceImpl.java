@@ -54,6 +54,11 @@ public class InstanceImpl implements Instance {
     }
     
     @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+    
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -65,10 +70,5 @@ public class InstanceImpl implements Instance {
         
         Instance instance = (Instance) obj;
         return Objects.equals(getId(), instance.getId());
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId());
     }
 }

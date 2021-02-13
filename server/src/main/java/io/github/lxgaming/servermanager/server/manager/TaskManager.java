@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class TaskManager {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.NAME);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.NAME);
     public static final ScheduledThreadPoolExecutor SCHEDULED_EXECUTOR_SERVICE = new ScheduledThreadPoolExecutor(0, Toolbox.newThreadFactory("Task Thread #%d"));
     
     public static void prepare() {

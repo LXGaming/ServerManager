@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     api("com.google.guava:guava:${guavaVersion}")
-    api("net.kyori:adventure-nbt:${adventureVersion}")
+    api("io.github.lxgaming:binary-api:${binaryVersion}")
     api("net.kyori:event-api:${eventVersion}")
     api("org.checkerframework:checker-qual:${checkerqualVersion}")
 }

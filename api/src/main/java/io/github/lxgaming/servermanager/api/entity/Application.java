@@ -16,11 +16,11 @@
 
 package io.github.lxgaming.servermanager.api.entity;
 
-import net.kyori.adventure.nbt.CompoundBinaryTag;
+import io.github.lxgaming.binary.tag.CompoundTag;
 
 public interface Application extends ConnectionAssociation {
     
     String getName();
     
-    CompoundBinaryTag getData();
+    CompoundTag getData();
 }

@@ -16,8 +16,8 @@
 
 package io.github.lxgaming.servermanager.common.entity;
 
+import io.github.lxgaming.binary.tag.CompoundTag;
 import io.github.lxgaming.servermanager.api.entity.Instance;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -26,13 +26,13 @@ public class InstanceImpl implements Instance {
     
     private final UUID id;
     private final String name;
-    private final CompoundBinaryTag data;
+    private final CompoundTag data;
     
     public InstanceImpl(UUID id, String name) {
-        this(id, name, CompoundBinaryTag.builder().build());
+        this(id, name, new CompoundTag());
     }
     
-    public InstanceImpl(UUID id, String name, CompoundBinaryTag data) {
+    public InstanceImpl(UUID id, String name, CompoundTag data) {
         this.id = id;
         this.name = name;
         this.data = data;
@@ -49,7 +49,7 @@ public class InstanceImpl implements Instance {
     }
     
     @Override
-    public CompoundBinaryTag getData() {
+    public CompoundTag getData() {
         return data;
     }
     

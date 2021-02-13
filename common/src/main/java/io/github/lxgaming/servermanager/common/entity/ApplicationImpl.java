@@ -16,19 +16,19 @@
 
 package io.github.lxgaming.servermanager.common.entity;
 
+import io.github.lxgaming.binary.tag.CompoundTag;
 import io.github.lxgaming.servermanager.api.entity.Application;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 public class ApplicationImpl implements Application {
     
     private final String name;
-    private final CompoundBinaryTag data;
+    private final CompoundTag data;
     
     public ApplicationImpl(String name) {
-        this(name, CompoundBinaryTag.builder().build());
+        this(name, new CompoundTag());
     }
     
-    public ApplicationImpl(String name, CompoundBinaryTag data) {
+    public ApplicationImpl(String name, CompoundTag data) {
         this.name = name;
         this.data = data;
     }
@@ -39,7 +39,7 @@ public class ApplicationImpl implements Application {
     }
     
     @Override
-    public CompoundBinaryTag getData() {
+    public CompoundTag getData() {
         return data;
     }
 }

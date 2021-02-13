@@ -21,6 +21,7 @@ repositories {
 dependencies {
     api(project(path: ":servermanager-api"))
     api("com.google.code.gson:gson:${gsonVersion}")
+    api("io.github.lxgaming:binary-serializer-msgpack:${binaryVersion}")
     api("io.netty:netty-all:${nettyVersion}")
     api("net.kyori:event-method-asm:${eventVersion}")
     api("org.apache.commons:commons-lang3:${lang3Version}")

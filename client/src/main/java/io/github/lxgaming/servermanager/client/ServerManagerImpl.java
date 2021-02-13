@@ -22,6 +22,7 @@ import io.github.lxgaming.servermanager.client.configuration.ConfigurationImpl;
 import io.github.lxgaming.servermanager.client.manager.NetworkManager;
 import io.github.lxgaming.servermanager.common.configuration.Config;
 import io.github.lxgaming.servermanager.common.configuration.category.GeneralCategory;
+import io.github.lxgaming.servermanager.common.entity.Connection;
 import io.github.lxgaming.servermanager.common.event.EventManagerImpl;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class ServerManagerImpl extends ServerManager {
     
     private final Logger logger;
     private final ConfigurationImpl configuration;
+    private Connection connection;
     
     ServerManagerImpl() {
         this(Toolbox.getPath());
@@ -96,5 +98,13 @@ public class ServerManagerImpl extends ServerManager {
     
     public Optional<ConfigImpl> getConfig() {
         return Optional.ofNullable(getConfiguration().getConfig());
+    }
+    
+    public Connection getConnection() {
+        return connection;
+    }
+    
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }

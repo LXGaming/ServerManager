@@ -17,23 +17,17 @@
 package io.github.lxgaming.servermanager.common.network.util;
 
 import com.google.common.base.Preconditions;
-import io.github.lxgaming.binary.serializer.msgpack.MessagePackSerializer;
 import io.github.lxgaming.binary.tag.Tag;
+import io.github.lxgaming.servermanager.common.util.binary.MessagePackSerializerImpl;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.handler.codec.DecoderException;
-import io.netty.handler.codec.EncoderException;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class ProtocolUtils {
     
     private static final int DEFAULT_MAX_LENGTH = 65536; // 64KiB
-    private static final MessagePackSerializer SERIALIZER = new MessagePackSerializer();
     
     public static int readVarInt(ByteBuf byteBuf) {
         int read = readVarIntSafely(byteBuf);
@@ -155,18 +149,10 @@ public class ProtocolUtils {
     }
     
     public static Tag readTag(ByteBuf byteBuf) {
-        try (ByteBufInputStream inputStream = new ByteBufInputStream(byteBuf)) {
-            return SERIALIZER.read(inputStream);
-        } catch (IOException ex) {
-            throw new DecoderException(ex);
-        }
+        return MessagePackSerializerImpl.INSTANCE.read(byteBuf);
     }
     
     public static void writeTag(ByteBuf byteBuf, Tag tag) {
-        try (ByteBufOutputStream outputStream = new ByteBufOutputStream(byteBuf)) {
-            SERIALIZER.write(outputStream, tag);
-        } catch (IOException ex) {
-            throw new EncoderException(ex);
-        }
+        MessagePackSerializerImpl.INSTANCE.write(byteBuf, tag);
     }
 }

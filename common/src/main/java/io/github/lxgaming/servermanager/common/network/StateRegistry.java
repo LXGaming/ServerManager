@@ -73,7 +73,7 @@ public enum StateRegistry {
             // Serverbound
             registerPacket(Direction.SERVERBOUND, HeartbeatPacket.class);
             registerPacket(Direction.SERVERBOUND, IntentPacket.class);
-            registerPacket(Direction.CLIENTBOUND, ListPacket.Request.class);
+            registerPacket(Direction.SERVERBOUND, ListPacket.Request.class);
         }
     },
     
@@ -87,7 +87,7 @@ public enum StateRegistry {
             // Serverbound
             registerPacket(Direction.SERVERBOUND, HeartbeatPacket.class);
             registerPacket(Direction.SERVERBOUND, IntentPacket.class);
-            registerPacket(Direction.CLIENTBOUND, ListPacket.Request.class);
+            registerPacket(Direction.SERVERBOUND, ListPacket.Request.class);
         }
     };
     

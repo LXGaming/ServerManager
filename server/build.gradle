@@ -1,13 +1,10 @@
 plugins {
     id "com.github.johnrengelman.shadow"
-    id "java"
-    id "signing"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "io.github.lxgaming"
 archivesBaseName = "servermanager-server"
 
 configurations {
@@ -15,7 +12,7 @@ configurations {
         runtime.extendsFrom(shadow)
     }
 
-    // build.dependsOn("signJar")
+    build.dependsOn("signJar")
     compileJava.dependsOn(":servermanager-common:build")
     jar.enabled = false
     jar.dependsOn("shadowJar")
@@ -46,36 +43,4 @@ shadowJar {
     configurations = [project.configurations.shadow]
     exclude("META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat")
     exclude("module-info.class")
-}
-
-task signJar {
-    doFirst {
-        if (!project.hasProperty("signing.keyStorePath") || !project.hasProperty("signing.secretKeyRingFile")) {
-            project.logger.warn("========== [WARNING] ==========")
-            project.logger.warn("")
-            project.logger.warn("   This build is not signed!   ")
-            project.logger.warn("")
-            project.logger.warn("========== [WARNING] ==========")
-            throw new StopExecutionException()
-        }
-    }
-
-    doLast {
-        configurations.archives.allArtifacts.files.each {
-            ant.signjar(
-                jar: it,
-                alias: project.property("signing.alias"),
-                storepass: project.property("signing.keyStorePassword"),
-                keystore: project.property("signing.keyStorePath"),
-                keypass: project.property("signing.keyStorePassword"),
-                preservelastmodified: project.property("signing.preserveLastModified"),
-                tsaurl: project.property("signing.timestampAuthority"),
-                digestalg: project.property("signing.digestAlgorithm")
-            )
-            project.logger.lifecycle("JAR Signed: " + it.name)
-
-            signing.sign(it)
-            project.logger.lifecycle("PGP Signed: " + it.name)
-        }
-    }
 }

@@ -1,15 +1,11 @@
 plugins {
-    id "java"
     id "java-library"
-    id "maven-publish"
     id "net.kyori.blossom"
-    id "signing"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "io.github.lxgaming"
 archivesBaseName = "servermanager-api"
 
 blossom {
@@ -29,67 +25,12 @@ dependencies {
     api("org.checkerframework:checker-qual:${checkerqualVersion}")
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier.set("javadoc")
-    from javadoc.destinationDir
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set("sources")
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-javadoc {
-    failOnError = false
-}
-
 processResources {
     from("../LICENSE")
     rename("LICENSE", "LICENSE-ServerManager")
 }
 
 publishing {
-    publications {
-        mavenPublication(MavenPublication) {
-            from components.java
-            groupId group
-            artifactId archivesBaseName
-            version version
-            artifact javadocJar
-            artifact sourcesJar
-            pom {
-                name = "ServerManager"
-                description = "Server Manager"
-                url = "https://github.com/LXGaming/ServerManager"
-                developers {
-                    developer {
-                        id = "lxgaming"
-                        name = "LXGaming"
-                    }
-                }
-                issueManagement {
-                    system = "GitHub Issues"
-                    url = "https://github.com/LXGaming/ServerManager/issues"
-                }
-                licenses {
-                    license {
-                        name = "The Apache License, Version 2.0"
-                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-                scm {
-                    connection = "scm:git@github.com:LXGaming/ServerManager.git"
-                    developerConnection = "scm:git@github.com:LXGaming/ServerManager.git"
-                    url = "https://github.com/LXGaming/ServerManager"
-                }
-            }
-        }
-    }
     repositories {
         if (project.hasProperty("sonatype.username") && project.hasProperty("sonatype.password")) {
             maven {
@@ -102,8 +43,4 @@ publishing {
             }
         }
     }
-}
-
-signing {
-    sign publishing.publications
 }

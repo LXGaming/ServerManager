@@ -1,14 +1,10 @@
 plugins {
-    id "java"
     id "java-library"
-    id "maven-publish"
-    id "signing"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = "io.github.lxgaming"
 archivesBaseName = "servermanager-common"
 
 configurations {
@@ -26,65 +22,9 @@ dependencies {
     api("net.kyori:event-method-asm:${eventVersion}")
     api("org.apache.commons:commons-lang3:${lang3Version}")
     api("org.slf4j:slf4j-api:${slf4jVersion}")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier.set("javadoc")
-    from javadoc.destinationDir
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set("sources")
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-javadoc {
-    failOnError = false
 }
 
 publishing {
-    publications {
-        mavenPublication(MavenPublication) {
-            from components.java
-            groupId group
-            artifactId archivesBaseName
-            version version
-            artifact javadocJar
-            artifact sourcesJar
-            pom {
-                name = "ServerManager"
-                description = "Server Manager"
-                url = "https://github.com/LXGaming/ServerManager"
-                developers {
-                    developer {
-                        id = "lxgaming"
-                        name = "LXGaming"
-                    }
-                }
-                issueManagement {
-                    system = "GitHub Issues"
-                    url = "https://github.com/LXGaming/ServerManager/issues"
-                }
-                licenses {
-                    license {
-                        name = "The Apache License, Version 2.0"
-                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                    }
-                }
-                scm {
-                    connection = "scm:git@github.com:LXGaming/ServerManager.git"
-                    developerConnection = "scm:git@github.com:LXGaming/ServerManager.git"
-                    url = "https://github.com/LXGaming/ServerManager"
-                }
-            }
-        }
-    }
     repositories {
         if (project.hasProperty("sonatype.username") && project.hasProperty("sonatype.password")) {
             maven {
@@ -97,16 +37,4 @@ publishing {
             }
         }
     }
-}
-
-signing {
-    sign publishing.publications
-}
-
-test {
-    testLogging {
-        exceptionFormat = "full"
-    }
-
-    useJUnitPlatform()
 }

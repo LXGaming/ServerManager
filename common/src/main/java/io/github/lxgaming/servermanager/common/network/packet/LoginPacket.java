@@ -52,7 +52,6 @@ public abstract class LoginPacket implements Packet {
         @Override
         public void decode(ByteBuf byteBuf) {
             this.name = ProtocolUtils.readString(byteBuf, NAME_LENGTH);
-            
             if (byteBuf.readBoolean()) {
                 this.path = ProtocolUtils.readString(byteBuf, PATH_LENGTH);
             }
@@ -63,9 +62,7 @@ public abstract class LoginPacket implements Packet {
             Preconditions.checkNotNull(name, "name");
             Preconditions.checkState(name.length() <= NAME_LENGTH, "Name exceeds maximum length");
             Preconditions.checkState(path == null || path.length() <= PATH_LENGTH, "Path exceeds maximum length");
-            
             ProtocolUtils.writeString(byteBuf, name);
-            
             byteBuf.writeBoolean(path != null);
             if (path != null) {
                 ProtocolUtils.writeString(byteBuf, path);

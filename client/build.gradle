@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow"
+    id "java-library"
 }
 
 sourceCompatibility = 1.8
@@ -8,21 +8,14 @@ targetCompatibility = 1.8
 archivesBaseName = "servermanager-client"
 
 configurations {
-    shadow {
-        runtime.extendsFrom(shadow)
-    }
-
-    build.dependsOn("signJar")
     compileJava.dependsOn(":servermanager-common:build")
-    jar.enabled = false
-    jar.dependsOn("shadowJar")
 }
 
 repositories {
 }
 
 dependencies {
-    shadow(project(path: ":servermanager-common"))
+    api(project(path: ":servermanager-common"))
     runtime("org.slf4j:slf4j-simple:${slf4jVersion}")
 }
 
@@ -32,8 +25,17 @@ jar {
     }
 }
 
-shadowJar {
-    archiveClassifier.set(null)
-    configurations = [project.configurations.shadow]
-    exclude("module-info.class")
+publishing {
+    repositories {
+        if (project.hasProperty("sonatype.username") && project.hasProperty("sonatype.password")) {
+            maven {
+                name = "sonatype"
+                url = version.contains("-SNAPSHOT") ? "https://oss.sonatype.org/content/repositories/snapshots" : "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                credentials {
+                    username project.property("sonatype.username")
+                    password project.property("sonatype.password")
+                }
+            }
+        }
+    }
 }

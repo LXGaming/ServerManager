@@ -18,10 +18,12 @@ package io.github.lxgaming.servermanager.client.network.session;
 
 import io.github.lxgaming.servermanager.client.ServerManagerImpl;
 import io.github.lxgaming.servermanager.client.entity.ConnectionImpl;
+import io.github.lxgaming.servermanager.common.manager.InstanceManager;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
+import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
 
 public class ApplicationSessionHandler implements SessionHandler {
     
@@ -47,6 +49,13 @@ public class ApplicationSessionHandler implements SessionHandler {
     @Override
     public boolean handle(HeartbeatPacket packet) {
         connection.write(packet);
+        return true;
+    }
+    
+    @Override
+    public boolean handle(ListPacket.Response packet) {
+        InstanceManager.INSTANCES.clear();
+        InstanceManager.INSTANCES.addAll(packet.getInstances());
         return true;
     }
 }

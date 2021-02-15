@@ -21,6 +21,7 @@ import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HandshakePacket;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HelloPacket;
+import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
 import io.github.lxgaming.servermanager.common.network.packet.LoginPacket;
 import io.github.lxgaming.servermanager.common.network.packet.StatusPacket;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
@@ -66,9 +67,11 @@ public enum StateRegistry {
             // Clientbound
             registerPacket(Direction.CLIENTBOUND, DisconnectPacket.class);
             registerPacket(Direction.CLIENTBOUND, HeartbeatPacket.class);
+            registerPacket(Direction.CLIENTBOUND, ListPacket.Response.class);
             
             // Serverbound
             registerPacket(Direction.SERVERBOUND, HeartbeatPacket.class);
+            registerPacket(Direction.CLIENTBOUND, ListPacket.Request.class);
         }
     },
     
@@ -77,9 +80,11 @@ public enum StateRegistry {
             // Clientbound
             registerPacket(Direction.CLIENTBOUND, DisconnectPacket.class);
             registerPacket(Direction.CLIENTBOUND, HeartbeatPacket.class);
+            registerPacket(Direction.CLIENTBOUND, ListPacket.Response.class);
             
             // Serverbound
             registerPacket(Direction.SERVERBOUND, HeartbeatPacket.class);
+            registerPacket(Direction.CLIENTBOUND, ListPacket.Request.class);
         }
     };
     

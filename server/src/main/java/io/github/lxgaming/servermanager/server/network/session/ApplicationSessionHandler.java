@@ -16,9 +16,11 @@
 
 package io.github.lxgaming.servermanager.server.network.session;
 
+import io.github.lxgaming.servermanager.common.manager.InstanceManager;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
+import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
 import io.github.lxgaming.servermanager.server.ServerManagerImpl;
 import io.github.lxgaming.servermanager.server.entity.ConnectionImpl;
 
@@ -45,6 +47,12 @@ public class ApplicationSessionHandler implements SessionHandler {
             connection.disconnect("Timed out");
         }
         
+        return true;
+    }
+    
+    @Override
+    public boolean handle(ListPacket.Request packet) {
+        connection.write(new ListPacket.Response(InstanceManager.INSTANCES));
         return true;
     }
 }

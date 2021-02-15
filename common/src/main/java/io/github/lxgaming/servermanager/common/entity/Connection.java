@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.util.Set;
 
 public class Connection extends ChannelInboundHandlerAdapter {
     
@@ -48,6 +49,7 @@ public class Connection extends ChannelInboundHandlerAdapter {
     protected StateRegistry state;
     protected SessionHandler sessionHandler;
     protected ConnectionAssociation association;
+    protected Set<String> intents;
     protected boolean knownDisconnect;
     
     protected Connection(Channel channel) {
@@ -193,6 +195,20 @@ public class Connection extends ChannelInboundHandlerAdapter {
         }
     }
     
+    public boolean hasIntent(String key) {
+        if (intents == null) {
+            return false;
+        }
+        
+        for (String intent : intents) {
+            if (key.matches(intent)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     public Channel getChannel() {
         return channel;
     }
@@ -236,6 +252,14 @@ public class Connection extends ChannelInboundHandlerAdapter {
         ensureInEventLoop();
         
         this.association = association;
+    }
+    
+    public Set<String> getIntents() {
+        return intents;
+    }
+    
+    public void setIntents(Set<String> intents) {
+        this.intents = intents;
     }
     
     public boolean isKnownDisconnect() {

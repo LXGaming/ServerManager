@@ -16,6 +16,9 @@
 
 package io.github.lxgaming.servermanager.client.network.session;
 
+import com.google.common.base.Preconditions;
+import io.github.lxgaming.binary.tag.CompoundTag;
+import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.client.ServerManagerImpl;
 import io.github.lxgaming.servermanager.client.entity.ConnectionImpl;
 import io.github.lxgaming.servermanager.common.manager.InstanceManager;
@@ -24,6 +27,8 @@ import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
 import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
+import io.github.lxgaming.servermanager.common.network.packet.MessagePacket;
+import io.github.lxgaming.servermanager.common.util.BinaryUtils;
 
 public class ApplicationSessionHandler implements SessionHandler {
     
@@ -56,6 +61,22 @@ public class ApplicationSessionHandler implements SessionHandler {
     public boolean handle(ListPacket.Response packet) {
         InstanceManager.INSTANCES.clear();
         InstanceManager.INSTANCES.addAll(packet.getInstances());
+        return true;
+    }
+    
+    @Override
+    public boolean handle(MessagePacket packet) {
+        Preconditions.checkState(packet.getOrigin() != null, "Origin must be present");
+        Instance instance = InstanceManager.getOrCreateInstance(packet.getOrigin(), "Unknown");
+        if (instance == null) {
+            return true;
+        }
+        
+        if (packet.isPersistent()) {
+            CompoundTag compoundTag = BinaryUtils.getCompoundTag(instance.getData(), packet.getKey());
+            BinaryUtils.mergeCompoundTags(compoundTag, packet.getValue());
+        }
+        
         return true;
     }
 }

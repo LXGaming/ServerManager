@@ -16,14 +16,21 @@
 
 package io.github.lxgaming.servermanager.server.network.session;
 
+import com.google.common.base.Preconditions;
+import io.github.lxgaming.binary.tag.CompoundTag;
+import io.github.lxgaming.servermanager.api.entity.Instance;
+import io.github.lxgaming.servermanager.common.entity.Connection;
 import io.github.lxgaming.servermanager.common.manager.InstanceManager;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
 import io.github.lxgaming.servermanager.common.network.packet.IntentPacket;
 import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
+import io.github.lxgaming.servermanager.common.network.packet.MessagePacket;
+import io.github.lxgaming.servermanager.common.util.BinaryUtils;
 import io.github.lxgaming.servermanager.server.ServerManagerImpl;
 import io.github.lxgaming.servermanager.server.entity.ConnectionImpl;
+import io.github.lxgaming.servermanager.server.manager.NetworkManager;
 
 public class InstanceSessionHandler implements SessionHandler {
     
@@ -60,6 +67,25 @@ public class InstanceSessionHandler implements SessionHandler {
     @Override
     public boolean handle(ListPacket.Request packet) {
         connection.write(new ListPacket.Response(InstanceManager.INSTANCES));
+        return true;
+    }
+    
+    @Override
+    public boolean handle(MessagePacket packet) {
+        Preconditions.checkState(packet.getOrigin() == null, "Origin cannot be present");
+        Instance instance = (Instance) connection.getAssociation();
+        if (packet.isPersistent()) {
+            CompoundTag compoundTag = BinaryUtils.getCompoundTag(instance.getData(), packet.getKey());
+            BinaryUtils.mergeCompoundTags(compoundTag, packet.getValue());
+        }
+        
+        packet.setOrigin(instance.getId());
+        for (Connection connection : NetworkManager.CONNECTIONS) {
+            if (connection.hasIntent(packet.getKey())) {
+                connection.write(packet);
+            }
+        }
+        
         return true;
     }
 }

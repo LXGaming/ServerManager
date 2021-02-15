@@ -23,6 +23,7 @@ import io.github.lxgaming.servermanager.common.network.packet.HelloPacket;
 import io.github.lxgaming.servermanager.common.network.packet.IntentPacket;
 import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
 import io.github.lxgaming.servermanager.common.network.packet.LoginPacket;
+import io.github.lxgaming.servermanager.common.network.packet.MessagePacket;
 import io.github.lxgaming.servermanager.common.network.packet.StatusPacket;
 import io.netty.buffer.ByteBuf;
 
@@ -80,6 +81,10 @@ public interface SessionHandler {
     }
     
     default boolean handle(LoginPacket.Response packet) {
+        return false;
+    }
+    
+    default boolean handle(MessagePacket packet) {
         return false;
     }
     

@@ -16,6 +16,9 @@
 
 package io.github.lxgaming.servermanager.client.network.session;
 
+import com.google.common.base.Preconditions;
+import io.github.lxgaming.binary.tag.CompoundTag;
+import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.client.ServerManagerImpl;
 import io.github.lxgaming.servermanager.client.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.client.configuration.category.GeneralCategoryImpl;
@@ -26,6 +29,8 @@ import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
 import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
+import io.github.lxgaming.servermanager.common.network.packet.MessagePacket;
+import io.github.lxgaming.servermanager.common.util.BinaryUtils;
 
 import java.util.UUID;
 
@@ -61,6 +66,22 @@ public class InstanceSessionHandler implements SessionHandler {
         UUID id = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).map(GeneralCategoryImpl::getId).orElse(null);
         InstanceManager.INSTANCES.removeIf(instance -> !instance.getId().equals(id));
         InstanceManager.INSTANCES.addAll(packet.getInstances());
+        return true;
+    }
+    
+    @Override
+    public boolean handle(MessagePacket packet) {
+        Preconditions.checkState(packet.getOrigin() != null, "Origin must be present");
+        Instance instance = InstanceManager.getOrCreateInstance(packet.getOrigin(), "Unknown");
+        if (instance == null) {
+            return true;
+        }
+        
+        if (packet.isPersistent()) {
+            CompoundTag compoundTag = BinaryUtils.getCompoundTag(instance.getData(), packet.getKey());
+            BinaryUtils.mergeCompoundTags(compoundTag, packet.getValue());
+        }
+        
         return true;
     }
 }

@@ -18,8 +18,10 @@ package io.github.lxgaming.servermanager.server.network.session;
 
 import com.google.common.base.Preconditions;
 import io.github.lxgaming.binary.tag.CompoundTag;
+import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.common.entity.Connection;
+import io.github.lxgaming.servermanager.common.event.connection.MessageEventImpl;
 import io.github.lxgaming.servermanager.common.manager.InstanceManager;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
@@ -86,6 +88,7 @@ public class InstanceSessionHandler implements SessionHandler {
             }
         }
         
+        ServerManager.getInstance().getEventManager().fireAndForget(new MessageEventImpl(instance, packet.getKey(), packet.getValue(), packet.isPersistent()));
         return true;
     }
 }

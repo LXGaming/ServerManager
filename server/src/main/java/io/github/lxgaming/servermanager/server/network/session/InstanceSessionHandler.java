@@ -75,7 +75,7 @@ public class InstanceSessionHandler implements SessionHandler {
     @Override
     public boolean handle(MessagePacket packet) {
         Preconditions.checkState(packet.getOrigin() == null, "Origin cannot be present");
-        Instance instance = (Instance) connection.getAssociation();
+        Instance instance = connection.getInstance();
         if (packet.isPersistent()) {
             CompoundTag compoundTag = BinaryUtils.getCompoundTag(instance.getData(), packet.getKey());
             BinaryUtils.mergeCompoundTags(compoundTag, packet.getValue());

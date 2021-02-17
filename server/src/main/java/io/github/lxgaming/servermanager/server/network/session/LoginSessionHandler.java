@@ -62,7 +62,7 @@ public class LoginSessionHandler implements SessionHandler {
     public boolean handle(LoginPacket.Request packet) {
         if (StringUtils.isBlank(packet.getPath())) {
             connection.write(new LoginPacket.Response());
-            connection.setSessionHandler(new ApplicationSessionHandler(connection));
+            connection.setSessionHandler(new InstanceSessionHandler(connection));
             return true;
         }
         
@@ -108,7 +108,7 @@ public class LoginSessionHandler implements SessionHandler {
         
         ServerManagerImpl.getInstance().getLogger().info("{} ({}) logged in", instanceCategory.getName(), instanceCategory.getId());
         
-        connection.setAssociation(InstanceManager.getOrCreateInstance(instanceCategory.getId(), instanceCategory.getName()));
+        connection.setInstance(InstanceManager.getOrCreateInstance(instanceCategory.getId(), instanceCategory.getName()));
         connection.write(new LoginPacket.Response(instanceCategory.getId()));
         connection.setSessionHandler(new InstanceSessionHandler(connection));
         return true;

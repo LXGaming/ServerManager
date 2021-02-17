@@ -30,8 +30,6 @@ import io.github.lxgaming.servermanager.common.network.packet.LoginPacket;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.netty.buffer.ByteBuf;
 
-import java.util.UUID;
-
 public class LoginSessionHandler implements SessionHandler {
     
     private final ConnectionImpl connection;
@@ -62,9 +60,8 @@ public class LoginSessionHandler implements SessionHandler {
         }
         
         ServerManagerImpl.getInstance().getLogger().info("Sending LoginPacket Request");
-        String name = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).map(GeneralCategoryImpl::getName).orElse("Unknown");
-        String path = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).map(GeneralCategoryImpl::getPath).orElse(null);
-        connection.write(new LoginPacket.Request(name, path));
+        GeneralCategoryImpl category = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).orElseThrow(NullPointerException::new);
+        connection.write(new LoginPacket.Request(category.getName(), category.getPath()));
         return true;
     }
     
@@ -72,21 +69,17 @@ public class LoginSessionHandler implements SessionHandler {
     public boolean handle(LoginPacket.Response packet) {
         ServerManagerImpl.getInstance().getLogger().info("Successful login");
         if (packet.getId() != null) {
-            UUID id = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).map(GeneralCategoryImpl::getId).orElse(null);
-            String name = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).map(GeneralCategoryImpl::getName).orElse("Unknown");
-            
-            if (!packet.getId().equals(id)) {
-                ServerManagerImpl.getInstance().getLogger().warn("Id changed: {} -> {}", id, packet.getId());
-                ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).ifPresent(category -> category.setId(packet.getId()));
+            GeneralCategoryImpl category = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).orElseThrow(NullPointerException::new);
+            if (!packet.getId().equals(category.getId())) {
+                ServerManagerImpl.getInstance().getLogger().warn("Id changed: {} -> {}", category.getId(), packet.getId());
+                category.setId(packet.getId());
                 ServerManagerImpl.getInstance().getConfiguration().saveConfiguration();
             }
             
-            connection.setAssociation(InstanceManager.getOrCreateInstance(packet.getId(), name));
-            connection.setSessionHandler(new InstanceSessionHandler(connection));
-        } else {
-            connection.setSessionHandler(new ApplicationSessionHandler(connection));
+            connection.setInstance(InstanceManager.getOrCreateInstance(category.getId(), category.getName()));
         }
         
+        connection.setSessionHandler(new InstanceSessionHandler(connection));
         return true;
     }
     

@@ -20,7 +20,7 @@ import io.github.lxgaming.binary.tag.CompoundTag;
 
 import java.util.UUID;
 
-public interface Instance extends ConnectionAssociation {
+public interface Instance {
     
     UUID getId();
     

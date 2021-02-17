@@ -64,22 +64,7 @@ public enum StateRegistry {
         }
     },
     
-    APPLICATION(3, "Application") {
-        {
-            // Clientbound
-            registerPacket(Direction.CLIENTBOUND, DisconnectPacket.class);
-            registerPacket(Direction.CLIENTBOUND, HeartbeatPacket.class);
-            registerPacket(Direction.CLIENTBOUND, ListPacket.Response.class);
-            registerPacket(Direction.CLIENTBOUND, MessagePacket.class);
-            
-            // Serverbound
-            registerPacket(Direction.SERVERBOUND, HeartbeatPacket.class);
-            registerPacket(Direction.SERVERBOUND, IntentPacket.class);
-            registerPacket(Direction.SERVERBOUND, ListPacket.Request.class);
-        }
-    },
-    
-    INSTANCE(4, "Instance") {
+    INSTANCE(3, "Instance") {
         {
             // Clientbound
             registerPacket(Direction.CLIENTBOUND, DisconnectPacket.class);

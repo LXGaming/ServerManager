@@ -18,7 +18,7 @@ package io.github.lxgaming.servermanager.common.entity;
 
 import com.google.common.base.Preconditions;
 import io.github.lxgaming.servermanager.api.ServerManager;
-import io.github.lxgaming.servermanager.api.entity.ConnectionAssociation;
+import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
@@ -48,7 +48,7 @@ public class Connection extends ChannelInboundHandlerAdapter {
     protected InetSocketAddress address;
     protected StateRegistry state;
     protected SessionHandler sessionHandler;
-    protected ConnectionAssociation association;
+    protected Instance instance;
     protected Set<String> intents;
     protected boolean knownDisconnect;
     
@@ -244,14 +244,14 @@ public class Connection extends ChannelInboundHandlerAdapter {
         sessionHandler.activated();
     }
     
-    public ConnectionAssociation getAssociation() {
-        return association;
+    public Instance getInstance() {
+        return instance;
     }
     
-    public void setAssociation(ConnectionAssociation association) {
+    public void setInstance(Instance instance) {
         ensureInEventLoop();
         
-        this.association = association;
+        this.instance = instance;
     }
     
     public Set<String> getIntents() {

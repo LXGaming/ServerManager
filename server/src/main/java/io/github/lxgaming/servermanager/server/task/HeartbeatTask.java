@@ -44,7 +44,7 @@ public class HeartbeatTask extends Task {
         long currentTime = System.currentTimeMillis();
         long heartbeatTime = currentTime - readTimeout;
         for (ConnectionImpl connection : NetworkManager.CONNECTIONS) {
-            if (connection.getState() != StateRegistry.APPLICATION && connection.getState() != StateRegistry.INSTANCE) {
+            if (connection.getState() != StateRegistry.INSTANCE) {
                 continue;
             }
             

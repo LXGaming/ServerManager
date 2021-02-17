@@ -95,6 +95,7 @@ public enum StateRegistry {
         }
     };
     
+    private static final StateRegistry[] VALUES = values();
     private final int id;
     private final String name;
     private final List<Class<? extends Packet>> clientbound;
@@ -108,7 +109,7 @@ public enum StateRegistry {
     }
     
     public static StateRegistry getStateRegistry(int stateId) {
-        for (StateRegistry stateRegistry : StateRegistry.values()) {
+        for (StateRegistry stateRegistry : VALUES) {
             if (stateRegistry.getId() == stateId) {
                 return stateRegistry;
             }

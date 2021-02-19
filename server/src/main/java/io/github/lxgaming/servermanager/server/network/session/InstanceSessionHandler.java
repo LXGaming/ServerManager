@@ -30,7 +30,6 @@ import io.github.lxgaming.servermanager.common.network.packet.IntentPacket;
 import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
 import io.github.lxgaming.servermanager.common.network.packet.MessagePacket;
 import io.github.lxgaming.servermanager.common.util.BinaryUtils;
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
 import io.github.lxgaming.servermanager.server.entity.ConnectionImpl;
 import io.github.lxgaming.servermanager.server.manager.NetworkManager;
 
@@ -44,7 +43,6 @@ public class InstanceSessionHandler implements SessionHandler {
     
     @Override
     public void activated() {
-        ServerManagerImpl.getInstance().getLogger().info("InstanceSessionHandler active");
         connection.setState(StateRegistry.INSTANCE);
     }
     

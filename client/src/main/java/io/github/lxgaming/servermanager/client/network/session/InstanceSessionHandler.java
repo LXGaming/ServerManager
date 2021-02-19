@@ -46,7 +46,6 @@ public class InstanceSessionHandler implements SessionHandler {
     
     @Override
     public void activated() {
-        ServerManagerImpl.getInstance().getLogger().info("InstanceSessionHandler active");
         connection.setState(StateRegistry.INSTANCE);
     }
     

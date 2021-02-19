@@ -34,7 +34,6 @@ public class StatusSessionHandler implements SessionHandler {
     
     @Override
     public void activated() {
-        ServerManagerImpl.getInstance().getLogger().info("StatusSessionHandler active");
         connection.setState(StateRegistry.STATUS);
     }
     

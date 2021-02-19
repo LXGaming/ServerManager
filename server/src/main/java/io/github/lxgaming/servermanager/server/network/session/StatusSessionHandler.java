@@ -22,7 +22,6 @@ import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.StatusPacket;
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
 import io.github.lxgaming.servermanager.server.entity.ConnectionImpl;
 import io.netty.buffer.ByteBuf;
 
@@ -36,7 +35,6 @@ public class StatusSessionHandler implements SessionHandler {
     
     @Override
     public void activated() {
-        ServerManagerImpl.getInstance().getLogger().info("StatusSessionHandler active");
         connection.setState(StateRegistry.STATUS);
         
         JsonObject status = new JsonObject();

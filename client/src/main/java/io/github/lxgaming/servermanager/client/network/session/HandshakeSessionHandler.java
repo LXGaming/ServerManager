@@ -33,7 +33,6 @@ public class HandshakeSessionHandler implements SessionHandler {
     
     @Override
     public void activated() {
-        ServerManagerImpl.getInstance().getLogger().info("HandshakeSessionHandler active");
         connection.setState(StateRegistry.HANDSHAKE);
     }
     

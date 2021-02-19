@@ -18,6 +18,7 @@ package io.github.lxgaming.servermanager.client.entity;
 
 import io.github.lxgaming.servermanager.client.ServerManagerImpl;
 import io.github.lxgaming.servermanager.common.entity.Connection;
+import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -42,5 +43,11 @@ public class ConnectionImpl extends Connection {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         ServerManagerImpl.getInstance().setConnection(null);
+    }
+    
+    @Override
+    public void setSessionHandler(SessionHandler sessionHandler) {
+        ServerManagerImpl.getInstance().getLogger().debug("{} -> {}", this.sessionHandler, sessionHandler);
+        super.setSessionHandler(sessionHandler);
     }
 }

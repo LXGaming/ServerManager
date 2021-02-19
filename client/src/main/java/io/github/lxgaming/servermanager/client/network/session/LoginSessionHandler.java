@@ -40,7 +40,6 @@ public class LoginSessionHandler implements SessionHandler {
     
     @Override
     public void activated() {
-        ServerManagerImpl.getInstance().getLogger().info("LoginSessionHandler active");
         connection.setState(StateRegistry.LOGIN);
     }
     

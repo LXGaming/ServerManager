@@ -21,7 +21,6 @@ import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HandshakePacket;
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
 import io.github.lxgaming.servermanager.server.entity.ConnectionImpl;
 import io.netty.buffer.ByteBuf;
 
@@ -35,7 +34,6 @@ public class HandshakeSessionHandler implements SessionHandler {
     
     @Override
     public void activated() {
-        ServerManagerImpl.getInstance().getLogger().info("HandshakeSessionHandler active");
         connection.setState(StateRegistry.HANDSHAKE);
     }
     

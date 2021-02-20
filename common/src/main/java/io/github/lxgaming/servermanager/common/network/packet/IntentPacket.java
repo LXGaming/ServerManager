@@ -17,13 +17,12 @@
 package io.github.lxgaming.servermanager.common.network.packet;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.util.ProtocolUtils;
 import io.netty.buffer.ByteBuf;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 public class IntentPacket implements Packet {
@@ -43,8 +42,7 @@ public class IntentPacket implements Packet {
     @Override
     public void decode(ByteBuf byteBuf) {
         String[] array = ProtocolUtils.readStringArray(byteBuf, ARRAY_LENGTH, STRING_LENGTH);
-        this.intents = new HashSet<>(array.length);
-        Collections.addAll(this.intents, array);
+        this.intents = Sets.newHashSet(array);
     }
     
     @Override

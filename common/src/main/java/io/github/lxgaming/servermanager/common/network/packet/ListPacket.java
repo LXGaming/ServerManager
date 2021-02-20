@@ -17,6 +17,7 @@
 package io.github.lxgaming.servermanager.common.network.packet;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import io.github.lxgaming.binary.tag.CompoundTag;
 import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.common.entity.InstanceImpl;
@@ -26,7 +27,6 @@ import io.github.lxgaming.servermanager.common.network.util.ProtocolUtils;
 import io.netty.buffer.ByteBuf;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.UUID;
 
 public abstract class ListPacket implements Packet {
@@ -67,7 +67,7 @@ public abstract class ListPacket implements Packet {
         @Override
         public void decode(ByteBuf byteBuf) {
             int size = ProtocolUtils.readVarInt(byteBuf);
-            this.instances = new HashSet<>(size);
+            this.instances = Sets.newHashSetWithExpectedSize(size);
             
             for (int index = 0; index < size; index++) {
                 UUID id = ProtocolUtils.readUUID(byteBuf);

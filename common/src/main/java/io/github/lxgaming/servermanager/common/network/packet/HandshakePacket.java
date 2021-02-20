@@ -43,8 +43,7 @@ public class HandshakePacket implements Packet {
     @Override
     public void encode(ByteBuf byteBuf) {
         Preconditions.checkNotNull(state, "state");
-        int stateId = state.getId();
-        ProtocolUtils.writeVarInt(byteBuf, stateId);
+        ProtocolUtils.writeVarInt(byteBuf, state.getId());
     }
     
     @Override

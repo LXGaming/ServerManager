@@ -89,6 +89,25 @@ public class ProtocolUtils {
         byteBuf.writeCharSequence(charSequence, StandardCharsets.UTF_8);
     }
     
+    public static Tag readTag(ByteBuf byteBuf) {
+        return MessagePackSerializerImpl.INSTANCE.read(byteBuf);
+    }
+    
+    public static void writeTag(ByteBuf byteBuf, Tag tag) {
+        MessagePackSerializerImpl.INSTANCE.write(byteBuf, tag);
+    }
+    
+    public static UUID readUUID(ByteBuf byteBuf) {
+        long mostSigBits = byteBuf.readLong();
+        long leastSigBits = byteBuf.readLong();
+        return new UUID(mostSigBits, leastSigBits);
+    }
+    
+    public static void writeUUID(ByteBuf byteBuf, UUID uuid) {
+        byteBuf.writeLong(uuid.getMostSignificantBits());
+        byteBuf.writeLong(uuid.getLeastSignificantBits());
+    }
+    
     public static long[] readLongArray(ByteBuf byteBuf) {
         return readLongArray(byteBuf, DEFAULT_MAX_LENGTH);
     }
@@ -135,24 +154,5 @@ public class ProtocolUtils {
         for (String value : array) {
             writeString(byteBuf, value);
         }
-    }
-    
-    public static UUID readUUID(ByteBuf byteBuf) {
-        long mostSigBits = byteBuf.readLong();
-        long leastSigBits = byteBuf.readLong();
-        return new UUID(mostSigBits, leastSigBits);
-    }
-    
-    public static void writeUUID(ByteBuf byteBuf, UUID uuid) {
-        byteBuf.writeLong(uuid.getMostSignificantBits());
-        byteBuf.writeLong(uuid.getLeastSignificantBits());
-    }
-    
-    public static Tag readTag(ByteBuf byteBuf) {
-        return MessagePackSerializerImpl.INSTANCE.read(byteBuf);
-    }
-    
-    public static void writeTag(ByteBuf byteBuf, Tag tag) {
-        MessagePackSerializerImpl.INSTANCE.write(byteBuf, tag);
     }
 }

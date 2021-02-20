@@ -48,6 +48,7 @@ public class IntentPacket implements Packet {
     @Override
     public void encode(ByteBuf byteBuf) {
         Preconditions.checkNotNull(intents, "intents");
+        Preconditions.checkState(intents.size() <= ARRAY_LENGTH, "Intents exceeds maximum length");
         String[] array = intents.toArray(new String[0]);
         ProtocolUtils.writeStringArray(byteBuf, array);
     }

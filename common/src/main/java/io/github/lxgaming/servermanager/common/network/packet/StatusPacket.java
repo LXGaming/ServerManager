@@ -37,13 +37,15 @@ public class StatusPacket implements Packet {
     
     @Override
     public void decode(ByteBuf byteBuf) {
-        this.status = Toolbox.GSON.fromJson(ProtocolUtils.readString(byteBuf), JsonObject.class);
+        String json = ProtocolUtils.readString(byteBuf);
+        this.status = Toolbox.GSON.fromJson(json, JsonObject.class);
     }
     
     @Override
     public void encode(ByteBuf byteBuf) {
         Preconditions.checkNotNull(status, "status");
-        ProtocolUtils.writeString(byteBuf, Toolbox.GSON.toJson(status));
+        String json = Toolbox.GSON.toJson(status);
+        ProtocolUtils.writeString(byteBuf, json);
     }
     
     @Override

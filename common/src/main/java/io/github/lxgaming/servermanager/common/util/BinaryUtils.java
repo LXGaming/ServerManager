@@ -31,45 +31,25 @@ import io.github.lxgaming.binary.tag.ShortTag;
 import io.github.lxgaming.binary.tag.StringTag;
 import io.github.lxgaming.binary.tag.Tag;
 
+import java.util.Map;
+
 public class BinaryUtils {
     
     public static CompoundTag getCompoundTag(CompoundTag compoundTag, String path) {
-        if (StringUtils.isBlank(path)) {
-            return compoundTag;
-        }
-        
-        CompoundTag parentTag = compoundTag;
-        for (String key : path.split("\\.")) {
-            parentTag = getOrCreateCompoundTag(parentTag, key);
-        }
-        
-        return parentTag;
+        return getCompoundTag(compoundTag, StringUtils.split(path, '.'));
     }
     
-    public static Tag getTag(String path, CompoundTag compoundTag) {
-        if (StringUtils.isBlank(path)) {
-            return compoundTag;
-        }
-        
-        Tag parentTag = compoundTag;
-        for (String key : path.split("\\.")) {
-            if (parentTag instanceof CompoundTag) {
-                Tag childTag = ((CompoundTag) parentTag).get(key);
-                if (childTag == null) {
-                    CompoundTag newCompoundTag = new CompoundTag();
-                    ((CompoundTag) parentTag).put(key, newCompoundTag);
-                    parentTag = newCompoundTag;
-                    continue;
-                }
-                
-                parentTag = childTag;
+    public static CompoundTag getCompoundTag(CompoundTag compoundTag, String... keys) {
+        CompoundTag parentCompoundTag = compoundTag;
+        for (String key : keys) {
+            if (StringUtils.isBlank(key)) {
                 continue;
             }
             
-            throw new UnsupportedOperationException(String.format("Unsupported BinaryTag (got %s, expected CompoundBinaryTag)", parentTag.getClass().getSimpleName()));
+            parentCompoundTag = getOrCreateCompoundTag(parentCompoundTag, key);
         }
         
-        return parentTag;
+        return parentCompoundTag;
     }
     
     public static CompoundTag getOrCreateCompoundTag(CompoundTag compoundTag, String key) {
@@ -83,10 +63,15 @@ public class BinaryUtils {
         return (CompoundTag) tag;
     }
     
-    @SuppressWarnings("ConstantConditions")
-    public static void mergeCompoundTags(CompoundTag targetCompoundTag, CompoundTag compoundTag) {
-        for (String key : compoundTag.keySet()) {
-            targetCompoundTag.put(key, compoundTag.get(key));
+    public static void mergeCompoundTags(CompoundTag fromCompound, String fromPath, CompoundTag toCompound, String toPath) {
+        CompoundTag from = getCompoundTag(fromCompound, fromPath);
+        CompoundTag to = getCompoundTag(toCompound, toPath);
+        mergeCompoundTags(from, to);
+    }
+    
+    public static void mergeCompoundTags(CompoundTag from, CompoundTag to) {
+        for (Map.Entry<String, Tag> entry : from.entrySet()) {
+            to.put(entry.getKey(), entry.getValue().copy());
         }
     }
     

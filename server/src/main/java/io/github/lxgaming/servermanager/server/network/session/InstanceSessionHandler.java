@@ -75,18 +75,18 @@ public class InstanceSessionHandler implements SessionHandler {
         Preconditions.checkState(packet.getOrigin() == null, "Origin cannot be present");
         Instance instance = connection.getInstance();
         if (packet.isPersistent()) {
-            CompoundTag compoundTag = BinaryUtils.getCompoundTag(instance.getData(), packet.getKey());
-            BinaryUtils.mergeCompoundTags(compoundTag, packet.getValue());
+            CompoundTag compoundTag = BinaryUtils.getCompoundTag(instance.getData(), packet.getNamespace());
+            BinaryUtils.mergeCompoundTags(packet.getValue(), "", compoundTag, packet.getPath());
         }
         
         packet.setOrigin(instance.getId());
         for (Connection connection : NetworkManager.CONNECTIONS) {
-            if (connection.hasIntent(packet.getKey())) {
+            if (connection.hasIntent(packet.getNamespace() + ":" + packet.getPath())) {
                 connection.write(packet);
             }
         }
         
-        ServerManager.getInstance().getEventManager().fireAndForget(new MessageEventImpl(instance, packet.getKey(), packet.getValue(), packet.isPersistent()));
+        ServerManager.getInstance().getEventManager().fireAndForget(new MessageEventImpl(instance, packet.getNamespace(), packet.getPath(), packet.getValue(), packet.isPersistent()));
         return true;
     }
 }

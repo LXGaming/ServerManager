@@ -24,7 +24,9 @@ public interface MessageEvent extends Event {
     
     Instance getInstance();
     
-    String getKey();
+    String getNamespace();
+    
+    String getPath();
     
     CompoundTag getValue();
     

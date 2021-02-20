@@ -79,11 +79,11 @@ public class InstanceSessionHandler implements SessionHandler {
         }
         
         if (packet.isPersistent()) {
-            CompoundTag compoundTag = BinaryUtils.getCompoundTag(instance.getData(), packet.getKey());
-            BinaryUtils.mergeCompoundTags(compoundTag, packet.getValue());
+            CompoundTag compoundTag = BinaryUtils.getCompoundTag(instance.getData(), packet.getNamespace());
+            BinaryUtils.mergeCompoundTags(packet.getValue(), "", compoundTag, packet.getPath());
         }
         
-        ServerManager.getInstance().getEventManager().fireAndForget(new MessageEventImpl(instance, packet.getKey(), packet.getValue(), packet.isPersistent()));
+        ServerManager.getInstance().getEventManager().fireAndForget(new MessageEventImpl(instance, packet.getNamespace(), packet.getPath(), packet.getValue(), packet.isPersistent()));
         return true;
     }
 }

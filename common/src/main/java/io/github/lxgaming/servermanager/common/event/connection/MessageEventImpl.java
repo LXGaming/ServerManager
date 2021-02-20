@@ -24,13 +24,15 @@ import io.github.lxgaming.servermanager.common.event.EventImpl;
 public class MessageEventImpl extends EventImpl implements MessageEvent {
     
     private final Instance instance;
-    private final String key;
+    private final String namespace;
+    private final String path;
     private final CompoundTag value;
     private final boolean persistent;
     
-    public MessageEventImpl(Instance instance, String key, CompoundTag value, boolean persistent) {
+    public MessageEventImpl(Instance instance, String namespace, String path, CompoundTag value, boolean persistent) {
         this.instance = instance;
-        this.key = key;
+        this.namespace = namespace;
+        this.path = path;
         this.value = value;
         this.persistent = persistent;
     }
@@ -41,8 +43,13 @@ public class MessageEventImpl extends EventImpl implements MessageEvent {
     }
     
     @Override
-    public String getKey() {
-        return key;
+    public String getNamespace() {
+        return namespace;
+    }
+    
+    @Override
+    public String getPath() {
+        return path;
     }
     
     @Override

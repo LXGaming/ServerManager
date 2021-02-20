@@ -27,9 +27,11 @@ import java.util.UUID;
 
 public class MessagePacket implements Packet {
     
-    public static final int KEY_LENGTH = 255;
+    public static final int NAMESPACE_LENGTH = 16;
+    public static final int PATH_LENGTH = 255;
     
-    private String key;
+    private String namespace;
+    private String path;
     private CompoundTag value;
     private boolean persistent;
     private UUID origin;
@@ -37,16 +39,17 @@ public class MessagePacket implements Packet {
     public MessagePacket() {
     }
     
-    public MessagePacket(String key, CompoundTag value) {
-        this(key, value, false);
+    public MessagePacket(String namespace, String path, CompoundTag value) {
+        this(namespace, path, value, false);
     }
     
-    public MessagePacket(String key, CompoundTag value, boolean persistent) {
-        this(key, value, persistent, null);
+    public MessagePacket(String namespace, String path, CompoundTag value, boolean persistent) {
+        this(namespace, path, value, persistent, null);
     }
     
-    public MessagePacket(String key, CompoundTag value, boolean persistent, UUID origin) {
-        this.key = key;
+    public MessagePacket(String namespace, String path, CompoundTag value, boolean persistent, UUID origin) {
+        this.namespace = namespace;
+        this.path = path;
         this.value = value;
         this.persistent = persistent;
         this.origin = origin;
@@ -54,7 +57,8 @@ public class MessagePacket implements Packet {
     
     @Override
     public void decode(ByteBuf byteBuf) {
-        this.key = ProtocolUtils.readString(byteBuf, KEY_LENGTH);
+        this.namespace = ProtocolUtils.readString(byteBuf, NAMESPACE_LENGTH);
+        this.path = ProtocolUtils.readString(byteBuf, PATH_LENGTH);
         this.value = (CompoundTag) ProtocolUtils.readTag(byteBuf);
         this.persistent = byteBuf.readBoolean();
         if (byteBuf.readBoolean()) {
@@ -64,10 +68,13 @@ public class MessagePacket implements Packet {
     
     @Override
     public void encode(ByteBuf byteBuf) {
-        Preconditions.checkNotNull(key, "key");
+        Preconditions.checkNotNull(namespace, "namespace");
+        Preconditions.checkNotNull(path, "path");
         Preconditions.checkNotNull(value, "value");
-        Preconditions.checkState(key.length() <= KEY_LENGTH, "Key exceeds maximum length");
-        ProtocolUtils.writeString(byteBuf, key);
+        Preconditions.checkState(namespace.length() <= NAMESPACE_LENGTH, "Namespace exceeds maximum length");
+        Preconditions.checkState(path.length() <= PATH_LENGTH, "Path exceeds maximum length");
+        ProtocolUtils.writeString(byteBuf, namespace);
+        ProtocolUtils.writeString(byteBuf, path);
         ProtocolUtils.writeTag(byteBuf, value);
         byteBuf.writeBoolean(persistent);
         byteBuf.writeBoolean(origin != null);
@@ -81,8 +88,12 @@ public class MessagePacket implements Packet {
         return handler.handle(this);
     }
     
-    public String getKey() {
-        return key;
+    public String getNamespace() {
+        return namespace;
+    }
+    
+    public String getPath() {
+        return path;
     }
     
     public CompoundTag getValue() {

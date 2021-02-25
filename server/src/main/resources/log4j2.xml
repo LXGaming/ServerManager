@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" shutdownHook="disable" packages="io.github.lxgaming.servermanager.server.util.log4j,net.minecrell.terminalconsole,net.minecrell.terminalconsole.util">
+<Configuration status="WARN" shutdownHook="disable" packages="net.minecrell.terminalconsole,net.minecrell.terminalconsole.util">
     <Appenders>
         <TerminalConsole name="Console">
-            <PatternLayout pattern="%color{[%d{HH:mm:ss}] [%t/%level]: %msg%n%xEx}"/>
+            <PatternLayout pattern="%highlight{[%d{HH:mm:ss}] [%t/%level]: %msg%n%xEx}{WARN=BRIGHT YELLOW,INFO=RESET,DEBUG=BRIGHT CYAN,TRACE=BRIGHT MAGENTA}"/>
         </TerminalConsole>
         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz" immediateFlush="false">
             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n"/>

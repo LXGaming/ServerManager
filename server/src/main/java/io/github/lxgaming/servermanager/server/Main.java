@@ -21,6 +21,10 @@ import io.github.lxgaming.servermanager.server.util.terminalconsole.TerminalCons
 public class Main {
     
     public static void main(String[] args) {
+        if (System.getProperty("log4j.skipJansi") == null) {
+            System.setProperty("log4j.skipJansi", "false");
+        }
+        
         Thread.currentThread().setName("Main Thread");
         ServerManagerImpl serverManager = new ServerManagerImpl();
         serverManager.load();

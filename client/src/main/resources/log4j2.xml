@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console">
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n%xEx"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger level="${sys:servermanager.logging.netty.level:-info}" name="io.netty"/>
+        <Root level="ALL">
+            <AppenderRef ref="Console" level="${sys:servermanager.logging.console.level:-info}"/>
+        </Root>
+    </Loggers>
+</Configuration>

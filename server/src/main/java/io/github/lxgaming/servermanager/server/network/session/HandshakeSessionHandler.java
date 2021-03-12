@@ -16,6 +16,9 @@
 
 package io.github.lxgaming.servermanager.server.network.session;
 
+import io.github.lxgaming.servermanager.api.ServerManager;
+import io.github.lxgaming.servermanager.api.entity.Platform;
+import io.github.lxgaming.servermanager.common.event.network.ConnectionEventImpl;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
@@ -35,6 +38,7 @@ public class HandshakeSessionHandler implements SessionHandler {
     @Override
     public void activated() {
         connection.setState(StateRegistry.HANDSHAKE);
+        ServerManager.getInstance().getEventManager().fireAndForget(new ConnectionEventImpl.Handshake(Platform.SERVER, connection));
     }
     
     @Override

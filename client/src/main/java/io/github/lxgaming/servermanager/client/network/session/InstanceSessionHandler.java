@@ -24,6 +24,7 @@ import io.github.lxgaming.servermanager.client.entity.ConnectionImpl;
 import io.github.lxgaming.servermanager.common.event.instance.ForwardEvent;
 import io.github.lxgaming.servermanager.common.event.instance.ListEventImpl;
 import io.github.lxgaming.servermanager.common.event.instance.MessageEventImpl;
+import io.github.lxgaming.servermanager.common.event.network.ConnectionEventImpl;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
@@ -43,6 +44,7 @@ public class InstanceSessionHandler implements SessionHandler {
     @Override
     public void activated() {
         connection.setState(StateRegistry.INSTANCE);
+        ServerManager.getInstance().getEventManager().fireAndForget(new ConnectionEventImpl.Instance(Platform.CLIENT, connection));
     }
     
     @Override

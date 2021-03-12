@@ -49,6 +49,34 @@ public class ConnectionEventImpl extends EventImpl implements ConnectionEvent {
         }
     }
     
+    public static final class Handshake extends ConnectionEventImpl implements ConnectionEvent.Handshake {
+        
+        public Handshake(@NonNull Platform platform, @NonNull Connection connection) {
+            super(platform, connection);
+        }
+    }
+    
+    public static final class Status extends ConnectionEventImpl implements ConnectionEvent.Status {
+        
+        public Status(@NonNull Platform platform, @NonNull Connection connection) {
+            super(platform, connection);
+        }
+    }
+    
+    public static final class Login extends ConnectionEventImpl implements ConnectionEvent.Login {
+        
+        public Login(@NonNull Platform platform, @NonNull Connection connection) {
+            super(platform, connection);
+        }
+    }
+    
+    public static final class Instance extends ConnectionEventImpl implements ConnectionEvent.Instance {
+        
+        public Instance(@NonNull Platform platform, @NonNull Connection connection) {
+            super(platform, connection);
+        }
+    }
+    
     public static final class Disconnect extends ConnectionEventImpl implements ConnectionEvent.Disconnect {
         
         public Disconnect(@NonNull Platform platform, @NonNull Connection connection) {

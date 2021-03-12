@@ -18,6 +18,8 @@ package io.github.lxgaming.servermanager.server.network.session;
 
 import com.google.gson.JsonObject;
 import io.github.lxgaming.servermanager.api.ServerManager;
+import io.github.lxgaming.servermanager.api.entity.Platform;
+import io.github.lxgaming.servermanager.common.event.network.ConnectionEventImpl;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
@@ -36,6 +38,7 @@ public class StatusSessionHandler implements SessionHandler {
     @Override
     public void activated() {
         connection.setState(StateRegistry.STATUS);
+        ServerManager.getInstance().getEventManager().fireAndForget(new ConnectionEventImpl.Status(Platform.SERVER, connection));
         
         JsonObject status = new JsonObject();
         status.addProperty("name", ServerManager.NAME);

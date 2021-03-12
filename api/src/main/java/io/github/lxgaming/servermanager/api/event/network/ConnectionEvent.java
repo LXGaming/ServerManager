@@ -28,6 +28,18 @@ public interface ConnectionEvent extends Event {
     interface Connect extends ConnectionEvent {
     }
     
+    interface Handshake extends ConnectionEvent {
+    }
+    
+    interface Status extends ConnectionEvent {
+    }
+    
+    interface Login extends ConnectionEvent {
+    }
+    
+    interface Instance extends ConnectionEvent {
+    }
+    
     interface Disconnect extends ConnectionEvent {
     }
 }

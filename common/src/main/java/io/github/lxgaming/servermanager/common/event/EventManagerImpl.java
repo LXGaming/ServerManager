@@ -17,7 +17,6 @@
 package io.github.lxgaming.servermanager.common.event;
 
 import com.google.common.base.Preconditions;
-import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.api.event.EventManager;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import net.kyori.event.EventBus;
@@ -26,29 +25,35 @@ import net.kyori.event.SimpleEventBus;
 import net.kyori.event.method.MethodSubscriptionAdapter;
 import net.kyori.event.method.SimpleMethodSubscriptionAdapter;
 import net.kyori.event.method.asm.ASMEventExecutorFactory;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-public class EventManagerImpl implements EventManager {
+public final class EventManagerImpl implements EventManager {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.NAME);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventManager.class);
     
     private final EventBus<Object> eventBus;
     private final MethodSubscriptionAdapter<Object> methodSubscriptionAdapter;
     private final ExecutorService executorService;
     
     public EventManagerImpl() {
+        this(Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), Toolbox.newThreadFactory("Event Thread #%d")));
+    }
+    
+    public EventManagerImpl(@NonNull ExecutorService executorService) {
         this.eventBus = new SimpleEventBus<>(Object.class);
         this.methodSubscriptionAdapter = new SimpleMethodSubscriptionAdapter<>(eventBus, new ASMEventExecutorFactory<>());
-        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), Toolbox.newThreadFactory("Event Executor - #%d"));
+        this.executorService = executorService;
     }
     
     @Override
-    public <T> CompletableFuture<T> fire(T event) {
+    public <T> @NonNull CompletableFuture<T> fire(@NonNull T event) {
         Preconditions.checkNotNull(event, "event");
         if (!eventBus.hasSubscribers(event.getClass())) {
             return CompletableFuture.completedFuture(event);
@@ -61,7 +66,7 @@ public class EventManagerImpl implements EventManager {
     }
     
     @Override
-    public void fireAndForget(Object event) {
+    public void fireAndForget(@NonNull Object event) {
         Preconditions.checkNotNull(event, "event");
         if (!eventBus.hasSubscribers(event.getClass())) {
             return;
@@ -71,18 +76,31 @@ public class EventManagerImpl implements EventManager {
     }
     
     @Override
-    public void register(Object listener) {
+    public void register(@NonNull Object listener) {
         Preconditions.checkNotNull(listener, "listener");
         methodSubscriptionAdapter.register(listener);
     }
     
     @Override
-    public void unregister(Object listener) {
+    public void unregister(@NonNull Object listener) {
         Preconditions.checkNotNull(listener, "listener");
         methodSubscriptionAdapter.unregister(listener);
     }
     
-    private void fireEvent(Object event) {
+    public void shutdown(long timeout, @NonNull TimeUnit unit) {
+        try {
+            executorService.shutdown();
+            if (!executorService.awaitTermination(timeout, unit)) {
+                throw new InterruptedException();
+            }
+            
+            LOGGER.info("Successfully terminated event, continuing with shutdown process...");
+        } catch (Exception ex) {
+            LOGGER.error("Failed to terminate event, continuing with shutdown process...");
+        }
+    }
+    
+    private void fireEvent(@NonNull Object event) {
         PostResult result = eventBus.post(event);
         if (!result.exceptions().isEmpty()) {
             LOGGER.error("Some errors occurred whilst posting event {}.", event);

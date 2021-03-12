@@ -16,7 +16,7 @@
 
 package io.github.lxgaming.servermanager.client.network.session;
 
-import io.github.lxgaming.servermanager.client.ServerManagerImpl;
+import io.github.lxgaming.servermanager.client.Client;
 import io.github.lxgaming.servermanager.client.entity.ConnectionImpl;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
@@ -39,14 +39,14 @@ public class StatusSessionHandler implements SessionHandler {
     
     @Override
     public boolean handle(DisconnectPacket packet) {
-        ServerManagerImpl.getInstance().getLogger().warn("Disconnected: {}", packet.getMessage());
+        Client.getInstance().getLogger().warn("Disconnected: {}", packet.getMessage());
         connection.close();
         return true;
     }
     
     @Override
     public boolean handle(StatusPacket packet) {
-        ServerManagerImpl.getInstance().getLogger().info(Toolbox.GSON.toJson(packet.getStatus()));
+        Client.getInstance().getLogger().info(Toolbox.GSON.toJson(packet.getStatus()));
         return true;
     }
 }

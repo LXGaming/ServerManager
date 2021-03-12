@@ -16,7 +16,7 @@
 
 package io.github.lxgaming.servermanager.server.command;
 
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
+import io.github.lxgaming.servermanager.server.Server;
 
 import java.util.List;
 
@@ -33,6 +33,6 @@ public class ShutdownCommand extends Command {
     
     @Override
     public void execute(List<String> arguments) throws Exception {
-        ServerManagerImpl.getInstance().getState().set(false);
+        Server.getInstance().getState().set(false);
     }
 }

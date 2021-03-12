@@ -16,18 +16,37 @@
 
 package io.github.lxgaming.servermanager.client.configuration;
 
+import io.github.lxgaming.servermanager.common.configuration.Config;
 import io.github.lxgaming.servermanager.common.configuration.Configuration;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.nio.file.Path;
 
 public class ConfigurationImpl extends Configuration {
     
-    public ConfigurationImpl(Path path) {
-        super(path, ConfigImpl.class);
+    public ConfigurationImpl(@NonNull Path path) {
+        super(path);
     }
     
     @Override
-    public ConfigImpl getConfig() {
+    public boolean loadConfiguration() {
+        Config config = loadFile(this.path.resolve("client.json"), ConfigImpl.class);
+        if (config != null) {
+            this.config = config;
+            return true;
+        }
+        
+        return false;
+    }
+    
+    @Override
+    public boolean saveConfiguration() {
+        return saveFile(this.path.resolve("client.json"), config);
+    }
+    
+    @Override
+    public @Nullable ConfigImpl getConfig() {
         return (ConfigImpl) super.getConfig();
     }
 }

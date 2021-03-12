@@ -17,6 +17,7 @@
 package io.github.lxgaming.servermanager.client.configuration.category;
 
 import com.google.gson.annotations.SerializedName;
+import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.common.configuration.category.GeneralCategory;
 
 import java.util.UUID;
@@ -24,10 +25,13 @@ import java.util.UUID;
 public class GeneralCategoryImpl extends GeneralCategory {
     
     @SerializedName("id")
-    private UUID id = null;
+    private UUID id = UUID.randomUUID();
     
     @SerializedName("name")
     private String name = "Unknown";
+    
+    @SerializedName("platform")
+    private Platform platform = Platform.UNKNOWN;
     
     @SerializedName("path")
     private String path = "";
@@ -46,6 +50,14 @@ public class GeneralCategoryImpl extends GeneralCategory {
     
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public Platform getPlatform() {
+        return platform;
+    }
+    
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
     }
     
     public String getPath() {

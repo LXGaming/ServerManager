@@ -18,7 +18,6 @@ package io.github.lxgaming.servermanager.server.manager;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.common.util.StringUtils;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.github.lxgaming.servermanager.server.command.Command;
@@ -34,7 +33,7 @@ public final class CommandManager {
     
     public static final Set<Command> COMMANDS = Sets.newLinkedHashSet();
     private static final Set<Class<? extends Command>> COMMAND_CLASSES = Sets.newHashSet();
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.NAME);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandManager.class);
     
     public static void prepare() {
         registerCommand(InformationCommand.class);

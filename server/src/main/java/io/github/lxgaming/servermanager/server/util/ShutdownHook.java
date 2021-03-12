@@ -16,19 +16,40 @@
 
 package io.github.lxgaming.servermanager.server.util;
 
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
+import io.github.lxgaming.servermanager.api.ServerManager;
+import io.github.lxgaming.servermanager.api.entity.Platform;
+import io.github.lxgaming.servermanager.common.ServerManagerImpl;
+import io.github.lxgaming.servermanager.common.configuration.category.GeneralCategory;
+import io.github.lxgaming.servermanager.common.event.lifecycle.LifecycleEventImpl;
+import io.github.lxgaming.servermanager.server.Server;
+import io.github.lxgaming.servermanager.server.configuration.ConfigImpl;
+import io.github.lxgaming.servermanager.server.manager.IntegrationManager;
 import io.github.lxgaming.servermanager.server.manager.NetworkManager;
-import io.github.lxgaming.servermanager.server.manager.TaskManager;
 import org.apache.logging.log4j.LogManager;
+
+import java.util.concurrent.TimeUnit;
 
 public final class ShutdownHook extends Thread {
     
     @Override
     public void run() {
         Thread.currentThread().setName("Shutdown Thread");
-        ServerManagerImpl.getInstance().getLogger().info("Shutting down...");
+        ServerManager.getInstance().getEventManager().fire(new LifecycleEventImpl.Shutdown(Platform.SERVER)).join();
         
-        TaskManager.shutdown();
+        synchronized (Server.getInstance().getState()) {
+            Server.getInstance().getState().notifyAll();
+        }
+        
+        if (ServerManagerImpl.isAvailable()) {
+            long timeout = Server.getInstance().getConfig()
+                    .map(ConfigImpl::getGeneralCategory)
+                    .map(GeneralCategory::getShutdownTimeout)
+                    .orElse(GeneralCategory.DEFAULT_SHUTDOWN_TIMEOUT);
+            
+            ServerManagerImpl.getInstance().shutdown(timeout, TimeUnit.MILLISECONDS);
+        }
+        
+        IntegrationManager.shutdown();
         NetworkManager.shutdown();
         LogManager.shutdown();
     }

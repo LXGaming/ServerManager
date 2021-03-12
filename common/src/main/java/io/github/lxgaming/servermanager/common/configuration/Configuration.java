@@ -18,8 +18,9 @@ package io.github.lxgaming.servermanager.common.configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-public class Configuration {
+public abstract class Configuration {
     
     private static final Gson GSON = new GsonBuilder()
             .disableHtmlEscaping()
@@ -38,32 +39,20 @@ public class Configuration {
             .serializeNulls()
             .setPrettyPrinting()
             .create();
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.NAME);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Configuration.class);
     
     protected final Path path;
-    private final Class<? extends Config> configClass;
-    private Config config;
+    protected Config config;
     
-    protected Configuration(Path path, Class<? extends Config> configClass) {
+    protected Configuration(@NonNull Path path) {
         this.path = path;
-        this.configClass = configClass;
     }
     
-    public boolean loadConfiguration() {
-        Config config = loadFile(this.path.resolve("config.json"), configClass);
-        if (config != null) {
-            this.config = config;
-            return true;
-        }
-        
-        return false;
-    }
+    public abstract boolean loadConfiguration();
     
-    public boolean saveConfiguration() {
-        return saveFile(this.path.resolve("config.json"), config);
-    }
+    public abstract boolean saveConfiguration();
     
-    public static <T> T loadFile(Path path, Class<T> type) {
+    protected static <T> @Nullable T loadFile(@NonNull Path path, @NonNull Class<T> type) {
         if (Files.exists(path)) {
             return deserializeFile(path, type);
         }
@@ -76,7 +65,7 @@ public class Configuration {
         return null;
     }
     
-    public static boolean saveFile(Path path, Object object) {
+    protected static boolean saveFile(@NonNull Path path, @Nullable Object object) {
         if (Files.exists(path) || createFile(path)) {
             return serializeFile(path, object);
         }
@@ -84,7 +73,7 @@ public class Configuration {
         return false;
     }
     
-    public static <T> T deserializeFile(Path path, Class<T> type) {
+    protected static <T> @Nullable T deserializeFile(@NonNull Path path, @NonNull Class<T> type) {
         try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             return GSON.fromJson(reader, type);
         } catch (Exception ex) {
@@ -93,7 +82,7 @@ public class Configuration {
         }
     }
     
-    public static boolean serializeFile(Path path, Object object) {
+    protected static boolean serializeFile(@NonNull Path path, @Nullable Object object) {
         try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
             GSON.toJson(object, writer);
             return true;
@@ -103,7 +92,7 @@ public class Configuration {
         }
     }
     
-    private static boolean createFile(Path path) {
+    protected static boolean createFile(@NonNull Path path) {
         try {
             if (path.getParent() != null) {
                 Files.createDirectories(path.getParent());
@@ -117,7 +106,7 @@ public class Configuration {
         }
     }
     
-    public Config getConfig() {
+    public @Nullable Config getConfig() {
         return config;
     }
 }

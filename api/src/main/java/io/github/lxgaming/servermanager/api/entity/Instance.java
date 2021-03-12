@@ -17,14 +17,17 @@
 package io.github.lxgaming.servermanager.api.entity;
 
 import io.github.lxgaming.binary.tag.CompoundTag;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.UUID;
 
 public interface Instance {
     
-    UUID getId();
+    @NonNull UUID getId();
     
-    String getName();
+    @NonNull String getName();
     
-    CompoundTag getData();
+    @NonNull Platform getPlatform();
+    
+    @NonNull CompoundTag getData();
 }

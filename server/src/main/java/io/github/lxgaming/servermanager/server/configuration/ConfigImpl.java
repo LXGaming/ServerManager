@@ -22,7 +22,6 @@ import io.github.lxgaming.servermanager.common.configuration.Config;
 import io.github.lxgaming.servermanager.common.configuration.category.GeneralCategory;
 import io.github.lxgaming.servermanager.server.configuration.category.InstanceCategory;
 import io.github.lxgaming.servermanager.server.configuration.category.NetworkCategoryImpl;
-import io.github.lxgaming.servermanager.server.configuration.category.TaskCategory;
 
 import java.util.Set;
 
@@ -37,9 +36,6 @@ public class ConfigImpl implements Config {
     @SerializedName("network")
     private NetworkCategoryImpl networkCategory = new NetworkCategoryImpl();
     
-    @SerializedName("task")
-    private TaskCategory taskCategory = new TaskCategory();
-    
     @Override
     public GeneralCategory getGeneralCategory() {
         return generalCategory;
@@ -52,9 +48,5 @@ public class ConfigImpl implements Config {
     @Override
     public NetworkCategoryImpl getNetworkCategory() {
         return networkCategory;
-    }
-    
-    public TaskCategory getTaskCategory() {
-        return taskCategory;
     }
 }

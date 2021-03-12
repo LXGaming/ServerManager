@@ -16,5 +16,10 @@
 
 package io.github.lxgaming.servermanager.api.event;
 
+import io.github.lxgaming.servermanager.api.entity.Platform;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 public interface Event {
+    
+    @NonNull Platform getPlatform();
 }

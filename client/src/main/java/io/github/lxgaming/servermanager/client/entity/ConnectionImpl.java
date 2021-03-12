@@ -16,10 +16,14 @@
 
 package io.github.lxgaming.servermanager.client.entity;
 
-import io.github.lxgaming.servermanager.client.ServerManagerImpl;
+import io.github.lxgaming.servermanager.api.ServerManager;
+import io.github.lxgaming.servermanager.api.entity.Platform;
+import io.github.lxgaming.servermanager.client.Client;
 import io.github.lxgaming.servermanager.common.entity.Connection;
+import io.github.lxgaming.servermanager.common.event.network.ConnectionEventImpl;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
+import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -36,18 +40,20 @@ public class ConnectionImpl extends Connection {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         this.address = (InetSocketAddress) channel.localAddress();
         super.channelActive(ctx);
-        ServerManagerImpl.getInstance().setConnection(this);
+        Client.getInstance().setConnection(this);
+        ServerManager.getInstance().getEventManager().fire(new ConnectionEventImpl.Connect(Platform.CLIENT, this)).join();
     }
     
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        ServerManagerImpl.getInstance().setConnection(null);
+        Client.getInstance().setConnection(null);
+        ServerManager.getInstance().getEventManager().fire(new ConnectionEventImpl.Disconnect(Platform.CLIENT, this)).join();
     }
     
     @Override
     public void setSessionHandler(SessionHandler sessionHandler) {
-        ServerManagerImpl.getInstance().getLogger().debug("{} -> {}", this.sessionHandler, sessionHandler);
+        LOGGER.debug("{} -> {}", Toolbox.getClassSimpleName(this.sessionHandler), Toolbox.getClassSimpleName(sessionHandler));
         super.setSessionHandler(sessionHandler);
     }
 }

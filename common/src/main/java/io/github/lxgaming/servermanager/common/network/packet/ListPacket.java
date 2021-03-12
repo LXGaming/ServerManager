@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import io.github.lxgaming.binary.tag.CompoundTag;
 import io.github.lxgaming.servermanager.api.entity.Instance;
+import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.common.entity.InstanceImpl;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
@@ -55,45 +56,59 @@ public abstract class ListPacket implements Packet {
     
     public static class Response extends ListPacket {
         
+        private Instance instance;
         private Collection<Instance> instances;
         
         public Response() {
         }
         
-        public Response(Collection<Instance> instances) {
+        public Response(Instance instance, Collection<Instance> instances) {
+            this.instance = instance;
             this.instances = instances;
         }
         
         @Override
         public void decode(ByteBuf byteBuf) {
+            this.instance = decodeInstance(byteBuf, Platform.SERVER);
             int size = ProtocolUtils.readVarInt(byteBuf);
             this.instances = Sets.newHashSetWithExpectedSize(size);
-            
             for (int index = 0; index < size; index++) {
-                UUID id = ProtocolUtils.readUUID(byteBuf);
-                String name = ProtocolUtils.readString(byteBuf);
-                CompoundTag data = (CompoundTag) ProtocolUtils.readTag(byteBuf);
-                
-                Instance instance = new InstanceImpl(id, name, data);
+                Instance instance = decodeInstance(byteBuf, Platform.CLIENT);
                 instances.add(instance);
             }
         }
         
         @Override
         public void encode(ByteBuf byteBuf) {
+            Preconditions.checkNotNull(instance, "instance");
             Preconditions.checkNotNull(instances, "instances");
+            encodeInstance(byteBuf, instance);
             ProtocolUtils.writeVarInt(byteBuf, instances.size());
-            
             for (Instance instance : instances) {
-                ProtocolUtils.writeUUID(byteBuf, instance.getId());
-                ProtocolUtils.writeString(byteBuf, instance.getName());
-                ProtocolUtils.writeTag(byteBuf, instance.getData());
+                encodeInstance(byteBuf, instance);
             }
         }
         
         @Override
         public boolean handle(SessionHandler handler) {
             return handler.handle(this);
+        }
+        
+        private Instance decodeInstance(ByteBuf byteBuf, Platform platform) {
+            UUID id = ProtocolUtils.readUUID(byteBuf);
+            String name = ProtocolUtils.readString(byteBuf);
+            CompoundTag data = (CompoundTag) ProtocolUtils.readTag(byteBuf);
+            return new InstanceImpl(id, name, platform, data);
+        }
+        
+        private void encodeInstance(ByteBuf byteBuf, Instance instance) {
+            ProtocolUtils.writeUUID(byteBuf, instance.getId());
+            ProtocolUtils.writeString(byteBuf, instance.getName());
+            ProtocolUtils.writeTag(byteBuf, instance.getData());
+        }
+        
+        public Instance getInstance() {
+            return instance;
         }
         
         public Collection<Instance> getInstances() {

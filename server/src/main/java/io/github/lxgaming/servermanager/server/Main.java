@@ -16,21 +16,28 @@
 
 package io.github.lxgaming.servermanager.server;
 
+import io.github.lxgaming.servermanager.common.ServerManagerImpl;
+import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.github.lxgaming.servermanager.server.util.terminalconsole.TerminalConsole;
 
 public class Main {
     
     public static void main(String[] args) {
+        Thread.currentThread().setName("Main Thread");
         if (System.getProperty("log4j.skipJansi") == null) {
             System.setProperty("log4j.skipJansi", "false");
         }
         
-        Thread.currentThread().setName("Main Thread");
-        ServerManagerImpl serverManager = new ServerManagerImpl();
-        serverManager.load();
+        ServerManagerImpl.init();
+        Server server = new Server(Toolbox.getPath());
+        if (!server.prepare()) {
+            return;
+        }
         
-        ServerManagerImpl.getInstance().getState().set(true);
+        server.execute();
+        
+        Server.getInstance().getState().set(true);
         new TerminalConsole().start();
-        ServerManagerImpl.getInstance().getState().set(false);
+        Server.getInstance().getState().set(false);
     }
 }

@@ -16,11 +16,11 @@
 
 package io.github.lxgaming.servermanager.client.network.session;
 
-import io.github.lxgaming.servermanager.client.ServerManagerImpl;
+import io.github.lxgaming.servermanager.client.Client;
 import io.github.lxgaming.servermanager.client.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.client.configuration.category.GeneralCategoryImpl;
 import io.github.lxgaming.servermanager.client.entity.ConnectionImpl;
-import io.github.lxgaming.servermanager.common.manager.InstanceManager;
+import io.github.lxgaming.servermanager.common.entity.InstanceImpl;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
@@ -45,7 +45,7 @@ public class LoginSessionHandler implements SessionHandler {
     
     @Override
     public boolean handle(DisconnectPacket packet) {
-        ServerManagerImpl.getInstance().getLogger().warn("Disconnected: {}", packet.getMessage());
+        Client.getInstance().getLogger().warn("Disconnected: {}", packet.getMessage());
         connection.close();
         return true;
     }
@@ -53,31 +53,28 @@ public class LoginSessionHandler implements SessionHandler {
     @Override
     public boolean handle(HelloPacket packet) {
         if (!Toolbox.isPrivateAddress(connection.getAddress()) && (!packet.isEncrypted() || packet.getCompressionThreshold() <= 0)) {
-            ServerManagerImpl.getInstance().getLogger().warn("Secure connection cannot be established");
+            Client.getInstance().getLogger().warn("Secure connection cannot be established");
             connection.close();
             return true;
         }
         
-        ServerManagerImpl.getInstance().getLogger().info("Sending LoginPacket Request");
-        GeneralCategoryImpl category = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).orElseThrow(NullPointerException::new);
-        connection.write(new LoginPacket.Request(category.getName(), category.getPath()));
+        Client.getInstance().getLogger().info("Sending LoginPacket Request");
+        GeneralCategoryImpl category = Client.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).orElseThrow(NullPointerException::new);
+        connection.write(new LoginPacket.Request(category.getId(), category.getName(), category.getPlatform(), category.getPath()));
         return true;
     }
     
     @Override
     public boolean handle(LoginPacket.Response packet) {
-        ServerManagerImpl.getInstance().getLogger().info("Successful login");
-        if (packet.getId() != null) {
-            GeneralCategoryImpl category = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).orElseThrow(NullPointerException::new);
-            if (!packet.getId().equals(category.getId())) {
-                ServerManagerImpl.getInstance().getLogger().warn("Id changed: {} -> {}", category.getId(), packet.getId());
-                category.setId(packet.getId());
-                ServerManagerImpl.getInstance().getConfiguration().saveConfiguration();
-            }
-            
-            connection.setInstance(InstanceManager.getOrCreateInstance(category.getId(), category.getName()));
+        Client.getInstance().getLogger().info("Successful login");
+        GeneralCategoryImpl category = Client.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).orElseThrow(NullPointerException::new);
+        if (!packet.getId().equals(category.getId())) {
+            Client.getInstance().getLogger().warn("Id changed: {} -> {}", category.getId(), packet.getId());
+            category.setId(packet.getId());
+            Client.getInstance().getConfiguration().saveConfiguration();
         }
         
+        connection.setInstance(new InstanceImpl(category.getId(), category.getName(), category.getPlatform()));
         connection.setSessionHandler(new InstanceSessionHandler(connection));
         return true;
     }

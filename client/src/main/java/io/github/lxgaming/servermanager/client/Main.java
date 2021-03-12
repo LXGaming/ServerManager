@@ -16,12 +16,21 @@
 
 package io.github.lxgaming.servermanager.client;
 
+import io.github.lxgaming.servermanager.common.ServerManagerImpl;
+import io.github.lxgaming.servermanager.common.util.Toolbox;
+
 public class Main {
     
     public static void main(String[] args) {
         Thread.currentThread().setName("Main Thread");
-        ServerManagerImpl serverManager = new ServerManagerImpl();
-        serverManager.load();
+        System.setProperty("servermanager.logging.console.level", "DEBUG");
+        ServerManagerImpl.init();
+        Client client = new Client(Toolbox.getPath());
+        if (!client.prepare()) {
+            return;
+        }
+        
+        client.execute();
         
         try {
             while (true) {

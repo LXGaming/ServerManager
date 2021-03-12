@@ -18,6 +18,7 @@ package io.github.lxgaming.servermanager.api;
 
 import com.google.common.base.Preconditions;
 import io.github.lxgaming.servermanager.api.event.EventManager;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class ServerManager {
@@ -30,14 +31,13 @@ public abstract class ServerManager {
     public static final String SOURCE = "https://github.com/LXGaming/ServerManager";
     public static final String WEBSITE = "https://lxgaming.github.io/";
     
-    private static ServerManager instance;
-    protected EventManager eventManager;
+    private static volatile ServerManager instance;
     
     protected ServerManager() {
-        ServerManager.instance = this;
+        instance = this;
     }
     
-    private static <T> T check(@Nullable T instance) {
+    private static <T> @NonNull T check(@Nullable T instance) {
         Preconditions.checkState(instance != null, "%s has not been initialized!", ServerManager.NAME);
         return instance;
     }
@@ -46,11 +46,13 @@ public abstract class ServerManager {
         return instance != null;
     }
     
-    public static ServerManager getInstance() {
+    protected void shutdown() {
+        instance = null;
+    }
+    
+    public static @NonNull ServerManager getInstance() {
         return check(instance);
     }
     
-    public EventManager getEventManager() {
-        return eventManager;
-    }
+    public abstract @NonNull EventManager getEventManager();
 }

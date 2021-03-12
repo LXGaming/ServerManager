@@ -17,94 +17,74 @@
 package io.github.lxgaming.servermanager.client;
 
 import io.github.lxgaming.servermanager.api.ServerManager;
+import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.client.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.client.configuration.ConfigurationImpl;
 import io.github.lxgaming.servermanager.client.manager.NetworkManager;
-import io.github.lxgaming.servermanager.common.configuration.Config;
-import io.github.lxgaming.servermanager.common.configuration.category.GeneralCategory;
+import io.github.lxgaming.servermanager.client.util.ShutdownHook;
 import io.github.lxgaming.servermanager.common.entity.Connection;
-import io.github.lxgaming.servermanager.common.event.EventManagerImpl;
-import io.github.lxgaming.servermanager.common.util.Toolbox;
+import io.github.lxgaming.servermanager.common.event.lifecycle.LifecycleEventImpl;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class ServerManagerImpl extends ServerManager {
+public final class Client {
     
+    private static Client instance;
     private final Logger logger;
     private final ConfigurationImpl configuration;
     private Connection connection;
     
-    ServerManagerImpl() {
-        this(Toolbox.getPath());
-    }
-    
-    public ServerManagerImpl(Path path) {
-        super();
-        this.eventManager = new EventManagerImpl();
-        this.logger = LoggerFactory.getLogger(ServerManager.NAME);
+    public Client(@NonNull Path path) {
+        instance = this;
+        this.logger = LoggerFactory.getLogger(Client.class);
         this.configuration = new ConfigurationImpl(path);
     }
     
-    public void load() {
-        getLogger().info("Initializing...");
-        if (!reload()) {
+    public boolean prepare() {
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+        if (!getConfiguration().loadConfiguration()) {
             getLogger().error("Failed to load");
-            return;
+            return false;
         }
         
         NetworkManager.prepare();
         
-        getConfiguration().saveConfiguration();
-        
-        NetworkManager.execute();
-        
-        getLogger().info("{} v{} has loaded", ServerManager.NAME, ServerManager.VERSION);
-    }
-    
-    public boolean reload() {
-        getConfiguration().loadConfiguration();
-        if (!getConfig().isPresent()) {
-            return false;
-        }
+        ServerManager.getInstance().getEventManager().fire(new LifecycleEventImpl.Initialize(Platform.CLIENT)).join();
         
         getConfiguration().saveConfiguration();
-        reloadLogger();
-        
         return true;
     }
     
-    public void reloadLogger() {
-        if (getConfig().map(Config::getGeneralCategory).map(GeneralCategory::isDebug).orElse(false)) {
-            getLogger().debug("Debug mode enabled");
-        } else {
-            getLogger().info("Debug mode disabled");
-        }
+    public void execute() {
+        NetworkManager.execute();
     }
     
-    public static ServerManagerImpl getInstance() {
-        return (ServerManagerImpl) ServerManager.getInstance();
+    public static @NonNull Client getInstance() {
+        return instance;
     }
     
-    public Logger getLogger() {
+    public @NonNull Logger getLogger() {
         return logger;
     }
     
-    public ConfigurationImpl getConfiguration() {
+    public @NonNull ConfigurationImpl getConfiguration() {
         return configuration;
     }
     
-    public Optional<ConfigImpl> getConfig() {
+    public @NonNull Optional<ConfigImpl> getConfig() {
         return Optional.ofNullable(getConfiguration().getConfig());
     }
     
-    public Connection getConnection() {
+    public @Nullable Connection getConnection() {
         return connection;
     }
     
-    public void setConnection(Connection connection) {
+    public void setConnection(@Nullable Connection connection) {
         this.connection = connection;
     }
 }

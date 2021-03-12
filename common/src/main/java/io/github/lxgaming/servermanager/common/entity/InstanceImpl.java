@@ -18,6 +18,8 @@ package io.github.lxgaming.servermanager.common.entity;
 
 import io.github.lxgaming.binary.tag.CompoundTag;
 import io.github.lxgaming.servermanager.api.entity.Instance;
+import io.github.lxgaming.servermanager.api.entity.Platform;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -26,30 +28,37 @@ public class InstanceImpl implements Instance {
     
     private final UUID id;
     private final String name;
+    private final Platform platform;
     private final CompoundTag data;
     
-    public InstanceImpl(UUID id, String name) {
-        this(id, name, new CompoundTag());
+    public InstanceImpl(@NonNull UUID id, @NonNull String name, @NonNull Platform platform) {
+        this(id, name, platform, new CompoundTag());
     }
     
-    public InstanceImpl(UUID id, String name, CompoundTag data) {
+    public InstanceImpl(@NonNull UUID id, @NonNull String name, @NonNull Platform platform, @NonNull CompoundTag data) {
         this.id = id;
         this.name = name;
+        this.platform = platform;
         this.data = data;
     }
     
     @Override
-    public UUID getId() {
+    public @NonNull UUID getId() {
         return id;
     }
     
     @Override
-    public String getName() {
+    public @NonNull String getName() {
         return name;
     }
     
     @Override
-    public CompoundTag getData() {
+    public @NonNull Platform getPlatform() {
+        return platform;
+    }
+    
+    @Override
+    public @NonNull CompoundTag getData() {
         return data;
     }
     

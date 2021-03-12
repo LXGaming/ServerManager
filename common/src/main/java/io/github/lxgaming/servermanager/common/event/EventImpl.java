@@ -16,7 +16,20 @@
 
 package io.github.lxgaming.servermanager.common.event;
 
+import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.api.event.Event;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class EventImpl implements Event {
+    
+    private final Platform platform;
+    
+    protected EventImpl(@NonNull Platform platform) {
+        this.platform = platform;
+    }
+    
+    @Override
+    public final @NonNull Platform getPlatform() {
+        return platform;
+    }
 }

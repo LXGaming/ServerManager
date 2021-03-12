@@ -18,11 +18,12 @@ package io.github.lxgaming.servermanager.server.command;
 
 import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
+import io.github.lxgaming.servermanager.server.Server;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class InformationCommand extends Command {
     
@@ -38,12 +39,12 @@ public class InformationCommand extends Command {
     public void execute(List<String> arguments) throws Exception {
         StringBuilder stringBuilder = new StringBuilder("\n");
         stringBuilder.append(ServerManager.NAME).append(" v").append(ServerManager.VERSION).append("\n");
-        stringBuilder.append("Uptime: ").append(Toolbox.getDuration(Duration.between(ServerManagerImpl.getInstance().getStartTime(), Instant.now()).toMillis())).append("\n");
+        stringBuilder.append("Uptime: ").append(Toolbox.getDuration(Duration.between(Server.getInstance().getStartTime(), Instant.now()).getSeconds(), TimeUnit.SECONDS)).append("\n");
         stringBuilder.append("Authors: ").append(ServerManager.AUTHORS).append("\n");
         stringBuilder.append("Website: ").append(ServerManager.WEBSITE).append("\n");
         stringBuilder.append("Source: ").append(ServerManager.SOURCE).append("\n");
         stringBuilder.append("Java Version: ").append(System.getProperty("java.version"));
         
-        ServerManagerImpl.getInstance().getLogger().info(stringBuilder.toString());
+        Server.getInstance().getLogger().info(stringBuilder.toString());
     }
 }

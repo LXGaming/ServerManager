@@ -17,24 +17,20 @@
 package io.github.lxgaming.servermanager.client.network.session;
 
 import com.google.common.base.Preconditions;
-import io.github.lxgaming.binary.tag.CompoundTag;
 import io.github.lxgaming.servermanager.api.ServerManager;
-import io.github.lxgaming.servermanager.api.entity.Instance;
-import io.github.lxgaming.servermanager.client.ServerManagerImpl;
-import io.github.lxgaming.servermanager.client.configuration.ConfigImpl;
-import io.github.lxgaming.servermanager.client.configuration.category.GeneralCategoryImpl;
+import io.github.lxgaming.servermanager.api.entity.Platform;
+import io.github.lxgaming.servermanager.client.Client;
 import io.github.lxgaming.servermanager.client.entity.ConnectionImpl;
-import io.github.lxgaming.servermanager.common.event.connection.MessageEventImpl;
-import io.github.lxgaming.servermanager.common.manager.InstanceManager;
+import io.github.lxgaming.servermanager.common.event.instance.ForwardEvent;
+import io.github.lxgaming.servermanager.common.event.instance.ListEventImpl;
+import io.github.lxgaming.servermanager.common.event.instance.MessageEventImpl;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
+import io.github.lxgaming.servermanager.common.network.packet.ForwardPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
 import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
 import io.github.lxgaming.servermanager.common.network.packet.MessagePacket;
-import io.github.lxgaming.servermanager.common.util.BinaryUtils;
-
-import java.util.UUID;
 
 public class InstanceSessionHandler implements SessionHandler {
     
@@ -51,8 +47,19 @@ public class InstanceSessionHandler implements SessionHandler {
     
     @Override
     public boolean handle(DisconnectPacket packet) {
-        ServerManagerImpl.getInstance().getLogger().warn("Disconnected: {}", packet.getMessage());
+        Client.getInstance().getLogger().warn("Disconnected: {}", packet.getMessage());
         connection.close();
+        return true;
+    }
+    
+    @Override
+    public boolean handle(ForwardPacket packet) {
+        if (connection.getInstance().getPlatform() != Platform.SERVER) {
+            connection.close();
+            return true;
+        }
+        
+        ServerManager.getInstance().getEventManager().fireAndForget(new ForwardEvent(Platform.CLIENT, connection.getInstance().getId(), packet.getInstanceIds(), packet.getDirection(), packet.getPacket()));
         return true;
     }
     
@@ -64,26 +71,14 @@ public class InstanceSessionHandler implements SessionHandler {
     
     @Override
     public boolean handle(ListPacket.Response packet) {
-        UUID id = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getGeneralCategory).map(GeneralCategoryImpl::getId).orElse(null);
-        InstanceManager.INSTANCES.removeIf(instance -> !instance.getId().equals(id));
-        InstanceManager.INSTANCES.addAll(packet.getInstances());
+        ServerManager.getInstance().getEventManager().fireAndForget(new ListEventImpl(Platform.CLIENT, packet.getInstance(), packet.getInstances()));
         return true;
     }
     
     @Override
     public boolean handle(MessagePacket packet) {
-        Preconditions.checkState(packet.getOrigin() != null, "Origin must be present");
-        Instance instance = InstanceManager.getOrCreateInstance(packet.getOrigin(), "Unknown");
-        if (instance == null) {
-            return true;
-        }
-        
-        if (packet.isPersistent()) {
-            CompoundTag compoundTag = BinaryUtils.getCompoundTag(instance.getData(), packet.getNamespace());
-            BinaryUtils.mergeCompoundTags(packet.getValue(), "", compoundTag, packet.getPath());
-        }
-        
-        ServerManager.getInstance().getEventManager().fireAndForget(new MessageEventImpl(instance, packet.getNamespace(), packet.getPath(), packet.getValue(), packet.isPersistent()));
+        Preconditions.checkState(packet.getInstanceId() != null, "InstanceId must be present");
+        ServerManager.getInstance().getEventManager().fireAndForget(new MessageEventImpl(Platform.CLIENT, packet.getInstanceId(), packet.getNamespace(), packet.getPath(), packet.getValue(), packet.isPersistent()));
         return true;
     }
 }

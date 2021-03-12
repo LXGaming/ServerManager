@@ -20,8 +20,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class GeneralCategory {
     
+    public static final long DEFAULT_SHUTDOWN_TIMEOUT = 15000L; // 15 Seconds
+    
     @SerializedName("debug")
     private boolean debug = false;
+    
+    @SerializedName("shutdownTimeout")
+    private long shutdownTimeout = DEFAULT_SHUTDOWN_TIMEOUT;
     
     public boolean isDebug() {
         return debug;
@@ -29,5 +34,9 @@ public class GeneralCategory {
     
     public void setDebug(boolean debug) {
         this.debug = debug;
+    }
+    
+    public long getShutdownTimeout() {
+        return shutdownTimeout;
     }
 }

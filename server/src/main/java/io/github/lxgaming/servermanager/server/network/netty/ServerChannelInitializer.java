@@ -22,7 +22,7 @@ import io.github.lxgaming.servermanager.common.network.netty.PacketDecoder;
 import io.github.lxgaming.servermanager.common.network.netty.PacketEncoder;
 import io.github.lxgaming.servermanager.common.network.netty.VarintFrameDecoder;
 import io.github.lxgaming.servermanager.common.network.netty.VarintFrameEncoder;
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
+import io.github.lxgaming.servermanager.server.Server;
 import io.github.lxgaming.servermanager.server.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.server.entity.ConnectionImpl;
 import io.github.lxgaming.servermanager.server.network.session.HandshakeSessionHandler;
@@ -47,7 +47,7 @@ public class ServerChannelInitializer extends ChannelInitializer<Channel> {
         connection.setSessionHandler(new HandshakeSessionHandler(connection));
         ch.pipeline().addLast(Connection.NAME, connection);
         
-        ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getNetworkCategory).ifPresent(category -> {
+        Server.getInstance().getConfig().map(ConfigImpl::getNetworkCategory).ifPresent(category -> {
             ch.pipeline().addFirst(new ReadTimeoutHandler(category.getReadTimeout(), TimeUnit.MILLISECONDS));
             if (category.isProxyProtocol()) {
                 ch.pipeline().addFirst(new HAProxyMessageDecoder());

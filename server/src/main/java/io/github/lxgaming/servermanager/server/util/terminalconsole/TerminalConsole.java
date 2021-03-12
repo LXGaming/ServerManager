@@ -16,18 +16,19 @@
 
 package io.github.lxgaming.servermanager.server.util.terminalconsole;
 
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
+import io.github.lxgaming.servermanager.server.Server;
 import io.github.lxgaming.servermanager.server.manager.CommandManager;
 import net.minecrell.terminalconsole.SimpleTerminalConsole;
 import net.minecrell.terminalconsole.TerminalConsoleAppender;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class TerminalConsole extends SimpleTerminalConsole {
     
     @Override
     protected boolean isRunning() {
-        return ServerManagerImpl.getInstance().getState().get();
+        return Server.getInstance().getState().get();
     }
     
     @Override
@@ -37,7 +38,7 @@ public class TerminalConsole extends SimpleTerminalConsole {
     
     @Override
     protected void shutdown() {
-        ServerManagerImpl.getInstance().getState().set(false);
+        Server.getInstance().getState().set(false);
     }
     
     /**
@@ -45,13 +46,21 @@ public class TerminalConsole extends SimpleTerminalConsole {
      */
     @Override
     public void start() {
-        super.start();
+        if (System.console() != null) {
+            super.start();
+        } else {
+            try {
+                Server.getInstance().awaitState(0L, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ex) {
+                // no-op
+            }
+        }
         
         try {
             // The TerminalConsoleAppender must be manually closed otherwise logging messages will not appear.
             TerminalConsoleAppender.close();
         } catch (IOException ex) {
-            ServerManagerImpl.getInstance().getLogger().error("Failed to close TerminalConsoleAppender, continuing with shutdown process...");
+            Server.getInstance().getLogger().error("Failed to close TerminalConsoleAppender, continuing with shutdown process...");
         }
     }
 }

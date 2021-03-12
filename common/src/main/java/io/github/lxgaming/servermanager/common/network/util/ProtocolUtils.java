@@ -155,4 +155,28 @@ public class ProtocolUtils {
             writeString(byteBuf, value);
         }
     }
+    
+    public static UUID[] readUUIDArray(ByteBuf byteBuf) {
+        return readUUIDArray(byteBuf, DEFAULT_MAX_LENGTH);
+    }
+    
+    public static UUID[] readUUIDArray(ByteBuf byteBuf, int maxArrayLength) {
+        int length = readVarInt(byteBuf);
+        Preconditions.checkArgument(length >= 0, "Got a negative-length array (%s)", length);
+        Preconditions.checkArgument(length <= maxArrayLength, "Bad array size (got %s, maximum is %s)", length, maxArrayLength);
+        Preconditions.checkState(byteBuf.isReadable(length), "Trying to read an array that is too long (wanted %s, only have %s)", length, byteBuf.readableBytes());
+        UUID[] array = new UUID[length];
+        for (int index = 0; index < length; index++) {
+            array[index] = readUUID(byteBuf);
+        }
+        
+        return array;
+    }
+    
+    public static void writeUUIDArray(ByteBuf byteBuf, UUID[] array) {
+        writeVarInt(byteBuf, array.length);
+        for (UUID value : array) {
+            writeUUID(byteBuf, value);
+        }
+    }
 }

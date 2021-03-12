@@ -16,7 +16,8 @@
 
 package io.github.lxgaming.servermanager.server.network.session;
 
-import io.github.lxgaming.servermanager.common.manager.InstanceManager;
+import io.github.lxgaming.servermanager.api.entity.Platform;
+import io.github.lxgaming.servermanager.common.entity.InstanceImpl;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
@@ -24,7 +25,7 @@ import io.github.lxgaming.servermanager.common.network.packet.HelloPacket;
 import io.github.lxgaming.servermanager.common.network.packet.LoginPacket;
 import io.github.lxgaming.servermanager.common.util.StringUtils;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
+import io.github.lxgaming.servermanager.server.Server;
 import io.github.lxgaming.servermanager.server.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.server.configuration.category.InstanceCategory;
 import io.github.lxgaming.servermanager.server.entity.ConnectionImpl;
@@ -59,13 +60,19 @@ public class LoginSessionHandler implements SessionHandler {
     
     @Override
     public boolean handle(LoginPacket.Request packet) {
+        if (packet.getPlatform().equals(Platform.UNKNOWN)) {
+            connection.disconnect("Unsupported Type");
+            return true;
+        }
+        
         if (StringUtils.isBlank(packet.getPath())) {
-            connection.write(new LoginPacket.Response());
+            connection.write(new LoginPacket.Response(packet.getId()));
+            connection.setInstance(new InstanceImpl(packet.getId(), packet.getName(), packet.getPlatform()));
             connection.setSessionHandler(new InstanceSessionHandler(connection));
             return true;
         }
         
-        if (!Toolbox.isPrivateAddress(connection.getAddress())) {
+        if (!packet.getPlatform().equals(Platform.CLIENT) || !Toolbox.isPrivateAddress(connection.getAddress())) {
             connection.disconnect("Forbidden");
             return true;
         }
@@ -81,7 +88,7 @@ public class LoginSessionHandler implements SessionHandler {
             return true;
         }
         
-        Set<InstanceCategory> instanceCategories = ServerManagerImpl.getInstance().getConfig().map(ConfigImpl::getInstanceCategories).orElse(null);
+        Set<InstanceCategory> instanceCategories = Server.getInstance().getConfig().map(ConfigImpl::getInstanceCategories).orElse(null);
         if (instanceCategories == null) {
             connection.disconnect("Registration is unavailable");
             return true;
@@ -93,7 +100,7 @@ public class LoginSessionHandler implements SessionHandler {
                 .orElseGet(() -> {
                     InstanceCategory category = new InstanceCategory(UUID.randomUUID(), packet.getName(), path.toString());
                     if (instanceCategories.add(category)) {
-                        ServerManagerImpl.getInstance().getConfiguration().saveConfiguration();
+                        Server.getInstance().getConfiguration().saveConfiguration();
                         return category;
                     }
                     
@@ -105,10 +112,13 @@ public class LoginSessionHandler implements SessionHandler {
             return true;
         }
         
-        ServerManagerImpl.getInstance().getLogger().info("{} ({}) logged in", instanceCategory.getName(), instanceCategory.getId());
+        if (!instanceCategory.getId().equals(packet.getId())) {
+            Server.getInstance().getLogger().warn("Id changed: {} -> {}", packet.getId(), instanceCategory.getId());
+        }
         
-        connection.setInstance(InstanceManager.getOrCreateInstance(instanceCategory.getId(), instanceCategory.getName()));
+        Server.getInstance().getLogger().info("{} ({}) logged in", instanceCategory.getName(), instanceCategory.getId());
         connection.write(new LoginPacket.Response(instanceCategory.getId()));
+        connection.setInstance(new InstanceImpl(instanceCategory.getId(), instanceCategory.getName(), Platform.CLIENT));
         connection.setSessionHandler(new InstanceSessionHandler(connection));
         return true;
     }

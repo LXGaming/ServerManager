@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package io.github.lxgaming.servermanager.server.task;
+package io.github.lxgaming.servermanager.common.task;
 
 import com.google.common.base.Preconditions;
-import io.github.lxgaming.servermanager.server.manager.TaskManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public abstract class Task implements Runnable {
+    
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Task.class);
     
     private long delay;
     private long interval;
@@ -40,7 +43,7 @@ public abstract class Task implements Runnable {
         try {
             execute();
         } catch (Exception ex) {
-            TaskManager.LOGGER.error("Encountered an error while executing {}", getClass().getName(), ex);
+            LOGGER.error("Encountered an error while executing {}", getClass().getName(), ex);
             exception(ex);
             getScheduledFuture().cancel(false);
         }

@@ -17,9 +17,11 @@
 package io.github.lxgaming.servermanager.server.task;
 
 import io.github.lxgaming.servermanager.common.configuration.category.NetworkCategory;
+import io.github.lxgaming.servermanager.common.entity.Connection;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
+import io.github.lxgaming.servermanager.common.task.Task;
+import io.github.lxgaming.servermanager.server.Server;
 import io.github.lxgaming.servermanager.server.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.server.entity.ConnectionImpl;
 import io.github.lxgaming.servermanager.server.manager.NetworkManager;
@@ -37,30 +39,35 @@ public class HeartbeatTask extends Task {
     
     @Override
     public void execute() throws Exception {
-        int readTimeout = ServerManagerImpl.getInstance().getConfig()
+        int readTimeout = Server.getInstance().getConfig()
                 .map(ConfigImpl::getNetworkCategory)
                 .map(NetworkCategory::getReadTimeout)
                 .orElse(NetworkCategory.DEFAULT_READ_TIMEOUT) / 2;
         long currentTime = System.currentTimeMillis();
         long heartbeatTime = currentTime - readTimeout;
-        for (ConnectionImpl connection : NetworkManager.CONNECTIONS) {
-            if (connection.getState() != StateRegistry.INSTANCE) {
+        for (Connection connection : NetworkManager.CONNECTIONS) {
+            if (!(connection instanceof ConnectionImpl)) {
                 continue;
             }
             
-            if (connection.getHeartbeatTime() >= heartbeatTime) {
+            ConnectionImpl connectionImpl = (ConnectionImpl) connection;
+            if (connectionImpl.getState() != StateRegistry.INSTANCE) {
                 continue;
             }
             
-            if (connection.isHeartbeatPending()) {
-                connection.disconnect("Timed out");
+            if (connectionImpl.getHeartbeatTime() >= heartbeatTime) {
                 continue;
             }
             
-            connection.getChannel().eventLoop().execute(() -> {
-                connection.setHeartbeatPending(true);
-                connection.setHeartbeatTime(currentTime);
-                connection.write(new HeartbeatPacket(currentTime));
+            if (connectionImpl.isHeartbeatPending()) {
+                connectionImpl.disconnect("Timed out");
+                continue;
+            }
+            
+            connectionImpl.getChannel().eventLoop().execute(() -> {
+                connectionImpl.setHeartbeatPending(true);
+                connectionImpl.setHeartbeatTime(currentTime);
+                connectionImpl.write(new HeartbeatPacket(currentTime));
             });
         }
     }

@@ -18,8 +18,8 @@ package io.github.lxgaming.servermanager.client.configuration;
 
 import com.google.gson.annotations.SerializedName;
 import io.github.lxgaming.servermanager.client.configuration.category.GeneralCategoryImpl;
+import io.github.lxgaming.servermanager.client.configuration.category.NetworkCategoryImpl;
 import io.github.lxgaming.servermanager.common.configuration.Config;
-import io.github.lxgaming.servermanager.common.configuration.category.NetworkCategory;
 
 public class ConfigImpl implements Config {
     
@@ -27,7 +27,7 @@ public class ConfigImpl implements Config {
     private GeneralCategoryImpl generalCategory = new GeneralCategoryImpl();
     
     @SerializedName("network")
-    private NetworkCategory networkCategory = new NetworkCategory();
+    private NetworkCategoryImpl networkCategory = new NetworkCategoryImpl();
     
     @Override
     public GeneralCategoryImpl getGeneralCategory() {
@@ -35,7 +35,7 @@ public class ConfigImpl implements Config {
     }
     
     @Override
-    public NetworkCategory getNetworkCategory() {
+    public NetworkCategoryImpl getNetworkCategory() {
         return networkCategory;
     }
 }

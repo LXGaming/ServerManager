@@ -17,7 +17,6 @@
 package io.github.lxgaming.servermanager.common.entity;
 
 import com.google.common.base.Preconditions;
-import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
@@ -42,7 +41,7 @@ import java.util.Set;
 public class Connection extends ChannelInboundHandlerAdapter {
     
     public static final String NAME = "handler";
-    protected static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.NAME);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(Connection.class);
     
     protected final Channel channel;
     protected InetSocketAddress address;

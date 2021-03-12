@@ -18,6 +18,7 @@ package io.github.lxgaming.servermanager.common.network;
 
 import com.google.common.collect.Lists;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
+import io.github.lxgaming.servermanager.common.network.packet.ForwardPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HandshakePacket;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HelloPacket;
@@ -69,11 +70,13 @@ public enum StateRegistry {
             // Clientbound
             registerPacket(Direction.CLIENTBOUND, DisconnectPacket.class);
             registerPacket(Direction.CLIENTBOUND, HeartbeatPacket.class);
+            registerPacket(Direction.CLIENTBOUND, ForwardPacket.class);
             registerPacket(Direction.CLIENTBOUND, ListPacket.Response.class);
             registerPacket(Direction.CLIENTBOUND, MessagePacket.class);
             
             // Serverbound
             registerPacket(Direction.SERVERBOUND, HeartbeatPacket.class);
+            registerPacket(Direction.SERVERBOUND, ForwardPacket.class);
             registerPacket(Direction.SERVERBOUND, IntentPacket.class);
             registerPacket(Direction.SERVERBOUND, ListPacket.Request.class);
             registerPacket(Direction.SERVERBOUND, MessagePacket.class);

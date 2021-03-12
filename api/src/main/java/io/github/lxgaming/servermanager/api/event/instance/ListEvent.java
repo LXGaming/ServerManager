@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package io.github.lxgaming.servermanager.api.event.connection;
+package io.github.lxgaming.servermanager.api.event.instance;
 
-import io.github.lxgaming.binary.tag.CompoundTag;
 import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.api.event.Event;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public interface MessageEvent extends Event {
+import java.util.Collection;
+
+public interface ListEvent extends Event {
     
-    Instance getInstance();
+    @NonNull Instance getInstance();
     
-    String getNamespace();
-    
-    String getPath();
-    
-    CompoundTag getValue();
-    
-    boolean isPersistent();
+    @NonNull Collection<Instance> getInstances();
 }

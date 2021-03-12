@@ -16,17 +16,19 @@
 
 package io.github.lxgaming.servermanager.api.event;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.concurrent.CompletableFuture;
 
 public interface EventManager {
     
-    <T> CompletableFuture<T> fire(T event);
+    <T> @NonNull CompletableFuture<T> fire(@NonNull T event);
     
-    default void fireAndForget(Object event) {
+    default void fireAndForget(@NonNull Object event) {
         fire(event);
     }
     
-    void register(Object listener);
+    void register(@NonNull Object listener);
     
-    void unregister(Object listener);
+    void unregister(@NonNull Object listener);
 }

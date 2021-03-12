@@ -34,7 +34,7 @@ public class MessagePacket implements Packet {
     private String path;
     private CompoundTag value;
     private boolean persistent;
-    private UUID origin;
+    private UUID instanceId;
     
     public MessagePacket() {
     }
@@ -47,12 +47,12 @@ public class MessagePacket implements Packet {
         this(namespace, path, value, persistent, null);
     }
     
-    public MessagePacket(String namespace, String path, CompoundTag value, boolean persistent, UUID origin) {
+    public MessagePacket(String namespace, String path, CompoundTag value, boolean persistent, UUID instanceId) {
         this.namespace = namespace;
         this.path = path;
         this.value = value;
         this.persistent = persistent;
-        this.origin = origin;
+        this.instanceId = instanceId;
     }
     
     @Override
@@ -62,7 +62,7 @@ public class MessagePacket implements Packet {
         this.value = (CompoundTag) ProtocolUtils.readTag(byteBuf);
         this.persistent = byteBuf.readBoolean();
         if (byteBuf.readBoolean()) {
-            this.origin = ProtocolUtils.readUUID(byteBuf);
+            this.instanceId = ProtocolUtils.readUUID(byteBuf);
         }
     }
     
@@ -77,9 +77,9 @@ public class MessagePacket implements Packet {
         ProtocolUtils.writeString(byteBuf, path);
         ProtocolUtils.writeTag(byteBuf, value);
         byteBuf.writeBoolean(persistent);
-        byteBuf.writeBoolean(origin != null);
-        if (origin != null) {
-            ProtocolUtils.writeUUID(byteBuf, origin);
+        byteBuf.writeBoolean(instanceId != null);
+        if (instanceId != null) {
+            ProtocolUtils.writeUUID(byteBuf, instanceId);
         }
     }
     
@@ -104,11 +104,11 @@ public class MessagePacket implements Packet {
         return persistent;
     }
     
-    public UUID getOrigin() {
-        return origin;
+    public UUID getInstanceId() {
+        return instanceId;
     }
     
-    public void setOrigin(UUID origin) {
-        this.origin = origin;
+    public void setInstanceId(UUID instanceId) {
+        this.instanceId = instanceId;
     }
 }

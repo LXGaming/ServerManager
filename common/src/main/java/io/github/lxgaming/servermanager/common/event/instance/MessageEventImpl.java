@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package io.github.lxgaming.servermanager.common.event.connection;
+package io.github.lxgaming.servermanager.common.event.instance;
 
 import io.github.lxgaming.binary.tag.CompoundTag;
-import io.github.lxgaming.servermanager.api.entity.Instance;
-import io.github.lxgaming.servermanager.api.event.connection.MessageEvent;
+import io.github.lxgaming.servermanager.api.entity.Platform;
+import io.github.lxgaming.servermanager.api.event.instance.MessageEvent;
 import io.github.lxgaming.servermanager.common.event.EventImpl;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class MessageEventImpl extends EventImpl implements MessageEvent {
+import java.util.UUID;
+
+public final class MessageEventImpl extends EventImpl implements MessageEvent {
     
-    private final Instance instance;
+    private final UUID instanceId;
     private final String namespace;
     private final String path;
     private final CompoundTag value;
     private final boolean persistent;
     
-    public MessageEventImpl(Instance instance, String namespace, String path, CompoundTag value, boolean persistent) {
-        this.instance = instance;
+    public MessageEventImpl(@NonNull Platform platform, @NonNull UUID instanceId, @NonNull String namespace, @NonNull String path, @NonNull CompoundTag value, boolean persistent) {
+        super(platform);
+        this.instanceId = instanceId;
         this.namespace = namespace;
         this.path = path;
         this.value = value;
@@ -38,22 +42,22 @@ public class MessageEventImpl extends EventImpl implements MessageEvent {
     }
     
     @Override
-    public Instance getInstance() {
-        return instance;
+    public @NonNull UUID getInstanceId() {
+        return instanceId;
     }
     
     @Override
-    public String getNamespace() {
+    public @NonNull String getNamespace() {
         return namespace;
     }
     
     @Override
-    public String getPath() {
+    public @NonNull String getPath() {
         return path;
     }
     
     @Override
-    public CompoundTag getValue() {
+    public @NonNull CompoundTag getValue() {
         return value;
     }
     

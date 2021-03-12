@@ -16,12 +16,14 @@
 
 package io.github.lxgaming.servermanager.server.entity;
 
+import io.github.lxgaming.servermanager.api.ServerManager;
+import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.common.entity.Connection;
+import io.github.lxgaming.servermanager.common.event.network.ConnectionEventImpl;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
-import io.github.lxgaming.servermanager.server.ServerManagerImpl;
 import io.github.lxgaming.servermanager.server.manager.NetworkManager;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -46,22 +48,24 @@ public class ConnectionImpl extends Connection {
         this.address = (InetSocketAddress) channel.remoteAddress();
         super.channelActive(ctx);
         NetworkManager.CONNECTIONS.add(this);
+        ServerManager.getInstance().getEventManager().fire(new ConnectionEventImpl.Connect(Platform.SERVER, this)).join();
     }
     
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         NetworkManager.CONNECTIONS.remove(this);
+        ServerManager.getInstance().getEventManager().fire(new ConnectionEventImpl.Disconnect(Platform.SERVER, this)).join();
     }
     
     @Override
     public void setSessionHandler(SessionHandler sessionHandler) {
-        ServerManagerImpl.getInstance().getLogger().debug("{} -> {}", this.sessionHandler, sessionHandler);
+        LOGGER.debug("{} -> {}", Toolbox.getClassSimpleName(this.sessionHandler), Toolbox.getClassSimpleName(sessionHandler));
         super.setSessionHandler(sessionHandler);
     }
     
     public void disconnect(String message) {
-        ServerManagerImpl.getInstance().getLogger().info("{} has disconnected: {}", Toolbox.getAddress(getAddress()), message);
+        LOGGER.info("{} has disconnected: {}", Toolbox.getAddress(getAddress()), message);
         closeWith(new DisconnectPacket(message));
     }
     

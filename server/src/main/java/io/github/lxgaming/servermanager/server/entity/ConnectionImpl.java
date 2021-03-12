@@ -48,14 +48,14 @@ public class ConnectionImpl extends Connection {
         this.address = (InetSocketAddress) channel.remoteAddress();
         super.channelActive(ctx);
         NetworkManager.CONNECTIONS.add(this);
-        ServerManager.getInstance().getEventManager().fire(new ConnectionEventImpl.Connect(Platform.SERVER, this)).join();
+        ServerManager.getInstance().getEventManager().fireAndForget(new ConnectionEventImpl.Connect(Platform.SERVER, this));
     }
     
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
         NetworkManager.CONNECTIONS.remove(this);
-        ServerManager.getInstance().getEventManager().fire(new ConnectionEventImpl.Disconnect(Platform.SERVER, this)).join();
+        ServerManager.getInstance().getEventManager().fireAndForget(new ConnectionEventImpl.Disconnect(Platform.SERVER, this));
     }
     
     @Override

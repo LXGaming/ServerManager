@@ -17,16 +17,23 @@
 package io.github.lxgaming.servermanager.common.util;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import io.github.lxgaming.binary.tag.BooleanTag;
 import io.github.lxgaming.binary.tag.ByteArrayTag;
 import io.github.lxgaming.binary.tag.ByteTag;
 import io.github.lxgaming.binary.tag.CompoundTag;
+import io.github.lxgaming.binary.tag.DoubleArrayTag;
 import io.github.lxgaming.binary.tag.DoubleTag;
+import io.github.lxgaming.binary.tag.FloatArrayTag;
 import io.github.lxgaming.binary.tag.FloatTag;
 import io.github.lxgaming.binary.tag.IntArrayTag;
 import io.github.lxgaming.binary.tag.IntTag;
+import io.github.lxgaming.binary.tag.ListTag;
 import io.github.lxgaming.binary.tag.LongArrayTag;
 import io.github.lxgaming.binary.tag.LongTag;
+import io.github.lxgaming.binary.tag.ShortArrayTag;
 import io.github.lxgaming.binary.tag.ShortTag;
 import io.github.lxgaming.binary.tag.StringTag;
 import io.github.lxgaming.binary.tag.Tag;
@@ -79,48 +86,85 @@ public class BinaryUtils {
         JsonObject jsonObject = new JsonObject();
         for (String key : compoundTag.keySet()) {
             Tag tag = compoundTag.get(key);
-            if (tag == null) {
-                // no-op
-            } else if (tag instanceof ByteArrayTag) {
-                JsonArray jsonArray = new JsonArray();
-                for (Byte value : ((ByteArrayTag) tag).getValue()) {
-                    jsonArray.add(value);
-                }
-                
-                jsonObject.add(key, jsonArray);
-            } else if (tag instanceof ByteTag) {
-                jsonObject.addProperty(key, ((ByteTag) tag).getValue());
-            } else if (tag instanceof CompoundTag) {
-                jsonObject.add(key, toJson((CompoundTag) tag));
-            } else if (tag instanceof DoubleTag) {
-                jsonObject.addProperty(key, ((DoubleTag) tag).getValue());
-            } else if (tag instanceof FloatTag) {
-                jsonObject.addProperty(key, ((FloatTag) tag).getValue());
-            } else if (tag instanceof IntArrayTag) {
-                JsonArray jsonArray = new JsonArray();
-                for (Integer value : ((IntArrayTag) tag).getValue()) {
-                    jsonArray.add(value);
-                }
-                
-                jsonObject.add(key, jsonArray);
-            } else if (tag instanceof IntTag) {
-                jsonObject.addProperty(key, ((IntTag) tag).getValue());
-            } else if (tag instanceof LongArrayTag) {
-                JsonArray jsonArray = new JsonArray();
-                for (Long value : ((LongArrayTag) tag).getValue()) {
-                    jsonArray.add(value);
-                }
-                
-                jsonObject.add(key, jsonArray);
-            } else if (tag instanceof LongTag) {
-                jsonObject.addProperty(key, ((LongTag) tag).getValue());
-            } else if (tag instanceof ShortTag) {
-                jsonObject.addProperty(key, ((ShortTag) tag).getValue());
-            } else if (tag instanceof StringTag) {
-                jsonObject.addProperty(key, ((StringTag) tag).getValue());
-            }
+            JsonElement element = toJson(tag);
+            jsonObject.add(key, element);
         }
         
         return jsonObject;
+    }
+    
+    public static JsonElement toJson(Tag tag) {
+        if (tag == null) {
+            return null;
+        } else if (tag instanceof BooleanTag) {
+            return new JsonPrimitive(((BooleanTag) tag).getValue());
+        } else if (tag instanceof ByteArrayTag) {
+            JsonArray jsonArray = new JsonArray();
+            for (Byte value : ((ByteArrayTag) tag).getValue()) {
+                jsonArray.add(value);
+            }
+            
+            return jsonArray;
+        } else if (tag instanceof ByteTag) {
+            return new JsonPrimitive(((ByteTag) tag).getValue());
+        } else if (tag instanceof CompoundTag) {
+            return toJson((CompoundTag) tag);
+        } else if (tag instanceof DoubleArrayTag) {
+            JsonArray jsonArray = new JsonArray();
+            for (Double value : ((DoubleArrayTag) tag).getValue()) {
+                jsonArray.add(value);
+            }
+            
+            return jsonArray;
+        } else if (tag instanceof DoubleTag) {
+            return new JsonPrimitive(((DoubleTag) tag).getValue());
+        } else if (tag instanceof FloatArrayTag) {
+            JsonArray jsonArray = new JsonArray();
+            for (Float value : ((FloatArrayTag) tag).getValue()) {
+                jsonArray.add(value);
+            }
+            
+            return jsonArray;
+        } else if (tag instanceof FloatTag) {
+            return new JsonPrimitive(((FloatTag) tag).getValue());
+        } else if (tag instanceof IntArrayTag) {
+            JsonArray jsonArray = new JsonArray();
+            for (Integer value : ((IntArrayTag) tag).getValue()) {
+                jsonArray.add(value);
+            }
+            
+            return jsonArray;
+        } else if (tag instanceof IntTag) {
+            return new JsonPrimitive(((IntTag) tag).getValue());
+        } else if (tag instanceof ListTag) {
+            JsonArray jsonArray = new JsonArray();
+            for (Tag value : (ListTag) tag) {
+                jsonArray.add(toJson(value));
+            }
+            
+            return jsonArray;
+        } else if (tag instanceof LongArrayTag) {
+            JsonArray jsonArray = new JsonArray();
+            for (Long value : ((LongArrayTag) tag).getValue()) {
+                jsonArray.add(value);
+            }
+            
+            return jsonArray;
+        } else if (tag instanceof LongTag) {
+            return new JsonPrimitive(((LongTag) tag).getValue());
+        } else if (tag instanceof ShortArrayTag) {
+            JsonArray jsonArray = new JsonArray();
+            for (Short value : ((ShortArrayTag) tag).getValue()) {
+                jsonArray.add(value);
+            }
+            
+            return jsonArray;
+        } else if (tag instanceof ShortTag) {
+            return new JsonPrimitive(((ShortTag) tag).getValue());
+        } else if (tag instanceof StringTag) {
+            return new JsonPrimitive(((StringTag) tag).getValue());
+        } else {
+            throw new UnsupportedOperationException(String.format("%s is not supported", tag.getClass().getSimpleName()));
+        }
     }
 }

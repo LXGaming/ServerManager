@@ -24,6 +24,10 @@ dependencies {
     api("org.slf4j:slf4j-api:${slf4jVersion}")
 }
 
+javadoc {
+    exclude("io/github/lxgaming/servermanager/common/network/util/ByteBufUtil.java")
+}
+
 publishing {
     repositories {
         if (project.hasProperty("sonatype.username") && project.hasProperty("sonatype.password")) {

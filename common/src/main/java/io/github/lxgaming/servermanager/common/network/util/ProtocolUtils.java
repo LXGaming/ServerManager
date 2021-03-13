@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import io.github.lxgaming.binary.tag.Tag;
 import io.github.lxgaming.servermanager.common.util.binary.MessagePackSerializerImpl;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;

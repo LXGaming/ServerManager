@@ -46,7 +46,7 @@ public class TerminalConsole extends SimpleTerminalConsole {
      */
     @Override
     public void start() {
-        if (System.console() != null) {
+        if (System.console() != null || System.getProperty("java.class.path").contains("idea_rt.jar")) {
             super.start();
         } else {
             try {

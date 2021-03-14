@@ -20,6 +20,8 @@ import io.github.lxgaming.servermanager.client.Client;
 import io.github.lxgaming.servermanager.client.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.client.configuration.category.NetworkCategoryImpl;
 import io.github.lxgaming.servermanager.common.ServerManagerImpl;
+import io.github.lxgaming.servermanager.common.entity.Connection;
+import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.task.Task;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.netty.bootstrap.Bootstrap;
@@ -62,9 +64,12 @@ public class ReconnectTask extends Task {
             if (future.isSuccess()) {
                 delay(0L, TimeUnit.MILLISECONDS);
                 future.channel().closeFuture().addListener((ChannelFuture closeFuture) -> {
-                    if (!closeFuture.isSuccess()) {
-                        ServerManagerImpl.getInstance().getTaskManager().schedule(this);
+                    Connection connection = Client.getInstance().getConnection();
+                    if (closeFuture.isSuccess() && (connection == null || connection.getState() != StateRegistry.INSTANCE)) {
+                        return;
                     }
+                    
+                    ServerManagerImpl.getInstance().getTaskManager().schedule(this);
                 });
             } else {
                 delay(Math.min(getDelay() << 1, maximumReconnectDelay), TimeUnit.MILLISECONDS);

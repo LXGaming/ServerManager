@@ -43,7 +43,7 @@ import java.util.Map;
 public class BinaryUtils {
     
     public static CompoundTag getCompoundTag(CompoundTag compoundTag, String path) {
-        return getCompoundTag(compoundTag, StringUtils.split(path, '.'));
+        return getCompoundTag(compoundTag, split(path));
     }
     
     public static CompoundTag getCompoundTag(CompoundTag compoundTag, String... keys) {
@@ -70,8 +70,17 @@ public class BinaryUtils {
         return (CompoundTag) tag;
     }
     
+    public static String[] split(String path) {
+        return StringUtils.split(path, '.');
+    }
+    
     public static void mergeCompoundTags(CompoundTag fromCompound, String fromPath, CompoundTag toCompound, String toPath) {
         CompoundTag from = getCompoundTag(fromCompound, fromPath);
+        if (from.isEmpty()) {
+            removeCompoundTag(toCompound, toPath);
+            return;
+        }
+        
         CompoundTag to = getCompoundTag(toCompound, toPath);
         mergeCompoundTags(from, to);
     }
@@ -79,6 +88,32 @@ public class BinaryUtils {
     public static void mergeCompoundTags(CompoundTag from, CompoundTag to) {
         for (Map.Entry<String, Tag> entry : from.entrySet()) {
             to.put(entry.getKey(), entry.getValue().copy());
+        }
+    }
+    
+    public static void removeCompoundTag(CompoundTag compoundTag, String path) {
+        removeCompoundTag(compoundTag, split(path));
+    }
+    
+    public static void removeCompoundTag(CompoundTag compoundTag, String... keys) {
+        CompoundTag parentCompoundTag = compoundTag;
+        for (int index = 0; index < keys.length; index++) {
+            String key = keys[index];
+            if (StringUtils.isBlank(key)) {
+                continue;
+            }
+            
+            if (index == keys.length - 1) {
+                parentCompoundTag.remove(key);
+                return;
+            }
+            
+            CompoundTag childCompoundTag = (CompoundTag) parentCompoundTag.get(key);
+            if (childCompoundTag == null) {
+                return;
+            }
+            
+            parentCompoundTag = childCompoundTag;
         }
     }
     

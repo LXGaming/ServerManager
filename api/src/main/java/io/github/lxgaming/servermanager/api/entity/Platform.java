@@ -17,7 +17,6 @@
 package io.github.lxgaming.servermanager.api.entity;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public enum Platform {
     
@@ -34,14 +33,14 @@ public enum Platform {
         this.name = name;
     }
     
-    public static @Nullable Platform getPlatform(int platformId) {
+    public static @NonNull Platform getPlatform(int platformId) {
         for (Platform platform : VALUES) {
             if (platform.getId() == platformId) {
                 return platform;
             }
         }
         
-        return null;
+        return UNKNOWN;
     }
     
     public int getId() {

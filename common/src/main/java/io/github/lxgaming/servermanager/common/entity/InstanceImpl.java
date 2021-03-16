@@ -17,8 +17,11 @@
 package io.github.lxgaming.servermanager.common.entity;
 
 import io.github.lxgaming.binary.tag.CompoundTag;
+import io.github.lxgaming.servermanager.api.ServerManager;
+import io.github.lxgaming.servermanager.api.entity.Health;
 import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.api.entity.Platform;
+import io.github.lxgaming.servermanager.api.entity.State;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Objects;
@@ -30,16 +33,18 @@ public class InstanceImpl implements Instance {
     private final String name;
     private final Platform platform;
     private final CompoundTag data;
+    private State state;
     
     public InstanceImpl(@NonNull UUID id, @NonNull String name, @NonNull Platform platform) {
-        this(id, name, platform, new CompoundTag());
+        this(id, name, platform, new CompoundTag(), State.UNKNOWN);
     }
     
-    public InstanceImpl(@NonNull UUID id, @NonNull String name, @NonNull Platform platform, @NonNull CompoundTag data) {
+    public InstanceImpl(@NonNull UUID id, @NonNull String name, @NonNull Platform platform, @NonNull CompoundTag data, @NonNull State state) {
         this.id = id;
         this.name = name;
         this.platform = platform;
         this.data = data;
+        this.state = state;
     }
     
     @Override
@@ -60,6 +65,22 @@ public class InstanceImpl implements Instance {
     @Override
     public @NonNull CompoundTag getData() {
         return data;
+    }
+    
+    @Override
+    public @NonNull Health getHealth() {
+        CompoundTag compound = (CompoundTag) getData().get(ServerManager.ID);
+        int healthId = compound != null ? compound.getInt("health") : 0;
+        return Health.getHealth(healthId);
+    }
+    
+    @Override
+    public @NonNull State getState() {
+        return state;
+    }
+    
+    public void setState(@NonNull State state) {
+        this.state = state;
     }
     
     @Override

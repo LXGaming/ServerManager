@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import io.github.lxgaming.binary.tag.CompoundTag;
 import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.api.entity.Platform;
+import io.github.lxgaming.servermanager.api.entity.State;
 import io.github.lxgaming.servermanager.common.entity.InstanceImpl;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
@@ -98,13 +99,16 @@ public abstract class ListPacket implements Packet {
             UUID id = ProtocolUtils.readUUID(byteBuf);
             String name = ProtocolUtils.readString(byteBuf);
             CompoundTag data = (CompoundTag) ProtocolUtils.readTag(byteBuf);
-            return new InstanceImpl(id, name, platform, data);
+            int stateId = ProtocolUtils.readVarInt(byteBuf);
+            State state = State.getState(stateId);
+            return new InstanceImpl(id, name, platform, data, state);
         }
         
         private void encodeInstance(ByteBuf byteBuf, Instance instance) {
             ProtocolUtils.writeUUID(byteBuf, instance.getId());
             ProtocolUtils.writeString(byteBuf, instance.getName());
             ProtocolUtils.writeTag(byteBuf, instance.getData());
+            ProtocolUtils.writeVarInt(byteBuf, instance.getState().getId());
         }
         
         public Instance getInstance() {

@@ -30,4 +30,8 @@ public interface Instance {
     @NonNull Platform getPlatform();
     
     @NonNull CompoundTag getData();
+    
+    @NonNull Health getHealth();
+    
+    @NonNull State getState();
 }

@@ -9,7 +9,7 @@ archivesBaseName = "servermanager-server"
 
 configurations {
     shadow {
-        runtime.extendsFrom(shadow)
+        runtimeOnly.extendsFrom(shadow)
     }
 
     build.dependsOn("signJar")

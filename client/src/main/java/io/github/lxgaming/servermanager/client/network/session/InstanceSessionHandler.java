@@ -21,12 +21,14 @@ import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.client.Client;
 import io.github.lxgaming.servermanager.client.entity.ConnectionImpl;
+import io.github.lxgaming.servermanager.common.event.instance.CommandEventImpl;
 import io.github.lxgaming.servermanager.common.event.instance.ForwardEvent;
 import io.github.lxgaming.servermanager.common.event.instance.ListEventImpl;
 import io.github.lxgaming.servermanager.common.event.instance.MessageEventImpl;
 import io.github.lxgaming.servermanager.common.event.network.ConnectionEventImpl;
 import io.github.lxgaming.servermanager.common.network.SessionHandler;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
+import io.github.lxgaming.servermanager.common.network.packet.CommandPacket;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
 import io.github.lxgaming.servermanager.common.network.packet.ForwardPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HeartbeatPacket;
@@ -45,6 +47,12 @@ public class InstanceSessionHandler implements SessionHandler {
     public void activated() {
         connection.setState(StateRegistry.INSTANCE);
         ServerManager.getInstance().getEventManager().fireAndForget(new ConnectionEventImpl.Instance(Platform.CLIENT, connection));
+    }
+    
+    @Override
+    public boolean handle(CommandPacket packet) {
+        ServerManager.getInstance().getEventManager().fireAndForget(new CommandEventImpl(Platform.CLIENT, packet.getInstanceId(), packet.getCommand(), packet.getUsername()));
+        return true;
     }
     
     @Override

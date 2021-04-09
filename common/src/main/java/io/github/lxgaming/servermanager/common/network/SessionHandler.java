@@ -16,6 +16,7 @@
 
 package io.github.lxgaming.servermanager.common.network;
 
+import io.github.lxgaming.servermanager.common.network.packet.CommandPacket;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
 import io.github.lxgaming.servermanager.common.network.packet.ForwardPacket;
 import io.github.lxgaming.servermanager.common.network.packet.HandshakePacket;
@@ -46,6 +47,10 @@ public interface SessionHandler {
     }
     
     default boolean beforeHandle() {
+        return false;
+    }
+    
+    default boolean handle(CommandPacket packet) {
         return false;
     }
     

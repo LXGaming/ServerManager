@@ -37,19 +37,18 @@ public final class ShutdownHook extends Thread {
             Server.getInstance().getState().notifyAll();
         }
         
+        long timeout = Server.getInstance().getConfig()
+                .map(ConfigImpl::getGeneralCategory)
+                .map(GeneralCategory::getShutdownTimeout)
+                .orElse(GeneralCategory.DEFAULT_SHUTDOWN_TIMEOUT);
+        
         if (ServerManagerImpl.isAvailable()) {
             ServerManagerImpl.getInstance().getEventManager().fire(new LifecycleEventImpl.Shutdown(Platform.SERVER)).join();
-            
-            long timeout = Server.getInstance().getConfig()
-                    .map(ConfigImpl::getGeneralCategory)
-                    .map(GeneralCategory::getShutdownTimeout)
-                    .orElse(GeneralCategory.DEFAULT_SHUTDOWN_TIMEOUT);
-            
             ServerManagerImpl.getInstance().shutdown(timeout, TimeUnit.MILLISECONDS);
         }
         
         IntegrationManager.shutdown();
-        NetworkManager.shutdown();
+        NetworkManager.shutdown(timeout, TimeUnit.MILLISECONDS);
         LogManager.shutdown();
     }
 }

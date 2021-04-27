@@ -29,6 +29,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.util.internal.SystemPropertyUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,14 +103,17 @@ public final class NetworkManager {
         }
     }
     
-    public static void shutdown() {
+    public static void shutdown(long timeout, @NonNull TimeUnit unit) {
         try {
-            LOGGER.info("Closing endpoint {}", Toolbox.getAddress(channel.localAddress()));
-            channel.close().sync();
-            network.shutdown(5L, TimeUnit.SECONDS);
-            LOGGER.info("Successfully terminated Netty, continuing with shutdown process...");
+            if (channel != null) {
+                LOGGER.info("Closing endpoint {}", Toolbox.getAddress(channel.localAddress()));
+                channel.close().sync();
+            }
+            
+            network.shutdown(timeout, unit);
+            LOGGER.info("Successfully terminated network, continuing with shutdown process...");
         } catch (Exception ex) {
-            LOGGER.error("Failed to terminate Netty, continuing with shutdown process...");
+            LOGGER.error("Failed to terminate network, continuing with shutdown process...");
         }
     }
 }

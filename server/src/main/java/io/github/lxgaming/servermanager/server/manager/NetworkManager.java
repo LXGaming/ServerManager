@@ -36,6 +36,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.internal.SystemPropertyUtil;
 import org.apache.commons.lang3.ArrayUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,15 +105,18 @@ public final class NetworkManager {
         });
     }
     
-    public static void shutdown() {
+    public static void shutdown(long timeout, @NonNull TimeUnit unit) {
         try {
-            LOGGER.info("Closing endpoint {}", Toolbox.getAddress(channel.localAddress()));
-            channel.close().sync();
             for (Connection connection : CONNECTIONS) {
                 connection.closeWith(new DisconnectPacket("Proxy shutting down."));
             }
             
-            network.shutdown(5L, TimeUnit.SECONDS);
+            if (channel != null) {
+                LOGGER.info("Closing endpoint {}", Toolbox.getAddress(channel.localAddress()));
+                channel.close().sync();
+            }
+            
+            network.shutdown(timeout, unit);
             LOGGER.info("Successfully terminated network, continuing with shutdown process...");
         } catch (Exception ex) {
             LOGGER.error("Failed to terminate network, continuing with shutdown process...");

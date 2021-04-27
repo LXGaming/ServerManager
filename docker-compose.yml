@@ -2,10 +2,11 @@ version: "3.9"
 services:
   server:
     build: .
+    image: "servermanager:server"
     command: ["java", "-jar", "server.jar"]
     container_name: "server"
     networks:
-      network:
+      default:
         ipv4_address: "192.168.76.2"
     ports:
       - "5976:5976/tcp"
@@ -13,7 +14,8 @@ services:
       - "./run/server/client.json:/app/client.json"
       - "./run/server/server.json:/app/server.json"
 networks:
-  network:
+  default:
+    name: "servermanager"
     ipam:
       driver: "default"
       config:

@@ -16,7 +16,6 @@
 
 package io.github.lxgaming.servermanager.server.util;
 
-import io.github.lxgaming.servermanager.api.ServerManager;
 import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.common.ServerManagerImpl;
 import io.github.lxgaming.servermanager.common.configuration.category.GeneralCategory;
@@ -34,13 +33,13 @@ public final class ShutdownHook extends Thread {
     @Override
     public void run() {
         Thread.currentThread().setName("Shutdown Thread");
-        ServerManager.getInstance().getEventManager().fire(new LifecycleEventImpl.Shutdown(Platform.SERVER)).join();
-        
         synchronized (Server.getInstance().getState()) {
             Server.getInstance().getState().notifyAll();
         }
         
         if (ServerManagerImpl.isAvailable()) {
+            ServerManagerImpl.getInstance().getEventManager().fire(new LifecycleEventImpl.Shutdown(Platform.SERVER)).join();
+            
             long timeout = Server.getInstance().getConfig()
                     .map(ConfigImpl::getGeneralCategory)
                     .map(GeneralCategory::getShutdownTimeout)

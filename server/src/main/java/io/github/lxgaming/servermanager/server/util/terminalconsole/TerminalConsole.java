@@ -46,14 +46,12 @@ public class TerminalConsole extends SimpleTerminalConsole {
      */
     @Override
     public void start() {
-        if (System.console() != null || System.getProperty("java.class.path").contains("idea_rt.jar")) {
-            super.start();
-        } else {
-            try {
-                Server.getInstance().awaitState(0L, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException ex) {
-                // no-op
-            }
+        super.start();
+        
+        try {
+            Server.getInstance().awaitState(0L, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException ex) {
+            // no-op
         }
         
         try {

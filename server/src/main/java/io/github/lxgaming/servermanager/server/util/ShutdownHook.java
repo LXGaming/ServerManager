@@ -32,7 +32,7 @@ public final class ShutdownHook extends Thread {
     
     @Override
     public void run() {
-        Thread.currentThread().setName("Shutdown Thread");
+        Thread.currentThread().setName("Server Shutdown Thread");
         synchronized (Server.getInstance().getState()) {
             Server.getInstance().getState().notifyAll();
         }

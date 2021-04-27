@@ -30,7 +30,7 @@ public final class ShutdownHook extends Thread {
     
     @Override
     public void run() {
-        Thread.currentThread().setName("Shutdown Thread");
+        Thread.currentThread().setName("Client Shutdown Thread");
         if (ServerManagerImpl.isAvailable()) {
             ServerManagerImpl.getInstance().getEventManager().fire(new LifecycleEventImpl.Shutdown(Platform.CLIENT)).join();
             

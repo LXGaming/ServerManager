@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class GeneralCategory {
     
-    public static final long DEFAULT_SHUTDOWN_TIMEOUT = 15000L; // 15 Seconds
+    public static final long DEFAULT_SHUTDOWN_TIMEOUT = 5000L; // 5 Seconds
     
     @SerializedName("debug")
     private boolean debug = false;

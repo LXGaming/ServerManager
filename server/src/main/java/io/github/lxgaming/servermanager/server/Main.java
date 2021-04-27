@@ -36,8 +36,6 @@ public class Main {
         
         server.execute();
         
-        Server.getInstance().getState().set(true);
         new TerminalConsole().start();
-        Server.getInstance().getState().set(false);
     }
 }

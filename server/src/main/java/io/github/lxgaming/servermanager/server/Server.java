@@ -46,15 +46,15 @@ public final class Server {
     private static Server instance;
     private final Logger logger;
     private final ConfigurationImpl configuration;
-    private final Instant startTime;
     private final AtomicBoolean state;
+    private final Instant startTime;
     
     public Server(@NonNull Path path) {
         instance = this;
         this.logger = LoggerFactory.getLogger(Server.class);
         this.configuration = new ConfigurationImpl(path);
-        this.startTime = Instant.now();
         this.state = new AtomicBoolean(false);
+        this.startTime = Instant.now();
     }
     
     public boolean prepare() {
@@ -75,6 +75,7 @@ public final class Server {
         ServerManager.getInstance().getEventManager().fire(new LifecycleEventImpl.Initialize(Platform.SERVER)).join();
         
         getConfiguration().saveConfiguration();
+        getState().set(true);
         return true;
     }
     
@@ -123,11 +124,11 @@ public final class Server {
         return Optional.ofNullable(getConfiguration().getConfig());
     }
     
-    public @NonNull Instant getStartTime() {
-        return startTime;
-    }
-    
     public @NonNull AtomicBoolean getState() {
         return state;
+    }
+    
+    public @NonNull Instant getStartTime() {
+        return startTime;
     }
 }

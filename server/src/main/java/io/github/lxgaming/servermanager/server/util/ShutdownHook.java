@@ -33,6 +33,7 @@ public final class ShutdownHook extends Thread {
     @Override
     public void run() {
         Thread.currentThread().setName("Server Shutdown Thread");
+        Server.getInstance().getState().set(false);
         synchronized (Server.getInstance().getState()) {
             Server.getInstance().getState().notifyAll();
         }
@@ -42,13 +43,14 @@ public final class ShutdownHook extends Thread {
                 .map(GeneralCategory::getShutdownTimeout)
                 .orElse(GeneralCategory.DEFAULT_SHUTDOWN_TIMEOUT);
         
+        NetworkManager.shutdown(timeout, TimeUnit.MILLISECONDS);
+        IntegrationManager.shutdown();
+        
         if (ServerManagerImpl.isAvailable()) {
             ServerManagerImpl.getInstance().getEventManager().fire(new LifecycleEventImpl.Shutdown(Platform.SERVER)).join();
             ServerManagerImpl.getInstance().shutdown(timeout, TimeUnit.MILLISECONDS);
         }
         
-        IntegrationManager.shutdown();
-        NetworkManager.shutdown(timeout, TimeUnit.MILLISECONDS);
         LogManager.shutdown();
     }
 }

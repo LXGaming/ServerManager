@@ -49,7 +49,6 @@ public final class ServerManagerImpl extends ServerManager {
     }
     
     public void shutdown(long timeout, @NonNull TimeUnit unit) {
-        getLogger().info("Shutting down...");
         getEventManager().shutdown(timeout, unit);
         getTaskManager().shutdown(timeout, unit);
         super.shutdown();

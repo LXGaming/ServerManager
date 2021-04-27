@@ -58,12 +58,20 @@ public class ReconnectTask extends Task {
             delay(2000L, TimeUnit.MILLISECONDS);
         }
         
+        if (!Client.getInstance().getState().get()) {
+            return;
+        }
+        
         ChannelFuture channelFuture = bootstrap.connect();
         channelFuture.addListener(listener);
         channelFuture.addListener((ChannelFuture future) -> {
             if (future.isSuccess()) {
                 delay(0L, TimeUnit.MILLISECONDS);
                 future.channel().closeFuture().addListener((ChannelFuture closeFuture) -> {
+                    if (!Client.getInstance().getState().get()) {
+                        return;
+                    }
+                    
                     Connection connection = Client.getInstance().getConnection();
                     if (closeFuture.isSuccess() && (connection == null || connection.getState() != StateRegistry.INSTANCE)) {
                         return;

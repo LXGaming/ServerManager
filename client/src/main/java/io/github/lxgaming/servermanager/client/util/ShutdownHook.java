@@ -31,16 +31,21 @@ public final class ShutdownHook extends Thread {
     @Override
     public void run() {
         Thread.currentThread().setName("Client Shutdown Thread");
+        Client.getInstance().getState().set(false);
+        synchronized (Client.getInstance().getState()) {
+            Client.getInstance().getState().notifyAll();
+        }
+        
         long timeout = Client.getInstance().getConfig()
                 .map(ConfigImpl::getGeneralCategory)
                 .map(GeneralCategory::getShutdownTimeout)
                 .orElse(GeneralCategory.DEFAULT_SHUTDOWN_TIMEOUT);
         
+        NetworkManager.shutdown(timeout, TimeUnit.MILLISECONDS);
+        
         if (ServerManagerImpl.isAvailable()) {
             ServerManagerImpl.getInstance().getEventManager().fire(new LifecycleEventImpl.Shutdown(Platform.CLIENT)).join();
             ServerManagerImpl.getInstance().shutdown(timeout, TimeUnit.MILLISECONDS);
         }
-        
-        NetworkManager.shutdown(timeout, TimeUnit.MILLISECONDS);
     }
 }

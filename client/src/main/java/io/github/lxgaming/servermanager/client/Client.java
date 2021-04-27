@@ -31,18 +31,21 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class Client {
     
     private static Client instance;
     private final Logger logger;
     private final ConfigurationImpl configuration;
+    private final AtomicBoolean state;
     private Connection connection;
     
     public Client(@NonNull Path path) {
         instance = this;
         this.logger = LoggerFactory.getLogger(Client.class);
         this.configuration = new ConfigurationImpl(path);
+        this.state = new AtomicBoolean(false);
     }
     
     public boolean prepare() {
@@ -57,6 +60,7 @@ public final class Client {
         ServerManager.getInstance().getEventManager().fire(new LifecycleEventImpl.Initialize(Platform.CLIENT)).join();
         
         getConfiguration().saveConfiguration();
+        getState().set(true);
         return true;
     }
     
@@ -78,6 +82,10 @@ public final class Client {
     
     public @NonNull Optional<ConfigImpl> getConfig() {
         return Optional.ofNullable(getConfiguration().getConfig());
+    }
+    
+    public @NonNull AtomicBoolean getState() {
+        return state;
     }
     
     public @Nullable Connection getConnection() {

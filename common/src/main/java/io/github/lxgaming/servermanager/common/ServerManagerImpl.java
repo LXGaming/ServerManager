@@ -39,14 +39,13 @@ public final class ServerManagerImpl extends ServerManager {
         this.taskManager = new TaskManager();
     }
     
-    public static synchronized boolean init() {
+    public static synchronized void init() {
         if (ServerManager.isAvailable()) {
-            return false;
+            return;
         }
         
         ServerManagerImpl serverManager = new ServerManagerImpl();
         serverManager.getLogger().info("{} v{} initialized", ServerManager.NAME, ServerManager.VERSION);
-        return true;
     }
     
     public void shutdown(long timeout, @NonNull TimeUnit unit) {

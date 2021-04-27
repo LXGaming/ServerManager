@@ -16,10 +16,8 @@
 
 package io.github.lxgaming.servermanager.common.event.instance;
 
-import io.github.lxgaming.binary.tag.CompoundTag;
 import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.api.event.instance.CommandEvent;
-import io.github.lxgaming.servermanager.api.event.instance.MessageEvent;
 import io.github.lxgaming.servermanager.common.event.EventImpl;
 import org.checkerframework.checker.nullness.qual.NonNull;
 

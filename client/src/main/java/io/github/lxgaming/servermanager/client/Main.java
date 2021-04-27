@@ -23,7 +23,10 @@ public class Main {
     
     public static void main(String[] args) {
         Thread.currentThread().setName("Main Thread");
-        System.setProperty("servermanager.logging.console.level", "DEBUG");
+        if (System.getProperty("servermanager.logging.console.level") == null) {
+            System.setProperty("servermanager.logging.console.level", "DEBUG");
+        }
+        
         ServerManagerImpl.init();
         Client client = new Client(Toolbox.getPath());
         if (!client.prepare()) {

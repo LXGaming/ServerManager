@@ -22,6 +22,7 @@ import io.github.lxgaming.servermanager.common.util.StringUtils;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.github.lxgaming.servermanager.server.command.Command;
 import io.github.lxgaming.servermanager.server.command.InformationCommand;
+import io.github.lxgaming.servermanager.server.command.ListCommand;
 import io.github.lxgaming.servermanager.server.command.ShutdownCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public final class CommandManager {
     
     public static void prepare() {
         registerCommand(InformationCommand.class);
+        registerCommand(ListCommand.class);
         registerCommand(ShutdownCommand.class);
     }
     

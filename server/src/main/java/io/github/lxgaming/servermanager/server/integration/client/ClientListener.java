@@ -21,12 +21,32 @@ import io.github.lxgaming.servermanager.api.event.lifecycle.LifecycleEvent;
 import io.github.lxgaming.servermanager.client.Client;
 import io.github.lxgaming.servermanager.client.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.client.configuration.category.GeneralCategoryImpl;
+import io.github.lxgaming.servermanager.common.event.network.ConnectionEventImpl;
+import io.github.lxgaming.servermanager.server.manager.NetworkManager;
 import net.kyori.event.method.annotation.Subscribe;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class ClientListener {
+    
+    @Subscribe
+    public void onConnect(ConnectionEventImpl.Connect event) {
+        if (event.getPlatform() != Platform.CLIENT) {
+            return;
+        }
+        
+        NetworkManager.CONNECTIONS.add(event.getConnection());
+    }
+    
+    @Subscribe
+    public void onDisconnect(ConnectionEventImpl.Disconnect event) {
+        if (event.getPlatform() != Platform.CLIENT) {
+            return;
+        }
+        
+        NetworkManager.CONNECTIONS.remove(event.getConnection());
+    }
     
     @Subscribe
     public void onInitialize(LifecycleEvent.Initialize event) {

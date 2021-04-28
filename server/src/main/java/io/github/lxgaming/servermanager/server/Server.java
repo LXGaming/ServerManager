@@ -24,7 +24,6 @@ import io.github.lxgaming.servermanager.common.event.lifecycle.LifecycleEventImp
 import io.github.lxgaming.servermanager.server.configuration.ConfigImpl;
 import io.github.lxgaming.servermanager.server.configuration.ConfigurationImpl;
 import io.github.lxgaming.servermanager.server.listener.InstanceListener;
-import io.github.lxgaming.servermanager.server.listener.NetworkListener;
 import io.github.lxgaming.servermanager.server.manager.CommandManager;
 import io.github.lxgaming.servermanager.server.manager.IntegrationManager;
 import io.github.lxgaming.servermanager.server.manager.NetworkManager;
@@ -71,7 +70,6 @@ public final class Server {
         NetworkManager.prepare();
         
         ServerManager.getInstance().getEventManager().register(new InstanceListener());
-        ServerManager.getInstance().getEventManager().register(new NetworkListener());
         ServerManager.getInstance().getEventManager().fire(new LifecycleEventImpl.Initialize(Platform.SERVER)).join();
         
         getConfiguration().saveConfiguration();

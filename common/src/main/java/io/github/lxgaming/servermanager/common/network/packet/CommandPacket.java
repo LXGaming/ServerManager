@@ -40,7 +40,6 @@ public class CommandPacket implements Packet {
         this.instanceId = instanceId;
         this.command = command;
         this.username = username;
-        
     }
     
     @Override

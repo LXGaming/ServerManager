@@ -39,10 +39,6 @@ public class ForwardPacket implements Packet {
     public ForwardPacket() {
     }
     
-    public ForwardPacket(UUID instanceId, Direction direction, Packet packet) {
-        this(Lists.newArrayList(instanceId), direction, packet);
-    }
-    
     public ForwardPacket(List<UUID> instanceIds, Direction direction, Packet packet) {
         this.instanceIds = instanceIds;
         this.direction = direction;
@@ -66,6 +62,7 @@ public class ForwardPacket implements Packet {
         Preconditions.checkNotNull(direction, "direction");
         Preconditions.checkNotNull(packet, "packet");
         Preconditions.checkState(instanceIds.size() <= ARRAY_LENGTH, "InstanceIds exceeds maximum length");
+        Preconditions.checkState(!(packet instanceof ForwardPacket), "Packet cannot be a ForwardPacket");
         UUID[] array = instanceIds.toArray(new UUID[0]);
         int packetId = StateRegistry.INSTANCE.getPacketId(direction, packet.getClass());
         ProtocolUtils.writeUUIDArray(byteBuf, array);

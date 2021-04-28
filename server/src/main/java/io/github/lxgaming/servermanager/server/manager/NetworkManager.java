@@ -17,16 +17,19 @@
 package io.github.lxgaming.servermanager.server.manager;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import io.github.lxgaming.servermanager.api.entity.Instance;
 import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.common.ServerManagerImpl;
 import io.github.lxgaming.servermanager.common.configuration.Config;
 import io.github.lxgaming.servermanager.common.configuration.category.NetworkCategory;
 import io.github.lxgaming.servermanager.common.entity.Connection;
+import io.github.lxgaming.servermanager.common.network.Direction;
 import io.github.lxgaming.servermanager.common.network.Network;
 import io.github.lxgaming.servermanager.common.network.Packet;
 import io.github.lxgaming.servermanager.common.network.StateRegistry;
 import io.github.lxgaming.servermanager.common.network.packet.DisconnectPacket;
+import io.github.lxgaming.servermanager.common.network.packet.ForwardPacket;
 import io.github.lxgaming.servermanager.common.util.Toolbox;
 import io.github.lxgaming.servermanager.server.Server;
 import io.github.lxgaming.servermanager.server.network.netty.ServerChannelInitializer;
@@ -35,7 +38,6 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.internal.SystemPropertyUtil;
-import org.apache.commons.lang3.ArrayUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -123,13 +124,33 @@ public final class NetworkManager {
         }
     }
     
-    public static void forward(Platform platform, Packet packet, UUID... excludedIds) {
+    public static void forward(Direction direction, Packet packet, UUID... excludedIds) {
+        forward(direction, packet, Lists.newArrayList(excludedIds));
+    }
+    
+    public static void forward(Direction direction, Packet packet, List<UUID> excludedIds) {
+        write(Platform.SERVER, new ForwardPacket(excludedIds, direction, packet), excludedIds);
+    }
+    
+    public static void forward(UUID id, Direction direction, Packet packet, UUID... excludedIds) {
+        forward(id, direction, packet, Lists.newArrayList(excludedIds));
+    }
+    
+    public static void forward(UUID id, Direction direction, Packet packet, List<UUID> excludedIds) {
+        write(id, new ForwardPacket(excludedIds, direction, packet));
+    }
+    
+    public static void write(Packet packet, UUID... excludedIds) {
+        write(packet, Lists.newArrayList(excludedIds));
+    }
+    
+    public static void write(Packet packet, List<UUID> excludedIds) {
+        write(Platform.CLIENT, packet, excludedIds);
+    }
+    
+    private static void write(Platform platform, Packet packet, List<UUID> excludedIds) {
         for (Connection connection : CONNECTIONS) {
-            if (connection.isClosed() || connection.getState() != StateRegistry.INSTANCE) {
-                continue;
-            }
-            
-            if (connection.getInstance() == null || ArrayUtils.contains(excludedIds, connection.getInstance().getId())) {
+            if (!connection.isState(StateRegistry.INSTANCE) || connection.getInstance() == null || excludedIds.contains(connection.getInstance().getId())) {
                 continue;
             }
             
@@ -139,7 +160,7 @@ public final class NetworkManager {
         }
     }
     
-    public static void forward(UUID id, Packet packet) {
+    public static void write(UUID id, Packet packet) {
         Connection connection = getConnection(id);
         if (connection != null) {
             connection.write(packet);
@@ -148,11 +169,7 @@ public final class NetworkManager {
     
     public static Connection getConnection(UUID id) {
         for (Connection connection : CONNECTIONS) {
-            if (connection.isClosed() || connection.getState() != StateRegistry.INSTANCE) {
-                continue;
-            }
-            
-            if (connection.getInstance().getId().equals(id)) {
+            if (connection.isState(StateRegistry.INSTANCE) && connection.getInstance().getId().equals(id)) {
                 return connection;
             }
         }
@@ -170,13 +187,11 @@ public final class NetworkManager {
     }
     
     public static Collection<Instance> getInstances() {
-        Set<Instance> instances = new HashSet<>();
+        Set<Instance> instances = Sets.newHashSet();
         for (Connection connection : CONNECTIONS) {
-            if (connection.isClosed() || connection.getState() != StateRegistry.INSTANCE) {
-                continue;
+            if (connection.isState(StateRegistry.INSTANCE)) {
+                instances.add(connection.getInstance());
             }
-            
-            instances.add(connection.getInstance());
         }
         
         return instances;

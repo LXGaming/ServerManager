@@ -57,8 +57,8 @@ public class InstanceSessionHandler implements SessionHandler {
     
     @Override
     public boolean handle(CommandPacket packet) {
-        NetworkManager.forward(Platform.CLIENT, packet, connection.getInstance().getId());
-        NetworkManager.forward(Platform.SERVER, packet, connection.getInstance().getId());
+        NetworkManager.write(packet, connection.getInstance().getId());
+        NetworkManager.forward(Direction.SERVERBOUND, packet, connection.getInstance().getId());
         ServerManager.getInstance().getEventManager().fireAndForget(new CommandEventImpl(Platform.SERVER, packet.getInstanceId(), packet.getCommand(), packet.getUsername()));
         return true;
     }
@@ -95,7 +95,7 @@ public class InstanceSessionHandler implements SessionHandler {
     @Override
     public boolean handle(ListPacket.Request packet) {
         connection.write(PacketUtils.createListResponse());
-        NetworkManager.forward(Platform.SERVER, new ForwardPacket(connection.getInstance().getId(), Direction.SERVERBOUND, packet), connection.getInstance().getId());
+        NetworkManager.forward(Direction.SERVERBOUND, packet, connection.getInstance().getId());
         return true;
     }
     

@@ -208,6 +208,14 @@ public class Connection extends ChannelInboundHandlerAdapter {
         return false;
     }
     
+    public boolean isState(StateRegistry state) {
+        if (isClosed()) {
+            return false;
+        }
+        
+        return this.state == state;
+    }
+    
     public Channel getChannel() {
         return channel;
     }

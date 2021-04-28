@@ -16,11 +16,9 @@
 
 package io.github.lxgaming.servermanager.server.listener;
 
-import io.github.lxgaming.servermanager.api.entity.Platform;
 import io.github.lxgaming.servermanager.common.ServerManagerImpl;
 import io.github.lxgaming.servermanager.common.event.instance.ForwardEvent;
 import io.github.lxgaming.servermanager.common.network.Direction;
-import io.github.lxgaming.servermanager.common.network.packet.ForwardPacket;
 import io.github.lxgaming.servermanager.common.network.packet.ListPacket;
 import io.github.lxgaming.servermanager.common.util.StringUtils;
 import io.github.lxgaming.servermanager.server.manager.NetworkManager;
@@ -40,9 +38,9 @@ public class InstanceListener {
             
             UUID instanceId = event.getInstanceIds().remove(event.getInstanceIds().size() - 1);
             if (event.getInstanceIds().isEmpty()) {
-                NetworkManager.forward(instanceId, event.getPacket());
+                NetworkManager.write(instanceId, event.getPacket());
             } else {
-                NetworkManager.forward(instanceId, new ForwardPacket(event.getInstanceIds(), event.getDirection(), event.getPacket()));
+                NetworkManager.forward(instanceId, event.getDirection(), event.getPacket(), event.getInstanceIds());
             }
             
             return;
@@ -55,11 +53,11 @@ public class InstanceListener {
             }
             
             if (event.getPacket() instanceof ListPacket.Request) {
-                NetworkManager.forward(event.getInstanceId(), new ForwardPacket(event.getInstanceIds(), Direction.CLIENTBOUND, PacketUtils.createListResponse()));
+                NetworkManager.forward(event.getInstanceId(), Direction.CLIENTBOUND, PacketUtils.createListResponse(), event.getInstanceIds());
             }
             
             event.getInstanceIds().add(event.getInstanceId());
-            NetworkManager.forward(Platform.SERVER, new ForwardPacket(event.getInstanceIds(), event.getDirection(), event.getPacket()), event.getInstanceIds().toArray(new UUID[0]));
+            NetworkManager.forward(event.getDirection(), event.getPacket(), event.getInstanceIds());
         }
     }
 }
